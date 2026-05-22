@@ -10,12 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import {
-  CreditCard,
-  ReceiptText,
-  Sparkles,
-  Wallet,
-} from "lucide-react";
+import { CreditCard, ReceiptText, Sparkles, Wallet } from "lucide-react";
+import { CardArt } from "@/components/bank-logo";
 import { formatCompactRewardCategory } from "@/lib/reward-display";
 
 const STORAGE_KEY = "smart-suggest:show-upgrades";
@@ -41,6 +37,28 @@ function formatRewardRate(card: SuggestedCard) {
 
   if (/cash/i.test(unit)) return `${value}% Cash Back`;
   return `${value}x ${unit}`;
+}
+
+function SuggestedCardArt({
+  card,
+  className,
+}: {
+  card: SuggestedCard;
+  className?: string;
+}) {
+  return (
+    <CardArt
+      cardImageUrl={card.cardImageUrl}
+      color={card.color}
+      alt={card.cardName}
+      className={className}
+      fallback={
+        <span className="flex h-full w-full items-center justify-center px-2 text-center text-xs font-medium text-white">
+          {card.cardName}
+        </span>
+      }
+    />
+  );
 }
 
 function CardResult({
@@ -82,28 +100,10 @@ function CardResult({
       </CardHeader>
       <CardContent className="p-4">
         <div className="grid gap-4 md:grid-cols-[144px_minmax(0,1fr)]">
-          <div
-            className="flex aspect-[1.586/1] w-full max-w-[170px] items-center justify-center overflow-hidden rounded-xl bg-secondary md:max-w-none"
-            style={card.cardImageUrl ? undefined : { background: card.color }}
-          >
-            {card.cardImageUrl ? (
-              <img
-                src={card.cardImageUrl}
-                alt={card.cardName}
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                  (
-                    (e.target as HTMLImageElement).parentElement as HTMLElement
-                  ).style.background = card.color;
-                }}
-              />
-            ) : (
-              <span className="px-2 text-center text-xs font-medium text-white">
-                {card.cardName}
-              </span>
-            )}
-          </div>
+          <SuggestedCardArt
+            card={card}
+            className="aspect-[1.586/1] w-full max-w-[170px] rounded-xl md:max-w-none"
+          />
           <div className="min-w-0">
             <div className="flex flex-wrap items-start gap-3">
               <div className="min-w-0">
@@ -201,28 +201,10 @@ function BetterCardsPanel({
             key={`better-card-${card.cardId}`}
             className="min-w-0 rounded-2xl border border-card-border bg-secondary/20 p-3"
           >
-            <div
-              className="mb-3 flex aspect-[1.586/1] w-full items-center justify-center overflow-hidden rounded-xl bg-secondary"
-              style={card.cardImageUrl ? undefined : { background: card.color }}
-            >
-              {card.cardImageUrl ? (
-                <img
-                  src={card.cardImageUrl}
-                  alt={card.cardName}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                    (
-                      (e.target as HTMLImageElement).parentElement as HTMLElement
-                    ).style.background = card.color;
-                  }}
-                />
-              ) : (
-                <span className="px-2 text-center text-xs font-medium text-white">
-                  {card.cardName}
-                </span>
-              )}
-            </div>
+            <SuggestedCardArt
+              card={card}
+              className="mb-3 aspect-[1.586/1] w-full rounded-xl"
+            />
             <div className="truncate text-sm font-semibold text-foreground">
               {card.cardName}
             </div>
