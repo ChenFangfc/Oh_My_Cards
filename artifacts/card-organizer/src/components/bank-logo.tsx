@@ -450,6 +450,7 @@ interface CardArtProps {
   alt: string;
   className?: string;
   imageClassName?: string;
+  imageBackground?: string;
   /** Rendered when the card image fails to load or isn't provided. */
   fallback: React.ReactNode;
   /**
@@ -474,6 +475,7 @@ export function CardArt({
   alt,
   className = "",
   imageClassName,
+  imageBackground = "#0f172a",
   fallback,
   issuer,
   logoUrl,
@@ -489,7 +491,7 @@ export function CardArt({
       className={cn("relative overflow-hidden", className)}
       style={{
         background: showImage
-          ? "#0f172a"
+          ? imageBackground
           : color || "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
       }}
     >
