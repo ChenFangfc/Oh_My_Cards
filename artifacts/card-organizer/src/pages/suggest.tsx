@@ -52,7 +52,8 @@ function SuggestedCardArt({
       color={card.color}
       alt={card.cardName}
       className={className}
-      imageClassName="p-1.5"
+      imageClassName="p-0"
+      imageBackground="transparent"
       fallback={
         <span className="flex h-full w-full items-center justify-center px-2 text-center text-xs font-medium text-white">
           {card.cardName}
