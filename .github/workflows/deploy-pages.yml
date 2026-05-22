@@ -1,0 +1,61 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        env:
+          npm_config_user_agent: pnpm/ci
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm install --frozen-lockfile
+
+      - name: Build workspace client types
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm exec tsc -p lib/api-client-react/tsconfig.json
+
+      - name: Typecheck
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir artifacts/card-organizer typecheck
+
+      - name: Build
+        run: COREPACK_ENABLE_AUTO_PIN=0 PORT=19957 BASE_PATH=/Oh_My_Cards/ corepack pnpm --dir artifacts/card-organizer build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: artifacts/card-organizer/dist/public
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

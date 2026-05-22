@@ -1,0 +1,1035 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Credit Card Organizer API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: cards
+    description: Credit card library
+  - name: wallet
+    description: User's owned cards
+  - name: transactions
+    description: Bill and purchase tracking
+  - name: benefits
+    description: Benefit tracking
+  - name: dashboard
+    description: Summary and analytics
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ─── Credit Card Library ───────────────────────────────────────────────────
+
+  /cards:
+    get:
+      operationId: listCards
+      tags: [cards]
+      summary: List all credit cards in the library
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of credit cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CreditCard"
+
+  /cards/{id}:
+    get:
+      operationId: getCard
+      tags: [cards]
+      summary: Get a single credit card by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Credit card detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreditCard"
+        "404":
+          description: Card not found
+
+  # ─── User Wallet ───────────────────────────────────────────────────────────
+
+  /wallet:
+    get:
+      operationId: listWallet
+      tags: [wallet]
+      summary: List all cards in the user's wallet
+      responses:
+        "200":
+          description: User's owned cards with cashback totals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WalletCard"
+
+    post:
+      operationId: addToWallet
+      tags: [wallet]
+      summary: Add a card to the user's wallet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddToWalletBody"
+      responses:
+        "201":
+          description: Card added to wallet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletCard"
+        "409":
+          description: Card already in wallet
+
+  /wallet/{id}:
+    patch:
+      operationId: updateWalletCard
+      tags: [wallet]
+      summary: Update wallet card billing settings (nickname, statement closing day, due day, credit limit)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateWalletCardBody"
+      responses:
+        "200":
+          description: Wallet card updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WalletCard"
+        "404":
+          description: Wallet entry not found
+
+    delete:
+      operationId: removeFromWallet
+      tags: [wallet]
+      summary: Remove a card from the user's wallet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Card removed
+        "404":
+          description: Wallet entry not found
+
+  # ─── Transactions ──────────────────────────────────────────────────────────
+
+  /transactions:
+    get:
+      operationId: listTransactions
+      tags: [transactions]
+      summary: List all transactions
+      parameters:
+        - name: walletCardId
+          in: query
+          schema:
+            type: integer
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Transaction"
+
+    post:
+      operationId: createTransaction
+      tags: [transactions]
+      summary: Log a new transaction/bill
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransactionBody"
+      responses:
+        "201":
+          description: Transaction created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Transaction"
+
+  /transactions/{id}:
+    delete:
+      operationId: deleteTransaction
+      tags: [transactions]
+      summary: Delete a transaction
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Transaction deleted
+        "404":
+          description: Transaction not found
+
+  # ─── Benefit Tracking ──────────────────────────────────────────────────────
+
+  /wallet/{id}/benefits:
+    get:
+      operationId: listCardBenefits
+      tags: [benefits]
+      summary: List benefits for a wallet card with usage status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Benefits with usage status
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BenefitUsage"
+
+  /wallet/{id}/benefits/{benefitId}/use:
+    post:
+      operationId: markBenefitUsed
+      tags: [benefits]
+      summary: Mark a benefit as used
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: benefitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Benefit marked as used
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BenefitUsage"
+
+  /wallet/{id}/benefits/{benefitId}/unuse:
+    post:
+      operationId: markBenefitUnused
+      tags: [benefits]
+      summary: Mark a benefit as unused
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: benefitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Benefit marked as unused
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BenefitUsage"
+
+  # ─── Dashboard / Analytics ─────────────────────────────────────────────────
+
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get dashboard summary totals
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/cashback-by-category:
+    get:
+      operationId: getCashbackByCategory
+      tags: [dashboard]
+      summary: Get total cashback grouped by spending category
+      responses:
+        "200":
+          description: Cashback by category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryCashback"
+
+  /dashboard/best-card-for-category:
+    get:
+      operationId: getBestCardForCategory
+      tags: [dashboard]
+      summary: Get the best card in wallet for each spending category
+      responses:
+        "200":
+          description: Best card per category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BestCardForCategory"
+
+  /dashboard/billing-cycles:
+    get:
+      operationId: getBillingCycles
+      tags: [dashboard]
+      summary: Get current billing cycle info (statement balance, due date, min payment estimate) for each wallet card with billing settings configured
+      responses:
+        "200":
+          description: Billing cycles for wallet cards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BillingCycle"
+
+  /dashboard/spending-stats:
+    get:
+      operationId: getSpendingStats
+      tags: [dashboard]
+      summary: Per-card spending and cashback totals for this month, this quarter, this year, and lifetime
+      responses:
+        "200":
+          description: Spending statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpendingStats"
+
+  /dashboard/unused-benefits:
+    get:
+      operationId: getUnusedBenefits
+      tags: [dashboard]
+      summary: Get all unused benefits across all wallet cards
+      responses:
+        "200":
+          description: All unused benefits
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UnusedBenefit"
+
+  /dashboard/suggest-card:
+    post:
+      operationId: suggestCard
+      tags: [dashboard]
+      summary: Suggest the best card to use for a given purchase description (and optional amount). Returns the best card from the user's wallet, plus the best card from the entire library (which may not be in the wallet) for upgrade recommendations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SuggestCardBody"
+      responses:
+        "200":
+          description: Card suggestion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CardSuggestion"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    CashbackCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+        cardId:
+          type: integer
+        category:
+          type: string
+        rate:
+          type: number
+          description: Cashback rate as a decimal (e.g. 0.03 = 3%)
+        isDefault:
+          type: boolean
+          description: True if this is the base/catch-all rate
+      required:
+        - id
+        - cardId
+        - category
+        - rate
+        - isDefault
+
+    CardBenefit:
+      type: object
+      properties:
+        id:
+          type: integer
+        cardId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        annualValue:
+          type: number
+          nullable: true
+          description: Estimated dollar value of this benefit per year
+      required:
+        - id
+        - cardId
+        - name
+        - description
+
+    CreditCard:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        issuer:
+          type: string
+        network:
+          type: string
+          enum: [Visa, Mastercard, Amex, Discover]
+        annualFee:
+          type: number
+        signupBonus:
+          type: string
+          nullable: true
+        signupBonusValue:
+          type: number
+          nullable: true
+        color:
+          type: string
+          description: CSS gradient or solid color for card display
+        logoUrl:
+          type: string
+          nullable: true
+          description: Bank logo URL for display
+        cardImageUrl:
+          type: string
+          nullable: true
+          description: Actual credit card product image URL
+        rewardType:
+          type: string
+          nullable: true
+          enum: [cashback, points, miles]
+          description: Primary reward unit used by this card
+        rewardProgram:
+          type: string
+          nullable: true
+          description: Issuer reward program name, when applicable
+        rewardUnitName:
+          type: string
+          nullable: true
+          description: Display name for the earned unit
+        rewardUnitValueCents:
+          type: number
+          nullable: true
+          description: Estimated cash-equivalent cents per reward unit for fee-progress calculations
+        rewardValuationDescription:
+          type: string
+          nullable: true
+          description: Short explanation of the redemption assumption behind rewardUnitValueCents
+        rewardRuleNotes:
+          type: array
+          nullable: true
+          description: Officially reviewed caveats such as caps, activation requirements, or redemption constraints
+          items:
+            type: string
+        cashbackCategories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CashbackCategory"
+        benefits:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardBenefit"
+        inWallet:
+          type: boolean
+          description: Whether this card is in the user's wallet
+      required:
+        - id
+        - name
+        - issuer
+        - network
+        - annualFee
+        - cashbackCategories
+        - benefits
+        - inWallet
+
+    WalletCard:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Wallet entry ID
+        cardId:
+          type: integer
+        addedAt:
+          type: string
+          format: date-time
+        totalCashbackEarned:
+          type: number
+          description: Total cashback earned using this card
+        nickname:
+          type: string
+          nullable: true
+        statementClosingDay:
+          type: integer
+          nullable: true
+          description: Day of month the statement closes (1-31)
+        paymentDueDay:
+          type: integer
+          nullable: true
+          description: Day of month the payment is due (1-31)
+        creditLimit:
+          type: number
+          nullable: true
+        openedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Date the card account was opened (used to compute the next annual fee anniversary)
+        currentYearCashback:
+          type: number
+          description: Cashback earned since the most recent anniversary of openedAt (or since addedAt if openedAt is not set)
+        card:
+          $ref: "#/components/schemas/CreditCard"
+      required:
+        - id
+        - cardId
+        - addedAt
+        - totalCashbackEarned
+        - card
+
+    UpdateWalletCardBody:
+      type: object
+      properties:
+        nickname:
+          type: string
+          nullable: true
+        statementClosingDay:
+          type: integer
+          nullable: true
+        paymentDueDay:
+          type: integer
+          nullable: true
+        creditLimit:
+          type: number
+          nullable: true
+        openedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    AddToWalletBody:
+      type: object
+      properties:
+        cardId:
+          type: integer
+      required:
+        - cardId
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        walletCardId:
+          type: integer
+        transactionType:
+          type: string
+          enum: [purchase, payment]
+        description:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+        cashbackEarned:
+          type: number
+        cashbackRate:
+          type: number
+        date:
+          type: string
+          format: date-time
+        cardName:
+          type: string
+        merchantName:
+          type: string
+          nullable: true
+        locationName:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+      required:
+        - id
+        - walletCardId
+        - description
+        - amount
+        - category
+        - cashbackEarned
+        - cashbackRate
+        - date
+
+    CreateTransactionBody:
+      type: object
+      properties:
+        walletCardId:
+          type: integer
+        transactionType:
+          type: string
+          enum: [purchase, payment]
+        description:
+          type: string
+        amount:
+          type: number
+        category:
+          type: string
+        date:
+          type: string
+          format: date-time
+        merchantName:
+          type: string
+          nullable: true
+        locationName:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+      required:
+        - walletCardId
+        - description
+        - amount
+        - category
+
+    BenefitUsage:
+      type: object
+      properties:
+        benefitId:
+          type: integer
+        walletCardId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        annualValue:
+          type: number
+          nullable: true
+        used:
+          type: boolean
+        usedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - benefitId
+        - walletCardId
+        - name
+        - description
+        - used
+
+    DashboardSummary:
+      type: object
+      properties:
+        totalCashbackEarned:
+          type: number
+        totalCardsInWallet:
+          type: number
+        totalTransactions:
+          type: number
+        totalAnnualFees:
+          type: number
+        totalBenefitValue:
+          type: number
+          description: Total estimated annual value of all wallet card benefits
+        unusedBenefitsCount:
+          type: number
+        thisMonthCashback:
+          type: number
+      required:
+        - totalCashbackEarned
+        - totalCardsInWallet
+        - totalTransactions
+        - totalAnnualFees
+        - totalBenefitValue
+        - unusedBenefitsCount
+        - thisMonthCashback
+
+    CategoryCashback:
+      type: object
+      properties:
+        category:
+          type: string
+        totalSpent:
+          type: number
+        totalCashback:
+          type: number
+        transactionCount:
+          type: number
+      required:
+        - category
+        - totalSpent
+        - totalCashback
+        - transactionCount
+
+    BestCardForCategory:
+      type: object
+      properties:
+        category:
+          type: string
+        walletCardId:
+          type: integer
+        cardName:
+          type: string
+        cashbackRate:
+          type: number
+      required:
+        - category
+        - walletCardId
+        - cardName
+        - cashbackRate
+
+    UnusedBenefit:
+      type: object
+      properties:
+        benefitId:
+          type: integer
+        walletCardId:
+          type: integer
+        cardName:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        annualValue:
+          type: number
+          nullable: true
+      required:
+        - benefitId
+        - walletCardId
+        - cardName
+        - name
+        - description
+
+    BillingCycle:
+      type: object
+      properties:
+        walletCardId:
+          type: integer
+        cardName:
+          type: string
+        nickname:
+          type: string
+          nullable: true
+        statementClosingDay:
+          type: integer
+        paymentDueDay:
+          type: integer
+        creditLimit:
+          type: number
+          nullable: true
+        currentCycleStart:
+          type: string
+          format: date-time
+          description: Start of the in-progress billing cycle
+        currentCycleEnd:
+          type: string
+          format: date-time
+          description: When the current cycle closes
+        nextDueDate:
+          type: string
+          format: date-time
+          description: Next payment due date (for the most recently closed cycle)
+        daysUntilDue:
+          type: integer
+          description: Days from today until next due date (negative if overdue)
+        statementBalance:
+          type: number
+          description: Remaining amount due for the most recently closed cycle after payments
+        statementSpend:
+          type: number
+          description: Purchases posted during the most recently closed cycle before payments
+        paymentsApplied:
+          type: number
+          description: Payments currently applied to the most recently closed cycle
+        currentCycleSpend:
+          type: number
+          description: Spend in the in-progress cycle (not yet billed)
+        totalBalance:
+          type: number
+          description: Current outstanding balance after payments
+        availableCredit:
+          type: number
+          nullable: true
+          description: Available credit after current outstanding balance
+        minimumPayment:
+          type: number
+          description: Estimated minimum payment due (greater of 2% of statement balance or $25, capped at full balance)
+        utilization:
+          type: number
+          nullable: true
+          description: Percent of credit limit used by current outstanding balance (0-1)
+      required:
+        - walletCardId
+        - cardName
+        - statementClosingDay
+        - paymentDueDay
+        - currentCycleStart
+        - currentCycleEnd
+        - nextDueDate
+        - daysUntilDue
+        - statementBalance
+        - currentCycleSpend
+        - minimumPayment
+
+    SpendingStatsPeriod:
+      type: object
+      properties:
+        totalSpent:
+          type: number
+        totalCashback:
+          type: number
+        transactionCount:
+          type: integer
+        perCard:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardPeriodStats"
+      required:
+        - totalSpent
+        - totalCashback
+        - transactionCount
+        - perCard
+
+    CardPeriodStats:
+      type: object
+      properties:
+        walletCardId:
+          type: integer
+        cardName:
+          type: string
+        totalSpent:
+          type: number
+        totalCashback:
+          type: number
+        transactionCount:
+          type: integer
+      required:
+        - walletCardId
+        - cardName
+        - totalSpent
+        - totalCashback
+        - transactionCount
+
+    SpendingStats:
+      type: object
+      properties:
+        thisMonth:
+          $ref: "#/components/schemas/SpendingStatsPeriod"
+        thisQuarter:
+          $ref: "#/components/schemas/SpendingStatsPeriod"
+        thisYear:
+          $ref: "#/components/schemas/SpendingStatsPeriod"
+        lifetime:
+          $ref: "#/components/schemas/SpendingStatsPeriod"
+        monthlyTrend:
+          type: array
+          description: Last 12 months of spend and cashback
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                description: YYYY-MM
+              totalSpent:
+                type: number
+              totalCashback:
+                type: number
+            required:
+              - month
+              - totalSpent
+              - totalCashback
+      required:
+        - thisMonth
+        - thisQuarter
+        - thisYear
+        - lifetime
+        - monthlyTrend
+
+    SuggestCardBody:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Free-text description of the upcoming purchase (e.g. "coffee", "Amazon shopping", "Costco grocery", "United flight to Tokyo")
+        amount:
+          type: number
+          nullable: true
+          description: Optional purchase amount in dollars
+      required:
+        - description
+
+    SuggestedCard:
+      type: object
+      properties:
+        cardId:
+          type: integer
+        walletCardId:
+          type: integer
+          nullable: true
+          description: If null, the card is not in the user's wallet
+        cardName:
+          type: string
+        issuer:
+          type: string
+        network:
+          type: string
+        color:
+          type: string
+        cardImageUrl:
+          type: string
+          nullable: true
+        cashbackRate:
+          type: number
+          description: Effective cashback / points multiplier as a decimal (e.g. 0.05 for 5%)
+        matchedCategory:
+          type: string
+          description: The card's category that matched the purchase (e.g. "Dining", "Other" if default)
+        isDefaultRate:
+          type: boolean
+          description: True when the matched rate is the card's default catch-all (no special bonus)
+        expectedCashback:
+          type: number
+          nullable: true
+          description: amount * cashbackRate, or null if no amount was provided
+      required:
+        - cardId
+        - cardName
+        - issuer
+        - network
+        - color
+        - cashbackRate
+        - matchedCategory
+        - isDefaultRate
+
+    CardSuggestion:
+      type: object
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+          nullable: true
+        detectedCategory:
+          type: string
+          description: The category our matcher inferred from the description
+        matchConfidence:
+          type: string
+          enum: [high, medium, low, none]
+          description: How confidently we matched the description to a category
+        bestWalletCard:
+          $ref: "#/components/schemas/SuggestedCard"
+          nullable: true
+        bestOverallCard:
+          $ref: "#/components/schemas/SuggestedCard"
+          nullable: true
+        upgradeAvailable:
+          type: boolean
+          description: True when bestOverallCard exists, is not in the wallet, and offers a strictly higher rate than bestWalletCard
+        reasoning:
+          type: string
+          description: Short human-readable explanation of the suggestion
+      required:
+        - description
+        - detectedCategory
+        - matchConfidence
+        - upgradeAvailable
+        - reasoning
