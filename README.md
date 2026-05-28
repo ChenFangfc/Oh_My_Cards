@@ -26,6 +26,31 @@
   </a>
 </p>
 
+## App Preview
+
+<p align="center">
+  <em>Wallet tracking, card library browsing, smart recommendations, and spending activity in one local-first app.</em>
+</p>
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="artifacts/card-organizer/public/card-images/detail001.PNG" alt="Oh My Cards wallet overview screenshot" />
+    </td>
+    <td width="50%">
+      <img src="artifacts/card-organizer/public/card-images/detail002.PNG" alt="Oh My Cards card library screenshot" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="artifacts/card-organizer/public/card-images/detail003.PNG" alt="Oh My Cards smart suggest screenshot" />
+    </td>
+    <td width="50%">
+      <img src="artifacts/card-organizer/public/card-images/detail004.PNG" alt="Oh My Cards activity screenshot" />
+    </td>
+  </tr>
+</table>
+
 ## What It Does
 
 | Organize                                                                                         | Decide                                                                               | Track                                                                                               |
