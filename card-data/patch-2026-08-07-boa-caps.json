@@ -1,0 +1,95 @@
+{
+  "_note": "Restores the two real Bank of America Customized Cash rules that were lost when an incorrect hardcoded special case was removed: the shared quarterly cap, and the fact that 6% is a first-year promo rather than the standing rate. Cap labels are phrased with 'combined with' so normalizeCapGroup puts both rows in one shared bucket.",
+
+  "patches": [
+    {
+      "cardId": 23,
+      "_why": "6% is a first-year bonus on top of the standing 3%; storing it as the permanent rate overstates the card for everyone past their first anniversary. The $2,500/quarter cap is shared with the grocery row and was enforced nowhere after the hardcode was deleted.",
+      "source": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
+      "confidence": "official",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
+          "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
+          "Preferred Rewards members earn 25-75% more than the rates shown."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Choice Category first year (then 3%)",
+            "to": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)"
+          },
+          {
+            "from": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter)",
+            "to": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter combined with choice category)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)",
+            "rate": 0.03
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 107,
+      "_why": "Same structure as the unsecured card, including the first-year 6% and the shared quarterly cap, which the catalog recorded on neither row.",
+      "source": "https://www.bankofamerica.com/credit-cards/products/cash-back-secured-credit-card/",
+      "confidence": "official",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
+          "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
+          "Secured accounts are not eligible for a welcome bonus or an introductory APR."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Choice category first year",
+            "to": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)"
+          },
+          {
+            "from": "Groceries and wholesale clubs",
+            "to": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter combined with choice category)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)",
+            "rate": 0.03
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 160,
+      "_why": "The business card's cap is $50,000 per calendar year shared with dining, not the consumer card's quarterly grocery cap. Neither was recorded.",
+      "source": "https://business.bankofamerica.com/en/small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard",
+      "confidence": "needs-review",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 3% choice category and the 2% dining rate share one $50,000 combined cap per calendar year; spend beyond it earns 1%.",
+          "Bank of America does not publish how often the business choice category can be changed."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Selected business category",
+            "to": "Selected business category (up to $50,000/year combined with dining)"
+          },
+          {
+            "from": "Dining",
+            "to": "Dining (up to $50,000/year combined with selected business category)"
+          }
+        ]
+      }
+    }
+  ]
+}

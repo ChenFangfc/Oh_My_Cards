@@ -10,7 +10,6 @@ import Wallet from "@/pages/wallet";
 import Activity from "@/pages/activity";
 import Suggest from "@/pages/suggest";
 import Data from "@/pages/data";
-import { AppUpdateDialog } from "@/components/app-update-dialog";
 import { CardRulesUpdater } from "@/components/card-rules-updater";
 
 const queryClient = new QueryClient();
@@ -65,7 +64,6 @@ function App() {
           <Router />
         </WouterRouter>
         <CardRulesUpdater />
-        <AppUpdateDialog />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>

@@ -1,0 +1,133 @@
+name: Card Data Freshness
+
+# Card terms drift constantly and silently. This job re-checks every card's
+# official source page on a fixed cadence and files what it finds for review.
+# It never edits catalog.ts — extracted values are signals, not truth.
+on:
+  schedule:
+    # 07:00 UTC on the 1st and 15th — roughly every two weeks.
+    - cron: "0 7 1,15 * *"
+  workflow_dispatch:
+    inputs:
+      stale_days:
+        description: "Flag cards not reviewed within this many days"
+        required: false
+        default: "90"
+      only:
+        description: "Comma-separated card ids to check (blank = all)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: card-data-freshness
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        env:
+          npm_config_user_agent: pnpm/ci
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm install --frozen-lockfile
+
+      # Cheap and high-signal: newsroom/blog headlines announce changes days
+      # before issuer product pages are rewritten. Run it first so its output is
+      # in the report even if the crawl is throttled.
+      - name: Watch issuer newsrooms
+        continue-on-error: true
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:watch
+
+      - name: Crawl card source pages
+        id: crawl
+        continue-on-error: true
+        run: |
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:check -- \
+            --stale-days=${{ github.event.inputs.stale_days || '90' }} \
+            ${{ github.event.inputs.only && format('--only={0}', github.event.inputs.only) || '' }}
+
+      - name: Build issue body
+        id: body
+        run: |
+          {
+            cat card-data/freshness-report.md
+            echo
+            echo "---"
+            echo
+            if [ -f card-data/newsroom-report.md ]; then
+              cat card-data/newsroom-report.md
+            fi
+            echo
+            echo "_Filed by \`.github/workflows/card-data-freshness.yml\` "
+            echo "([run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}))._"
+          } > /tmp/issue-body.md
+          # GitHub caps issue bodies at 65536 characters. The report is full of
+          # emoji severity markers, so a byte-wise cut can land mid-character and
+          # hand `gh` invalid UTF-8 — iconv -c drops any partial tail character.
+          head -c 60000 /tmp/issue-body.md | iconv -c -f utf-8 -t utf-8 > /tmp/issue-body-trimmed.md
+          if [ "$(wc -c < /tmp/issue-body.md)" -gt 60000 ]; then
+            printf '\n\n_Report truncated. See `card-data/freshness-report.md` in the repo for the full list._\n' >> /tmp/issue-body-trimmed.md
+          fi
+          mv /tmp/issue-body-trimmed.md /tmp/issue-body.md
+          {
+            echo "high_count=$(jq '.stats.bySeverity.high // 0' card-data/freshness-report.json)"
+            echo "total_count=$(jq '.findings | length' card-data/freshness-report.json)"
+          } >> "$GITHUB_OUTPUT"
+
+      # A single rolling issue instead of one per run: the review queue is a
+      # standing concern, not a stream of notifications to triage and close.
+      - name: File or update the review issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HIGH: ${{ steps.body.outputs.high_count }}
+          TOTAL: ${{ steps.body.outputs.total_count }}
+        run: |
+          TITLE="Card data review queue"
+          EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number,title \
+            --jq ".[] | select(.title | startswith(\"$TITLE\")) | .number" | head -1)
+          NEW_TITLE="$TITLE — $HIGH high / $TOTAL total ($(date -u +%Y-%m-%d))"
+
+          if [ -n "$EXISTING" ]; then
+            gh issue edit "$EXISTING" --title "$NEW_TITLE" --body-file /tmp/issue-body.md
+            gh issue comment "$EXISTING" --body "Refreshed $(date -u +%Y-%m-%d): $HIGH high-severity, $TOTAL total findings."
+          else
+            gh issue create --title "$NEW_TITLE" --body-file /tmp/issue-body.md --label "card-data" || \
+            gh issue create --title "$NEW_TITLE" --body-file /tmp/issue-body.md
+          fi
+
+      # The snapshot is the baseline the next run diffs against, so it has to be
+      # committed even when the crawl found problems.
+      - name: Commit refreshed snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add card-data
+          if git diff --staged --quiet; then
+            echo "No snapshot changes."
+          else
+            git commit -m "chore(card-data): refresh freshness snapshot $(date -u +%Y-%m-%d)"
+            git push
+          fi
+
+      - name: Fail when high-severity findings exist
+        if: steps.crawl.outcome == 'failure'
+        run: |
+          echo "::error::Card data check reported high-severity findings. See the review queue issue."
+          exit 1

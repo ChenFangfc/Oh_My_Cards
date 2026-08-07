@@ -1,0 +1,259 @@
+{
+  "generatedAt": "2026-08-06T19:51:24.782Z",
+  "rulesetVersion": "2026.08.06.2",
+  "cardCount": 182,
+  "crawled": 0,
+  "reachable": 0,
+  "findings": [
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 7,
+      "cardName": "Citi Custom Cash",
+      "issuer": "Citi",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 17,
+      "cardName": "Discover it Cash Back",
+      "issuer": "Capital One / Discover",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 18,
+      "cardName": "Discover it Miles",
+      "issuer": "Capital One / Discover",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 45,
+      "cardName": "Bilt Mastercard",
+      "issuer": "Wells Fargo / Bilt",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 56,
+      "cardName": "American Express Business Gold",
+      "issuer": "American Express",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 64,
+      "cardName": "Hawaiian Airlines World Elite Mastercard",
+      "issuer": "Barclays / Hawaiian Airlines",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 65,
+      "cardName": "AAdvantage Aviator Red World Elite",
+      "issuer": "Barclays / American Airlines",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 67,
+      "cardName": "US Bank Altitude Reserve",
+      "issuer": "US Bank",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 70,
+      "cardName": "Discover it Student Cash Back",
+      "issuer": "Discover",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 77,
+      "cardName": "Capital One Walmart Rewards (legacy)",
+      "issuer": "Capital One / Walmart",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 88,
+      "cardName": "American Express Green Card",
+      "issuer": "American Express",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 95,
+      "cardName": "World of Hyatt Business Credit Card",
+      "issuer": "Chase / Hyatt",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 109,
+      "cardName": "Wells Fargo Attune",
+      "issuer": "Wells Fargo",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 112,
+      "cardName": "U.S. Bank Shopper Cash Rewards Visa Signature",
+      "issuer": "U.S. Bank",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 122,
+      "cardName": "Hawaiian Airlines Business Mastercard",
+      "issuer": "Barclays / Hawaiian Airlines",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 160,
+      "cardName": "Bank of America Business Advantage Customized Cash Rewards",
+      "issuer": "Bank of America",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 166,
+      "cardName": "Capital One Spark 2X Miles",
+      "issuer": "Capital One",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 167,
+      "cardName": "Capital One Spark 1.5X Miles Select",
+      "issuer": "Capital One",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 171,
+      "cardName": "HSBC Red Credit Card",
+      "issuer": "HSBC Hong Kong",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 172,
+      "cardName": "HSBC Visa Signature Card",
+      "issuer": "HSBC Hong Kong",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 173,
+      "cardName": "Standard Chartered Cathay Mastercard",
+      "issuer": "Standard Chartered Hong Kong / Cathay",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 174,
+      "cardName": "Hang Seng MMPOWER World Mastercard",
+      "issuer": "Hang Seng Bank",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 175,
+      "cardName": "DBS Black World Mastercard",
+      "issuer": "DBS Hong Kong",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 176,
+      "cardName": "Citi Cash Back Card (Hong Kong)",
+      "issuer": "Citi Hong Kong",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 177,
+      "cardName": "DBS Live Fresh Visa",
+      "issuer": "DBS Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 178,
+      "cardName": "UOB One Card",
+      "issuer": "UOB Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 179,
+      "cardName": "OCBC 365 Credit Card",
+      "issuer": "OCBC Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 180,
+      "cardName": "HSBC Revolution Credit Card",
+      "issuer": "HSBC Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 181,
+      "cardName": "Citi Cash Back Card (Singapore)",
+      "issuer": "Citi Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "LOW_CONFIDENCE",
+      "severity": "medium",
+      "cardId": 182,
+      "cardName": "Standard Chartered Smart Credit Card",
+      "issuer": "Standard Chartered Singapore",
+      "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    }
+  ],
+  "stats": {
+    "byKind": {
+      "LOW_CONFIDENCE": 30
+    },
+    "bySeverity": {
+      "medium": 30
+    },
+    "stalestReviewDate": "2026-05-17",
+    "medianReviewAgeDays": 79
+  }
+}

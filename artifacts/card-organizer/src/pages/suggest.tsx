@@ -11,8 +11,14 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { CreditCard, ReceiptText, Sparkles, Wallet } from "lucide-react";
+import { Link } from "wouter";
 import { CardArt } from "@/components/bank-logo";
-import { formatCompactRewardCategory } from "@/lib/reward-display";
+import {
+  formatCompactEarnRate,
+  formatCompactRewardCategory,
+  getCompactRewardUnitName,
+} from "@/lib/reward-display";
+import { formatCardAmount } from "@/lib/card-format";
 
 const STORAGE_KEY = "smart-suggest:show-upgrades";
 
@@ -27,16 +33,38 @@ const EXAMPLES = [
   "Netflix subscription",
 ];
 
-function formatRewardRate(card: SuggestedCard) {
-  const unit = card.rewardUnitName ?? "Cash Back";
-  const rawRate = card.rewardRate ?? card.cashbackRate;
-  const multiplier = rawRate * 100;
-  const value = Number.isInteger(multiplier)
-    ? multiplier.toFixed(0)
-    : multiplier.toFixed(1);
+/**
+ * Cash-equivalent unit names that do not literally say "cash": Target's
+ * "Discount", "Verizon Dollars", "DBS$". These earn a percentage, not a
+ * multiplier, so they must not render as "5x".
+ */
+const CASHBACK_UNIT_PATTERN = /cash|discount|dollar|rebate|\$/i;
 
-  if (/cash/i.test(unit)) return `${value}% Cash Back`;
-  return `${value}x ${unit}`;
+/**
+ * Shapes a SuggestedCard for the shared reward-display / card-format helpers.
+ * `rewardType` is read defensively because the wire type does not carry it yet;
+ * until it does, the unit name is the only available signal. `annualFee` is
+ * required by the helper's parameter type but never read by the calls below.
+ */
+function toRewardCard(card: SuggestedCard) {
+  const explicitType = (card as { rewardType?: "cashback" | "points" | "miles" | null }).rewardType;
+  const unit = card.rewardUnitName ?? "Cash Back";
+  return {
+    annualFee: 0,
+    currency: card.currency,
+    rewardType: explicitType ?? (CASHBACK_UNIT_PATTERN.test(unit) ? ("cashback" as const) : null),
+    rewardUnitName: card.rewardUnitName,
+  };
+}
+
+function formatRewardRate(card: SuggestedCard) {
+  const rewardCard = toRewardCard(card);
+  const rawRate = card.rewardRate ?? card.cashbackRate;
+  return `${formatCompactEarnRate(rewardCard, rawRate)} ${getCompactRewardUnitName(rewardCard)}`;
+}
+
+function formatSuggestedAmount(card: SuggestedCard, amount: number) {
+  return formatCardAmount(toRewardCard(card), amount);
 }
 
 function SuggestedCardArt({
@@ -86,7 +114,7 @@ function CardResult({
     >
       <CardHeader className="border-b border-card-border/70 bg-secondary/25 p-4 pb-3">
         <div className="flex items-center justify-between gap-3">
-          <CardTitle className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <CardTitle as="h2" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             {icon}
             {title}
           </CardTitle>
@@ -134,7 +162,7 @@ function CardResult({
                     Expected Value
                   </div>
                   <div className="text-xl font-semibold tabular-nums">
-                    ${card.expectedCashback.toFixed(2)}
+                    {formatSuggestedAmount(card, card.expectedCashback)}
                   </div>
                 </div>
               ) : null}
@@ -146,10 +174,10 @@ function CardResult({
                   <span>{card.rewardEstimate}</span>
                 ) : (
                   <span>
-                    ${card.expectedCashback.toFixed(2)} estimated value
+                    {formatSuggestedAmount(card, card.expectedCashback)} estimated value
                   </span>
                 )}
-                <span> on ${amount.toFixed(2)}</span>
+                <span> on {formatSuggestedAmount(card, amount)}</span>
               </div>
             )}
             {card.rulesApplied?.length ? (
@@ -185,7 +213,7 @@ function BetterCardsPanel({
     <Card className="overflow-hidden rounded-[22px] border-card-border bg-card">
       <CardHeader className="border-b border-card-border/70 bg-secondary/25 p-4 pb-3">
         <div className="flex items-center justify-between gap-3">
-          <CardTitle className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+          <CardTitle as="h2" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <CreditCard className="h-4 w-4" />
             Better Card
           </CardTitle>
@@ -222,7 +250,7 @@ function BetterCardsPanel({
             </div>
             {amount != null && card.expectedCashback != null ? (
               <div className="mt-2 text-sm font-semibold tabular-nums text-emerald-800">
-                ${card.expectedCashback.toFixed(2)} value
+                {formatSuggestedAmount(card, card.expectedCashback)} value
               </div>
             ) : null}
           </div>
@@ -257,7 +285,15 @@ function ResultDisplay({
         </Badge>
       </div>
 
-      {result.bestWalletCard && (
+      {result.clarifyingQuestion ? (
+        <Card className="rounded-[20px] border-card-border bg-secondary/25">
+          <CardContent className="p-4 text-sm leading-relaxed text-muted-foreground">
+            {result.clarifyingQuestion}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {result.bestWalletCard ? (
         <CardResult
           title="Best in your wallet"
           card={result.bestWalletCard}
@@ -265,6 +301,24 @@ function ResultDisplay({
           icon={<Wallet className="w-4 h-4" />}
           highlight
         />
+      ) : (
+        <Card className="rounded-[22px] border-dashed border-card-border bg-card/75">
+          <CardContent className="flex flex-col items-start gap-3 p-5">
+            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <Wallet className="h-4 w-4" />
+              Nothing in your wallet to compare
+            </div>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {result.reasoning}
+            </p>
+            <Link
+              href="/cards"
+              className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Browse Card Library
+            </Link>
+          </CardContent>
+        </Card>
       )}
 
       <BetterCardsPanel cards={betterCards} amount={result.amount ?? null} />
@@ -307,12 +361,12 @@ export default function Suggest() {
   };
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-6">
+    <div className="min-w-0">
       <div className="mb-5">
-        <h1 className="flex items-center gap-2 text-2xl font-semibold tracking-tight md:text-[28px]">
-          <Sparkles className="h-6 w-6 text-foreground" />
+        <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight md:text-[28px]">
+          <Sparkles aria-hidden="true" className="h-6 w-6 text-foreground" />
           Smart Suggest
-        </h1>
+        </h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Pick the highest-value card for the next purchase.
         </p>
@@ -339,7 +393,6 @@ export default function Suggest() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="e.g. coffee, Costco grocery, United flight..."
                   className="mt-2 h-11 rounded-2xl border-card-border bg-background px-4"
-                  autoFocus
                 />
                 <div className="mt-3 flex flex-wrap gap-1.5">
                   {EXAMPLES.map((ex) => (

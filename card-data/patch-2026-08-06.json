@@ -1,0 +1,324 @@
+{
+  "_note": "Structural corrections from the 2026-08-06 freshness pass: product availability, annual fees, renames and issuer changes. Each was proposed by a research agent, then independently re-confirmed against the issuer's own page by a second agent. Category-rate and benefit corrections are NOT in this patch — see pending-corrections.md for why. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-08-06.json",
+
+  "patches": [
+    {
+      "cardId": 1,
+      "_why": "Chase refreshed the Sapphire Preferred on 2026-06-15: added 3x gas/EV and 3x vacation rentals, doubled the hotel credit to $100, added a Global Entry credit, DashPass and Apple TV, and discontinued the 10% anniversary bonus.",
+      "source": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
+      "confidence": "official",
+      "set": {
+        "signupBonus": "100,000 points after $5,000 spend in 3 months",
+        "signupBonusValue": 1250
+      },
+      "categories": {
+        "upsert": [
+          { "category": "Gas and EV Charging", "rate": 0.03 },
+          { "category": "Vacation Home Rentals", "rate": 0.03 }
+        ]
+      },
+      "benefits": {
+        "remove": ["10% Anniversary Points Boost"],
+        "upsert": [
+          {
+            "name": "Annual Hotel Credit",
+            "description": "Up to $100 in statement credits each account anniversary year for hotels booked through Chase Travel.",
+            "annualValue": 100
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 in statement credits toward Global Entry, TSA PreCheck or NEXUS every four years.",
+            "annualValue": 30
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "Complimentary DashPass membership plus up to $10 per month in DoorDash credits on groceries and daily essentials.",
+            "annualValue": 120
+          },
+          {
+            "name": "Emergency Evacuation and Transportation",
+            "description": "Up to $100,000 in emergency evacuation and transportation coverage when a covered reason applies.",
+            "annualValue": 0
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 7,
+      "_why": "Citi stopped accepting Custom Cash applications on 2026-05-28. Existing cardholders keep the card and its 5%/$500-per-cycle structure.",
+      "source": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
+      "confidence": "official",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-05-28",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-05-28. Existing cardholders keep the card and its current earning structure.",
+          "The 5% bonus applies to one eligible category per billing cycle, on up to $500 of spend in that cycle."
+        ]
+      }
+    },
+    {
+      "cardId": 88,
+      "_why": "Amex removed the Green Card product page on 2026-07-23; public application and referral links now error. Existing cardholders keep the card.",
+      "source": "https://www.doctorofcredit.com/american-express-removes-green-card-from-website/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-07-23",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-07-23, when American Express removed the product page. Existing cardholders keep the card.",
+          "Availability confirmed from secondary reporting only — American Express has published no statement."
+        ]
+      }
+    },
+    {
+      "cardId": 112,
+      "_why": "U.S. Bank retired the Shopper Cash Rewards card to new applicants on 2026-06-22. The crawler independently caught this: the sourceUrl now redirects to the generic card index.",
+      "source": "https://www.usbank.com/credit-cards.html",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-06-22",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-06-22. Existing cardholders keep the card and all reward categories.",
+          "The official product page has been removed; this row is retained so existing wallet entries still resolve."
+        ]
+      }
+    },
+    {
+      "cardId": 67,
+      "_why": "U.S. Bank stopped accepting Altitude Reserve applications on 2024-11-11. The catalog already noted this in prose but left the card presented as obtainable.",
+      "source": "https://www.usbank.com/credit-cards.html",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2024-11-11",
+        "signupBonus": null,
+        "signupBonusValue": null
+      }
+    },
+    {
+      "cardId": 109,
+      "_why": "Wells Fargo removed the Attune World Elite Mastercard from its lineup around 2026-06-15. The crawler caught the sourceUrl redirecting to the Wells Fargo card index.",
+      "source": "https://creditcards.wellsfargo.com/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-06-15",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since approximately 2026-06-15. Existing cardholders keep the card."
+        ]
+      }
+    },
+    {
+      "cardId": 64,
+      "_why": "Barclays removed the Hawaiian Airlines World Elite Mastercard on 2025-10-01 when HawaiianMiles folded into Alaska's Atmos Rewards.",
+      "source": "https://cards.barclaycardus.com/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2025-10-01",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program.",
+          "Earning and redemption now run through Atmos Rewards; the rates below describe the legacy HawaiianMiles structure and need re-verification."
+        ]
+      }
+    },
+    {
+      "cardId": 122,
+      "_why": "The Hawaiian Airlines World Elite Business Mastercard was withdrawn alongside the personal card on 2025-10-01.",
+      "source": "https://cards.barclaycardus.com/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2025-10-01",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program."
+        ]
+      }
+    },
+    {
+      "cardId": 65,
+      "_why": "Barclays Aviator accounts went inactive at midnight on 2026-04-24 and were converted to the Citi / AAdvantage Platinum Select. No Aviator Red accounts remain.",
+      "source": "https://cards.barclaycardus.com/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "discontinued",
+        "availabilityChangedAt": "2026-04-24",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Discontinued on 2026-04-24. All Aviator Red accounts were converted to the Citi / AAdvantage Platinum Select World Elite Mastercard (catalog #34).",
+          "This row is retained only so existing wallet entries still resolve to a name."
+        ]
+      }
+    },
+    {
+      "cardId": 77,
+      "_why": "Applications closed 2024-05-24 and every remaining account was converted to Quicksilver in 2025. The product no longer exists in any form.",
+      "source": "https://www.capitalone.com/credit-cards/quicksilver/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "discontinued",
+        "availabilityChangedAt": "2024-05-24",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Discontinued. Applications closed 2024-05-24 and all remaining accounts were converted to the Capital One Quicksilver Cash Rewards Mastercard (catalog #16).",
+          "This row is retained only so existing wallet entries still resolve to a name."
+        ]
+      }
+    },
+    {
+      "cardId": 166,
+      "_why": "Capital One closed Spark Miles for Business to new applicants on 2026-04-14 and relaunched it as Capital One Venture Business, which is already catalog #99.",
+      "source": "https://www.capitalone.com/small-business/credit-cards/travel-and-miles/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "discontinued",
+        "availabilityChangedAt": "2026-04-14",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Discontinued on 2026-04-14 and relaunched as the Capital One Venture Business (catalog #99).",
+          "This row is retained only so existing wallet entries still resolve to a name."
+        ]
+      }
+    },
+    {
+      "cardId": 167,
+      "_why": "Spark Miles Select was rebranded to Capital One VentureOne Business on 2026-04-14, which is already catalog #155.",
+      "source": "https://www.capitalone.com/small-business/credit-cards/travel-and-miles/",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "discontinued",
+        "availabilityChangedAt": "2026-04-14",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Discontinued on 2026-04-14 and rebranded as the Capital One VentureOne Business (catalog #155).",
+          "This row is retained only so existing wallet entries still resolve to a name."
+        ]
+      }
+    },
+    {
+      "cardId": 45,
+      "_why": "The Wells Fargo-issued Bilt Mastercard was shut down on 2026-02-07. Bilt Card 2.0 is issued by Column N.A. and serviced by Cardless, with an entirely different tiered structure — it is a different product, not an update to this one.",
+      "source": "https://newsroom.biltrewards.com/meetbiltcard2.0",
+      "confidence": "needs-review",
+      "set": {
+        "availability": "discontinued",
+        "availabilityChangedAt": "2026-02-07",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "The Wells Fargo-issued Bilt Mastercard was discontinued on 2026-02-07.",
+          "Bilt Card 2.0 (Blue / Silver / Gold / Platinum tiers, issued by Column N.A. and serviced by Cardless) is a separate product with a different fee and earning structure. It is not yet in this catalog.",
+          "The rates below describe the retired Wells Fargo product and should not be used for planning."
+        ]
+      }
+    },
+
+    {
+      "cardId": 15,
+      "_why": "SavorOne was relaunched on 2025-08-21 as a $39-annual-fee card for fair/average credit. The $0-fee product it used to be is now branded 'Savor' (catalog #14). Independently caught by the crawler: the page states a single $39 fee.",
+      "source": "https://www.capitalone.com/credit-cards/savorone/",
+      "confidence": "official",
+      "set": { "annualFee": 39 }
+    },
+    {
+      "cardId": 42,
+      "_why": "Barclays and Wyndham relaunched the Earner card suite; the Earner+ annual fee went $75 -> $95. Independently caught by the crawler.",
+      "source": "https://cards.barclaycardus.com/banking/cards/wyndham-rewards-earner-plus-card/",
+      "confidence": "official",
+      "set": { "annualFee": 95 }
+    },
+    {
+      "cardId": 121,
+      "_why": "Same Wyndham/Barclays relaunch: the Earner Business annual fee went $95 -> $149. Independently caught by the crawler.",
+      "source": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
+      "confidence": "official",
+      "set": { "annualFee": 149 }
+    },
+    {
+      "cardId": 62,
+      "_why": "Citi and American Airlines are rebranding this card to 'World Legend' and raising the fee to $695, both effective 2026-08-23. The fee is still $595 today, so only the name and a forward-looking note are applied now.",
+      "source": "https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard",
+      "confidence": "official",
+      "set": {
+        "name": "Citi / AAdvantage Executive World Legend Mastercard",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Annual fee rises from $595 to $695 for new applicants on 2026-08-23. Existing cardmembers are notified in Aug/Sep 2026; the catalog still carries $595 because that is today's fee.",
+          "Rebranded from World Elite to World Legend Mastercard effective 2026-08-23."
+        ]
+      }
+    },
+    {
+      "cardId": 148,
+      "_why": "Citi renamed this product off the 'CitiBusiness / AAdvantage Platinum Select' branding; the catalog name was a hybrid of the old and new names.",
+      "source": "https://www.citi.com/credit-cards/citi-aadvantage-business-credit-card",
+      "confidence": "official",
+      "set": { "name": "Citi / AAdvantage Business World Elite Mastercard" }
+    },
+
+    {
+      "cardId": 17,
+      "_why": "Capital One completed its Discover acquisition in May 2025 and Discover's own pages now describe Capital One as the operator. The card keeps Discover branding and network.",
+      "source": "https://www.discover.com/credit-cards/cash-back/it-card/",
+      "confidence": "needs-review",
+      "set": { "issuer": "Capital One / Discover" }
+    },
+    {
+      "cardId": 18,
+      "_why": "Same Capital One / Discover transition; the Discover it Miles page now refers to Capital One matching miles.",
+      "source": "https://www.discover.com/credit-cards/travel/",
+      "confidence": "needs-review",
+      "set": { "issuer": "Capital One / Discover" }
+    },
+
+    {
+      "cardId": 69,
+      "_why": "sourceUrl link rot caught by the crawler — the .html path now redirects.",
+      "source": "https://www.discover.com/credit-cards/cash-back/chrome/",
+      "confidence": "official"
+    },
+    {
+      "cardId": 70,
+      "_why": "sourceUrl link rot caught by the crawler.",
+      "source": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
+      "confidence": "official"
+    },
+    {
+      "cardId": 44,
+      "_why": "sourceUrl link rot caught by the crawler.",
+      "source": "https://www.citi.com/credit-cards/costco-anywhere-visa-card",
+      "confidence": "official"
+    },
+    {
+      "cardId": 113,
+      "_why": "sourceUrl pointed at the Visa Platinum page, which redirects to the Shield Visa page.",
+      "source": "https://www.usbank.com/credit-cards/shield-visa-credit-card.html",
+      "confidence": "official"
+    },
+    {
+      "cardId": 85,
+      "_why": "sourceUrl link rot caught by the crawler.",
+      "source": "https://www.rogersbank.com/en/rogers_red_worldelite_mastercard_details/",
+      "confidence": "official"
+    }
+  ]
+}

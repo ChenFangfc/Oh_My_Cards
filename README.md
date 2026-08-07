@@ -35,18 +35,18 @@
 <table>
   <tr>
     <td width="50%">
-      <img src="artifacts/card-organizer/public/card-images/detail001.PNG" alt="Oh My Cards wallet overview screenshot" />
+      <img src="docs/screenshots/detail001.PNG" alt="Oh My Cards wallet overview screenshot" />
     </td>
     <td width="50%">
-      <img src="artifacts/card-organizer/public/card-images/detail002.PNG" alt="Oh My Cards card library screenshot" />
+      <img src="docs/screenshots/detail002.PNG" alt="Oh My Cards card library screenshot" />
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="artifacts/card-organizer/public/card-images/detail003.PNG" alt="Oh My Cards smart suggest screenshot" />
+      <img src="docs/screenshots/detail003.PNG" alt="Oh My Cards smart suggest screenshot" />
     </td>
     <td width="50%">
-      <img src="artifacts/card-organizer/public/card-images/detail004.PNG" alt="Oh My Cards activity screenshot" />
+      <img src="docs/screenshots/detail004.PNG" alt="Oh My Cards activity screenshot" />
     </td>
   </tr>
 </table>
@@ -85,6 +85,25 @@ COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm run typecheck
 ```
 
 </details>
+
+## Keeping Card Data Current
+
+Card terms change constantly. `scripts/src/card-data/` crawls every card's
+official source page, diffs it against both the catalog and the previous crawl,
+and files what it finds for review — it never edits `catalog.ts` on its own.
+
+```bash
+# Crawl all 182 source pages and write card-data/freshness-report.md
+COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:check
+
+# Headlines that name a catalog card alongside change language
+COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:watch
+```
+
+`.github/workflows/card-data-freshness.yml` runs both on the 1st and 15th of
+each month and keeps a single rolling review issue up to date. See
+[scripts/src/card-data/README.md](scripts/src/card-data/README.md) for the
+review workflow and why the pipeline stops short of auto-applying changes.
 
 ## Contributing
 

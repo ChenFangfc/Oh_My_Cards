@@ -1,0 +1,403 @@
+{
+  "_note": "Declares which bonus rows are filled in by a cardholder selection, by an issuer-published quarterly calendar, or automatically from the top spend category. Verified 2026-08-06 against issuer pages; see card-data/pending-corrections.md for the wider queue. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-08-06-choices.json",
+  "patches": [
+    {
+      "cardId": 23,
+      "_why": "Bank of America's choice category is picked by the cardholder and changeable monthly. The engine previously hardcoded a wrong 3%/6% across gas, dining, travel and online at once.",
+      "source": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Choice Category first year (then 3%)",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "month",
+          "options": [
+            "Gas and EV charging stations",
+            "Online shopping including cable, internet, phone plans and streaming",
+            "Dining",
+            "Travel",
+            "Drug stores and pharmacies",
+            "Home improvement and furnishings"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 107,
+      "_why": "Same choice list, cap and monthly cadence as the unsecured card, confirmed on its own product page.",
+      "source": "https://www.bankofamerica.com/credit-cards/products/secured-cash-rewards-credit-card/",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Choice category first year",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "month",
+          "options": [
+            "Gas and EV charging stations",
+            "Online shopping including cable, internet, phone plans and streaming",
+            "Dining",
+            "Travel",
+            "Drug stores and pharmacies",
+            "Home improvement and furnishings"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 160,
+      "_why": "Business choice list differs from the consumer one. Its cap is $50,000/yr combined with dining, not the consumer card's $2,500/quarter with groceries. Bank of America does not publish how often the business choice can be changed, so the cadence is left unasserted.",
+      "source": "https://business.bankofamerica.com/en/small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Selected business category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "unknown",
+          "options": [
+            "Gas stations and EV charging stations",
+            "Office supply stores",
+            "Travel",
+            "TV, telecom and wireless",
+            "Computer services",
+            "Business consulting services"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 24,
+      "_why": "U.S. Bank Cash+ lets the cardholder pick two 5% categories each calendar quarter, from the issuer's own 12-option selection list.",
+      "source": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Two Chosen Categories (up to $2,000/quarter combined)",
+          "mode": "user-selected",
+          "picks": 2,
+          "resets": "quarter",
+          "options": [
+            "Cell phone providers",
+            "Department stores",
+            "Electronics stores",
+            "Fast food",
+            "Furniture stores",
+            "Ground transportation",
+            "Gym and fitness centers",
+            "Home utilities",
+            "Movie theaters",
+            "Select clothing stores",
+            "Sporting goods stores",
+            "TV, internet and streaming services"
+          ]
+        },
+        {
+          "category": "One Everyday Category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Gas stations and EV charging stations",
+            "Grocery stores and grocery delivery",
+            "Restaurants"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 144,
+      "_why": "TD Cash lets the cardholder pick one 3% and one 2% category quarterly, both from the same five-option pool.",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/cash",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Selected 3% category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Dining",
+            "Entertainment",
+            "Gas",
+            "Grocery Stores",
+            "Travel"
+          ]
+        },
+        {
+          "category": "Selected 2% category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Dining",
+            "Entertainment",
+            "Gas",
+            "Grocery Stores",
+            "Travel"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 146,
+      "_why": "Secured sibling of #144 with the same selection mechanic.",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/cash-secured",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Selected 3% category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Dining",
+            "Entertainment",
+            "Gas",
+            "Grocery Stores",
+            "Travel"
+          ]
+        },
+        {
+          "category": "Selected 2% category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Dining",
+            "Entertainment",
+            "Gas",
+            "Grocery Stores",
+            "Travel"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 7,
+      "_why": "Citi applies the 5% to whichever eligible category you spent most in during the billing cycle, so it can be derived from logged spend rather than asked for.",
+      "source": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Top Eligible Category (up to $500/month)",
+          "mode": "automatic-top-spend",
+          "picks": 1,
+          "resets": "month",
+          "options": [
+            "Restaurants",
+            "Gas stations",
+            "Grocery stores",
+            "Select travel",
+            "Select transit",
+            "Select streaming services",
+            "Drugstores",
+            "Home improvement stores",
+            "Fitness clubs",
+            "Live entertainment"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 56,
+      "_why": "Amex assigns the 4X to your top two eligible categories each billing cycle automatically.",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Top 2 Categories (up to $150,000/yr combined)",
+          "mode": "automatic-top-spend",
+          "picks": 2,
+          "resets": "month",
+          "options": [
+            "Advertising with U.S. media providers",
+            "U.S. electronic goods retailers and software and cloud providers",
+            "U.S. monthly wireless telephone service",
+            "U.S. gas stations",
+            "U.S. restaurants",
+            "Transit"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 95,
+      "_why": "Chase assigns the 2X to your top three eligible business categories each quarter automatically.",
+      "source": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt-business",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Top 3 Quarterly Business Categories",
+          "mode": "automatic-top-spend",
+          "picks": 3,
+          "resets": "quarter",
+          "options": [
+            "Dining",
+            "Shipping",
+            "Airline tickets purchased directly with the airline",
+            "Local transit and commuting",
+            "Social media and search engine advertising",
+            "Car rental agencies",
+            "Gas stations",
+            "Internet, cable and phone services"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 115,
+      "_why": "U.S. Bank states the 2X lands on the top two of 48 categories where the business spent most that month, with no cap and no cardholder selection.",
+      "source": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-visa-signature-card.html",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Top two monthly business categories",
+          "mode": "automatic-top-spend",
+          "picks": 2,
+          "resets": "month",
+          "options": [
+            "Advertising firms",
+            "Airlines",
+            "Auto rental and transport providers",
+            "Cable, satellite, TV and radio providers",
+            "Computer service providers",
+            "Computer stores",
+            "Department, book and novelty stores",
+            "Discount stores and wholesale clubs",
+            "Drug stores and pharmacies",
+            "Entertainment places",
+            "Gas stations and fuel dealers",
+            "Grocery stores and supermarkets",
+            "Home improvement service and supply",
+            "Hotels",
+            "Pet supply stores",
+            "Restaurants",
+            "Stationery and office supply stores",
+            "Telecom service providers",
+            "Utility companies"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 4,
+      "_why": "Chase publishes a quarterly 5% calendar that the cardholder must activate. Recording the activated quarter is what lets the engine price it at all.",
+      "source": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
+      "confidence": "official",
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Dining and select charities",
+            "Q2 2026: Amazon and Chase Travel",
+            "Q3 2026: Gas, public transit, EV charging and select live entertainment",
+            "Q4 2026: not yet announced"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 17,
+      "_why": "Discover publishes a quarterly 5% calendar requiring activation. Discover's own calendar page was erroring during review, so this came from agreeing secondary sources.",
+      "source": "https://www.discover.com/credit-cards/cash-back/it-card/",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+            "Q2 2026: Restaurants and home improvement stores",
+            "Q3 2026: Gas stations, transportation and drug stores",
+            "Q4 2026: not yet announced"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 70,
+      "_why": "Shares the Discover it Cash Back calendar exactly.",
+      "source": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
+      "confidence": "needs-review",
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+            "Q2 2026: Restaurants and home improvement stores",
+            "Q3 2026: Gas stations, transportation and drug stores",
+            "Q4 2026: not yet announced"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 60,
+      "_why": "Citi's own page words this as \"3x points on an eligible Self-Select Category of your choice\", changeable quarterly. The catalog listed only one of the five options as if it were fixed.",
+      "source": "https://www.citi.com/credit-cards/citi-strata-credit-card",
+      "confidence": "official",
+      "categories": {
+        "rename": [
+          {
+            "from": "Select streaming",
+            "to": "Self-Select Category"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Self-Select Category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Select streaming services",
+            "Fitness clubs",
+            "Live entertainment",
+            "Cosmetic stores, barber shops and hair salons",
+            "Pet supply stores"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 172,
+      "_why": "HSBC lets the cardholder allocate the 5X extra RewardCash multiplier to one \"Rewards of Your Choice\" category.",
+      "source": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
+      "confidence": "needs-review",
+      "categories": {
+        "rename": [
+          {
+            "from": "Selected Lifestyle and Overseas Spend",
+            "to": "Rewards of Your Choice Category"
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Rewards of Your Choice Category",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "unknown",
+          "options": [
+            "Dining",
+            "Home",
+            "Lifestyle",
+            "Shopping",
+            "Overseas and Mainland China spending"
+          ]
+        }
+      ]
+    }
+  ]
+}

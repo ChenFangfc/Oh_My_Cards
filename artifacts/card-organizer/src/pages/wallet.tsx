@@ -16,7 +16,11 @@ import {
   getGetBillingCyclesQueryKey,
   getGetSpendingStatsQueryKey,
   getListTransactionsQueryKey,
+  type CardCategoryChoice,
+  type CashbackCategory,
   type CreditCard as CreditCardData,
+  type Transaction as TransactionRecord,
+  type WalletCard as WalletCardEntry,
 } from "@workspace/api-client-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,7 +35,6 @@ import {
   Gift,
   Wallet as WalletIcon,
   TrendingUp,
-  Settings2,
   AlertCircle,
   CalendarClock,
   ExternalLink,
@@ -59,7 +62,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
@@ -117,9 +119,16 @@ const CASHBACK_PERIODS: Array<{
 function getCashbackPeriodStart(period: CashbackPeriod): Date {
   const selectedPeriod =
     CASHBACK_PERIODS.find((item) => item.id === period) ?? CASHBACK_PERIODS[3];
-  const start = new Date();
-  start.setMonth(start.getMonth() - selectedPeriod.months);
-  return start;
+  const now = new Date();
+  const shiftedMonth = now.getMonth() - selectedPeriod.months;
+  const year = now.getFullYear() + Math.floor(shiftedMonth / 12);
+  const monthIdx = ((shiftedMonth % 12) + 12) % 12;
+
+  return new Date(
+    year,
+    monthIdx,
+    Math.min(now.getDate(), daysInMonth(year, monthIdx)),
+  );
 }
 
 function daysInMonth(year: number, monthIdx: number): number {
@@ -160,72 +169,22 @@ function startOfLocalDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+/** `openedAt` is a calendar day, not an instant: parsing it in local time keeps
+ * the day the user picked from shifting across the UTC boundary. */
+function parseCalendarDate(value: string): Date {
+  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    return new Date(value);
+  }
+  return new Date(year, month - 1, day);
+}
+
 function isTransactionOnOrAfter(dateInput: string, start: Date): boolean {
   return startOfLocalDay(new Date(dateInput)) >= startOfLocalDay(start);
 }
 
 function isTransactionOnOrBefore(dateInput: string, end: Date): boolean {
   return startOfLocalDay(new Date(dateInput)) <= startOfLocalDay(end);
-}
-
-function matchesWalletCardId(
-  transaction: { walletCardId?: unknown },
-  walletCardId: number,
-): boolean {
-  return Number(transaction.walletCardId) === walletCardId;
-}
-
-function getCardRewardKind(
-  card: DetailedCreditCard,
-): "cash back" | "points" | "miles" {
-  if (card.rewardType === "points") return "points";
-  if (card.rewardType === "miles") return "miles";
-  if (card.rewardType === "cashback") return "cash back";
-
-  const text = `${card.name} ${card.signupBonus ?? ""}`.toLowerCase();
-
-  if (
-    text.includes("cash back") ||
-    text.includes("cashback") ||
-    text.includes("cash rewards")
-  ) {
-    return "cash back";
-  }
-  if (text.includes("mile")) return "miles";
-  if (text.includes("point") || text.includes("rewards")) return "points";
-  return "cash back";
-}
-
-function getRewardUnitValueCents(card: DetailedCreditCard): number {
-  return card.rewardUnitValueCents && card.rewardUnitValueCents > 0
-    ? card.rewardUnitValueCents
-    : 1;
-}
-
-function formatCardRewardTotal(
-  card: DetailedCreditCard,
-  rewardValue: number,
-): string {
-  const kind = getCardRewardKind(card);
-  if (kind === "cash back") {
-    return `${formatCardAmount(card, rewardValue)} Cash Back`;
-  }
-
-  const unitValueCents = getRewardUnitValueCents(card);
-  const units = Math.round((rewardValue * 100) / unitValueCents).toLocaleString(
-    "en-US",
-  );
-  const unitName =
-    card.rewardUnitName ?? (kind === "miles" ? "Miles" : "Points");
-  return `${units} ${unitName}`;
-}
-
-function formatEarnRate(card: DetailedCreditCard, rate: number): string {
-  const multiplier = rate * 100;
-  const value = Number.isInteger(multiplier)
-    ? multiplier.toFixed(0)
-    : multiplier.toFixed(1);
-  return getCardRewardKind(card) === "cash back" ? `${value}%` : `${value}x`;
 }
 
 function getAnnualFeeTone(percent: number, covered: boolean) {
@@ -260,7 +219,7 @@ function getAnnualFeeTone(percent: number, covered: boolean) {
 
 function formatEstimatedAmount(
   amount: number | null | undefined,
-  card?: DetailedCreditCard,
+  card?: CreditCardData,
 ): string | null {
   if (!amount || amount <= 0) return null;
 
@@ -288,6 +247,73 @@ function formatCompactCardAmount(
     maximumFractionDigits: 1,
   }).format(amount);
 }
+
+/** Wallet-wide sums can span currencies, so they are kept per currency with a
+ * representative card that resolves the right symbol. */
+interface CurrencyTotal {
+  currency: string;
+  card: CreditCardData;
+  amount: number;
+}
+
+function addCurrencyAmount(
+  totals: Map<string, CurrencyTotal>,
+  card: CreditCardData,
+  amount: number,
+): void {
+  const currency = getCardCurrency(card);
+  const existing = totals.get(currency);
+
+  if (existing) {
+    existing.amount += amount;
+    return;
+  }
+
+  totals.set(currency, { currency, card, amount });
+}
+
+function sortCurrencyTotals(
+  totals: Map<string, CurrencyTotal>,
+): CurrencyTotal[] {
+  return [...totals.values()].sort((a, b) => b.amount - a.amount);
+}
+
+function visibleCurrencyTotals(totals: CurrencyTotal[]): CurrencyTotal[] {
+  const nonZero = totals.filter((total) => total.amount !== 0);
+  return nonZero.length > 0 ? nonZero : totals.slice(0, 1);
+}
+
+function formatCurrencyTotals(totals: CurrencyTotal[]): string {
+  const visible = visibleCurrencyTotals(totals);
+  if (visible.length === 0) return "—";
+
+  return visible
+    .map((total) => formatCardAmount(total.card, total.amount))
+    .join(" · ");
+}
+
+function CurrencyTotalsValue({ totals }: { totals: CurrencyTotal[] }) {
+  const visible = visibleCurrencyTotals(totals);
+  if (visible.length === 0) return <span>—</span>;
+
+  const [primary, ...rest] = visible;
+
+  return (
+    <span className="flex min-w-0 flex-wrap items-baseline gap-x-2">
+      <span>{formatCardAmount(primary.card, primary.amount)}</span>
+      {rest.length > 0 ? (
+        <span className="text-xs font-semibold text-muted-foreground">
+          +{" "}
+          {rest
+            .map((total) => formatCardAmount(total.card, total.amount))
+            .join(" · ")}
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
+const BENEFIT_DETAILS_PANEL_ID = "wallet-benefit-details";
 
 type VisualTone = "neutral" | "value" | "fee" | "attention";
 
@@ -333,72 +359,203 @@ const TONE_STYLES: Record<
   },
 };
 
-interface BillingSettingsDialogProps {
-  walletCardId: number;
-  cardName: string;
-  trigger?: ReactNode;
-  initial: {
-    nickname: string | null | undefined;
-    statementClosingDay: number | null | undefined;
-    paymentDueDay: number | null | undefined;
-    creditLimit: number | null | undefined;
-    openedAt: string | null | undefined;
-  };
+type BillingField = "closing" | "due" | "limit" | "opened";
+
+const CHOICE_RESET_LABEL: Record<string, string> = {
+  month: "each month",
+  quarter: "each quarter",
+  year: "each year",
+  anniversary: "each cardmember year",
+  never: "once",
+  unknown: "on the issuer's own schedule",
+};
+
+interface ChoiceCategoryPickerProps {
+  choice: CardCategoryChoice;
+  categoryLabel: string;
+  rate: number;
+  card: DetailedCreditCard;
+  selected: string[];
+  onChange: (options: string[]) => void;
 }
 
-function BillingSettingsDialog({
-  walletCardId,
-  cardName,
-  trigger,
-  initial,
-}: BillingSettingsDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [nickname, setNickname] = useState(initial.nickname ?? "");
-  const [closingDay, setClosingDay] = useState(
-    initial.statementClosingDay?.toString() ?? "",
+/**
+ * Lets the cardholder record which options their choice category is set to.
+ *
+ * Without this the app has no way to know, so these bonuses were priced at the
+ * card's base rate — Bank of America's 3% choice category earned 1%.
+ */
+function ChoiceCategoryPicker({
+  choice,
+  categoryLabel,
+  rate,
+  card,
+  selected,
+  onChange,
+}: ChoiceCategoryPickerProps) {
+  const atLimit = selected.length >= choice.picks;
+
+  const toggle = (option: string) => {
+    if (selected.includes(option)) {
+      onChange(selected.filter((value) => value !== option));
+      return;
+    }
+    // Picking past the limit drops the oldest choice rather than refusing the
+    // click, which is what the issuer sites do too.
+    const next = atLimit ? selected.slice(1) : selected;
+    onChange([...next, option]);
+  };
+
+  return (
+    <fieldset className="rounded-xl border border-card-border p-3">
+      <legend className="px-1 text-sm font-semibold">
+        {formatCompactRewardCategory(categoryLabel)} ·{" "}
+        {formatCompactEarnRate(card, rate)}
+      </legend>
+      <p className="text-xs text-muted-foreground">
+        {choice.mode === "rotating-calendar"
+          ? "Pick the quarter you have activated with your issuer. Unactivated quarters earn the base rate."
+          : `${
+              choice.picks === 1
+                ? "Pick the category you have selected with your issuer"
+                : `Pick up to ${choice.picks} categories you have selected with your issuer`
+            }, changeable ${CHOICE_RESET_LABEL[choice.resets] ?? "periodically"}.`}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {choice.options.map((option) => {
+          const isSelected = selected.includes(option);
+          return (
+            <button
+              key={option}
+              type="button"
+              role="checkbox"
+              aria-checked={isSelected}
+              onClick={() => toggle(option)}
+              className={cn(
+                "min-h-9 rounded-full border px-3 text-xs font-semibold transition-colors",
+                isSelected
+                  ? "border-transparent bg-primary text-primary-foreground"
+                  : "border-card-border bg-card text-muted-foreground hover:bg-secondary",
+              )}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+      {selected.length === 0 ? (
+        <p className="mt-2 text-xs text-muted-foreground">
+          Nothing selected, so this card earns its base rate everywhere.
+        </p>
+      ) : null}
+    </fieldset>
   );
-  const [dueDay, setDueDay] = useState(initial.paymentDueDay?.toString() ?? "");
+}
+
+interface BillingSettingsFormProps {
+  walletCard: WalletCardEntry;
+  onClose: () => void;
+}
+
+function BillingSettingsForm({
+  walletCard,
+  onClose,
+}: BillingSettingsFormProps) {
+  const [nickname, setNickname] = useState(walletCard.nickname ?? "");
+  const [closingDay, setClosingDay] = useState(
+    walletCard.statementClosingDay?.toString() ?? "",
+  );
+  const [dueDay, setDueDay] = useState(
+    walletCard.paymentDueDay?.toString() ?? "",
+  );
   const [creditLimit, setCreditLimit] = useState(
-    initial.creditLimit?.toString() ?? "",
+    walletCard.creditLimit?.toString() ?? "",
   );
   const [openedAt, setOpenedAt] = useState(
-    initial.openedAt ? initial.openedAt.slice(0, 10) : "",
+    walletCard.openedAt ? walletCard.openedAt.slice(0, 10) : "",
   );
+  const [selectedCategories, setSelectedCategories] = useState<
+    Record<number, string[]>
+  >(() => ({ ...(walletCard.selectedCategories ?? {}) }));
+  const [fieldError, setFieldError] = useState<{
+    field: BillingField;
+    message: string;
+  } | null>(null);
   const update = useUpdateWalletCard();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const todayIso = format(new Date(), "yyyy-MM-dd");
+
+  // Automatic choices (Citi Custom Cash and friends) are derived from logged
+  // spend, so only the ones the cardholder actually sets are offered here.
+  const userChoices = useMemo(
+    () =>
+      (walletCard.card.categoryChoices ?? [])
+        .filter((choice) => choice.mode !== "automatic-top-spend")
+        .map((choice) => ({
+          choice,
+          row: walletCard.card.cashbackCategories.find(
+            (category) => category.id === choice.categoryId,
+          ),
+        }))
+        .filter(
+          (entry): entry is { choice: CardCategoryChoice; row: CashbackCategory } =>
+            entry.row !== undefined,
+        ),
+    [walletCard.card],
+  );
 
   const handleSave = () => {
     const closingNum = closingDay ? Number(closingDay) : null;
     const dueNum = dueDay ? Number(dueDay) : null;
     const limitNum = creditLimit ? Number(creditLimit) : null;
+    const isInvalidDay = (value: number | null) =>
+      value !== null && (!Number.isInteger(value) || value < 1 || value > 31);
 
-    if (closingNum !== null && (closingNum < 1 || closingNum > 31)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid closing day",
-        description: "Must be between 1 and 31",
+    if (isInvalidDay(closingNum)) {
+      setFieldError({
+        field: "closing",
+        message: "Enter a whole day between 1 and 31.",
       });
       return;
     }
-    if (dueNum !== null && (dueNum < 1 || dueNum > 31)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid due day",
-        description: "Must be between 1 and 31",
+    if (isInvalidDay(dueNum)) {
+      setFieldError({
+        field: "due",
+        message: "Enter a whole day between 1 and 31.",
+      });
+      return;
+    }
+    if (limitNum !== null && (!Number.isFinite(limitNum) || limitNum < 0)) {
+      setFieldError({
+        field: "limit",
+        message: "Enter a credit limit of 0 or more.",
+      });
+      return;
+    }
+    if (openedAt && openedAt > todayIso) {
+      setFieldError({
+        field: "opened",
+        message: "The opened date cannot be in the future.",
       });
       return;
     }
 
+    setFieldError(null);
     update.mutate(
       {
-        id: walletCardId,
+        id: walletCard.id,
         data: {
           nickname: nickname.trim() || null,
           statementClosingDay: closingNum,
           paymentDueDay: dueNum,
           creditLimit: limitNum,
-          openedAt: openedAt ? new Date(openedAt).toISOString() : null,
+          // Stored as the bare calendar day. Round-tripping through
+          // `toISOString()` rewrites the leading YYYY-MM-DD to the UTC day,
+          // which moves the anniversary a day earlier east of Greenwich —
+          // and the engine reads that prefix back verbatim.
+          openedAt: openedAt || null,
+          selectedCategories,
         },
       },
       {
@@ -408,112 +565,183 @@ function BillingSettingsDialog({
             queryKey: getGetBillingCyclesQueryKey(),
           });
           toast({ title: "Billing settings saved" });
-          setOpen(false);
+          onClose();
         },
-        onError: () =>
+        onError: (error) =>
           toast({
             variant: "destructive",
             title: "Could not save settings",
+            description:
+              error instanceof Error ? error.message : "Please try again.",
           }),
       },
     );
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <Settings2 className="h-4 w-4 mr-1" /> Billing
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Billing Settings</DialogTitle>
-          <DialogDescription>
-            Configure {cardName} so we can compute statement balances, due
-            dates, and minimum payments.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="space-y-4 pt-2">
+    <>
+      <DialogHeader>
+        <DialogTitle>Billing Settings</DialogTitle>
+        <DialogDescription>
+          Configure {walletCard.card.name} so we can compute statement balances,
+          due dates, and minimum payments.
+        </DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4 pt-2">
+        <div>
+          <Label htmlFor="nickname">Nickname (optional)</Label>
+          <Input
+            id="nickname"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="e.g. Travel card"
+            className="mt-1"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="nickname">Nickname (optional)</Label>
+            <Label htmlFor="closing">Statement closes on (day)</Label>
             <Input
-              id="nickname"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="e.g. Travel card"
-              className="mt-1"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="closing">Statement closes on (day)</Label>
-              <Input
-                id="closing"
-                type="number"
-                min={1}
-                max={31}
-                value={closingDay}
-                onChange={(e) => setClosingDay(e.target.value)}
-                placeholder="e.g. 15"
-                className="mt-1"
-              />
-            </div>
-            <div>
-              <Label htmlFor="due">Payment due on (day)</Label>
-              <Input
-                id="due"
-                type="number"
-                min={1}
-                max={31}
-                value={dueDay}
-                onChange={(e) => setDueDay(e.target.value)}
-                placeholder="e.g. 12"
-                className="mt-1"
-              />
-            </div>
-          </div>
-          <div>
-            <Label htmlFor="limit">Credit limit ($)</Label>
-            <Input
-              id="limit"
+              id="closing"
               type="number"
-              min={0}
-              step="100"
-              value={creditLimit}
-              onChange={(e) => setCreditLimit(e.target.value)}
-              placeholder="e.g. 10000"
+              min={1}
+              max={31}
+              step={1}
+              value={closingDay}
+              aria-invalid={fieldError?.field === "closing"}
+              onChange={(e) => setClosingDay(e.target.value)}
+              placeholder="e.g. 15"
               className="mt-1"
             />
+            {fieldError?.field === "closing" ? (
+              <p className="mt-1 text-xs font-medium text-destructive">
+                {fieldError.message}
+              </p>
+            ) : null}
+          </div>
+          <div>
+            <Label htmlFor="due">Payment due on (day)</Label>
+            <Input
+              id="due"
+              type="number"
+              min={1}
+              max={31}
+              step={1}
+              value={dueDay}
+              aria-invalid={fieldError?.field === "due"}
+              onChange={(e) => setDueDay(e.target.value)}
+              placeholder="e.g. 12"
+              className="mt-1"
+            />
+            {fieldError?.field === "due" ? (
+              <p className="mt-1 text-xs font-medium text-destructive">
+                {fieldError.message}
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <div>
+          <Label htmlFor="limit">
+            Credit limit ({getCardCurrency(walletCard.card)})
+          </Label>
+          <Input
+            id="limit"
+            type="number"
+            min={0}
+            step="100"
+            value={creditLimit}
+            aria-invalid={fieldError?.field === "limit"}
+            onChange={(e) => setCreditLimit(e.target.value)}
+            placeholder="e.g. 10000"
+            className="mt-1"
+          />
+          {fieldError?.field === "limit" ? (
+            <p className="mt-1 text-xs font-medium text-destructive">
+              {fieldError.message}
+            </p>
+          ) : (
             <p className="text-xs text-muted-foreground mt-1">
               Used to track utilization in the current cycle.
             </p>
-          </div>
-          <div>
-            <Label htmlFor="opened">Account opened on</Label>
-            <Input
-              id="opened"
-              type="date"
-              value={openedAt}
-              onChange={(e) => setOpenedAt(e.target.value)}
-              className="mt-1"
-            />
+          )}
+        </div>
+        <div>
+          <Label htmlFor="opened">Account opened on</Label>
+          <Input
+            id="opened"
+            type="date"
+            max={todayIso}
+            value={openedAt}
+            aria-invalid={fieldError?.field === "opened"}
+            onChange={(e) => setOpenedAt(e.target.value)}
+            className="mt-1"
+          />
+          {fieldError?.field === "opened" ? (
+            <p className="mt-1 text-xs font-medium text-destructive">
+              {fieldError.message}
+            </p>
+          ) : (
             <p className="text-xs text-muted-foreground mt-1">
               Used to count down to your next annual fee charge and track
               cashback earned this cardmember year.
             </p>
-          </div>
+          )}
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={update.isPending}>
-            {update.isPending ? "Saving..." : "Save Settings"}
-          </Button>
-        </DialogFooter>
+        {userChoices.map(({ choice, row }) => (
+          <ChoiceCategoryPicker
+            key={choice.categoryId}
+            choice={choice}
+            categoryLabel={row.category}
+            rate={row.rate}
+            card={walletCard.card}
+            selected={selectedCategories[choice.categoryId] ?? []}
+            onChange={(options) =>
+              setSelectedCategories((current) => ({
+                ...current,
+                [choice.categoryId]: options,
+              }))
+            }
+          />
+        ))}
+      </div>
+      <DialogFooter>
+        <Button variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleSave} disabled={update.isPending}>
+          {update.isPending ? "Saving..." : "Save Settings"}
+        </Button>
+      </DialogFooter>
+    </>
+  );
+}
+
+interface BillingSettingsDialogProps {
+  walletCard: WalletCardEntry | null;
+  onOpenChange: (open: boolean) => void;
+}
+
+function BillingSettingsDialog({
+  walletCard,
+  onOpenChange,
+}: BillingSettingsDialogProps) {
+  // Keeps the last card on screen while the close animation plays.
+  const [visibleCard, setVisibleCard] = useState(walletCard);
+
+  useEffect(() => {
+    if (walletCard) setVisibleCard(walletCard);
+  }, [walletCard]);
+
+  return (
+    <Dialog open={walletCard !== null} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        {visibleCard ? (
+          <BillingSettingsForm
+            key={visibleCard.id}
+            walletCard={visibleCard}
+            onClose={() => onOpenChange(false)}
+          />
+        ) : null}
       </DialogContent>
     </Dialog>
   );
@@ -523,15 +751,19 @@ interface WalletSummaryStripProps {
   isLoading: boolean;
   isBenefitsLoading: boolean;
   isCashbackLoading: boolean;
+  isBenefitsError: boolean;
+  isCashbackError: boolean;
+  onRetry: () => void;
   cashbackPeriod: CashbackPeriod;
-  cashbackValue: number;
+  cashbackTotals: CurrencyTotal[];
+  annualFeeTotals: CurrencyTotal[];
+  usedBenefitTotals: CurrencyTotal[];
   isBenefitDetailsOpen: boolean;
   onCashbackPeriodChange: (period: CashbackPeriod) => void;
   onBenefitDetailsToggle: () => void;
   benefitDetailsPanel?: ReactNode;
   totalCards: number;
   usedBenefitsCount: number;
-  usedBenefitValue: number;
   summary:
     | {
         totalCashbackEarned?: number;
@@ -546,8 +778,13 @@ function WalletSummaryStrip({
   isLoading,
   isBenefitsLoading,
   isCashbackLoading,
+  isBenefitsError,
+  isCashbackError,
+  onRetry,
   cashbackPeriod,
-  cashbackValue,
+  cashbackTotals,
+  annualFeeTotals,
+  usedBenefitTotals,
   isBenefitDetailsOpen,
   onCashbackPeriodChange,
   onBenefitDetailsToggle,
@@ -555,7 +792,6 @@ function WalletSummaryStrip({
   summary,
   totalCards,
   usedBenefitsCount,
-  usedBenefitValue,
 }: WalletSummaryStripProps) {
   const unusedBenefitsCount = summary?.unusedBenefitsCount ?? 0;
   const totalBenefitsCount = usedBenefitsCount + unusedBenefitsCount;
@@ -570,6 +806,7 @@ function WalletSummaryStrip({
   return (
     <div className="grid items-stretch gap-3 md:grid-cols-3">
       <WalletSummaryTile
+        className="hidden md:block"
         title="Cards"
         value={isLoading ? <Skeleton className="h-7 w-12" /> : totalCards}
         helper={
@@ -579,7 +816,7 @@ function WalletSummaryStrip({
             <span>
               Active Wallet ·{" "}
               <span className="font-semibold text-amber-900 dark:text-amber-200">
-                Total Annual Fee: ${(summary?.totalAnnualFees ?? 0).toFixed(2)}
+                Total Annual Fee: {formatCurrencyTotals(annualFeeTotals)}
                 /yr
               </span>
             </span>
@@ -591,32 +828,51 @@ function WalletSummaryStrip({
       <WalletSummaryTile
         title="Cashback"
         value={
-          isLoading || isCashbackLoading ? (
+          isCashbackError ? (
+            <span className="text-base font-semibold text-destructive">
+              Unavailable
+            </span>
+          ) : isLoading || isCashbackLoading ? (
             <Skeleton className="h-7 w-20" />
           ) : (
-            `$${cashbackValue.toFixed(2)}`
+            <CurrencyTotalsValue totals={cashbackTotals} />
           )
         }
         helper={
           <div className="space-y-2">
-            <div>{selectedCashbackPeriod.helper}</div>
-            <div className="inline-flex w-fit max-w-full flex-wrap gap-1 rounded-md bg-secondary/60 p-1">
-              {CASHBACK_PERIODS.map((period) => (
-                <button
-                  key={period.id}
-                  type="button"
-                  onClick={() => onCashbackPeriodChange(period.id)}
-                  className={cn(
-                    "h-6 rounded px-2 text-[11px] font-semibold transition-colors",
-                    cashbackPeriod === period.id
-                      ? "bg-card text-foreground shadow-[var(--app-shadow-soft)]"
-                      : "text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {period.label}
-                </button>
-              ))}
+            <div>
+              {isCashbackError
+                ? "Couldn't read your transactions."
+                : selectedCashbackPeriod.helper}
             </div>
+            {isCashbackError ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-[11px]"
+                onClick={onRetry}
+              >
+                Try again
+              </Button>
+            ) : (
+              <div className="inline-flex w-fit max-w-full flex-wrap gap-1 rounded-md bg-secondary/60 p-1">
+                {CASHBACK_PERIODS.map((period) => (
+                  <button
+                    key={period.id}
+                    type="button"
+                    onClick={() => onCashbackPeriodChange(period.id)}
+                    className={cn(
+                      "h-6 rounded px-2 text-[11px] font-semibold transition-colors",
+                      cashbackPeriod === period.id
+                        ? "bg-card text-foreground shadow-[var(--app-shadow-soft)]"
+                        : "text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {period.label}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         }
         icon={DollarSign}
@@ -626,7 +882,11 @@ function WalletSummaryStrip({
         title="Benefits"
         className="relative z-20"
         value={
-          isLoading || isBenefitsLoading ? (
+          isBenefitsError ? (
+            <span className="text-base font-semibold text-destructive">
+              Unavailable
+            </span>
+          ) : isLoading || isBenefitsLoading ? (
             <Skeleton className="h-7 w-20" />
           ) : (
             <button
@@ -634,6 +894,7 @@ function WalletSummaryStrip({
               data-benefit-toggle
               className="block w-full rounded-lg text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-expanded={isBenefitDetailsOpen}
+              aria-controls={BENEFIT_DETAILS_PANEL_ID}
               onClick={onBenefitDetailsToggle}
             >
               <div className="relative h-8 w-full overflow-hidden rounded-full bg-secondary">
@@ -654,19 +915,35 @@ function WalletSummaryStrip({
           )
         }
         helper={
-          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-            <span className="tabular-nums">
-              Est. Used Value ${usedBenefitValue.toFixed(2)}
-            </span>
-            <button
-              type="button"
-              data-benefit-toggle
-              className="font-semibold text-foreground underline-offset-4 hover:underline"
-              onClick={onBenefitDetailsToggle}
-            >
-              {isBenefitDetailsOpen ? "Hide Details" : "View Details"}
-            </button>
-          </div>
+          isBenefitsError ? (
+            <div className="space-y-2">
+              <div>Couldn't read your benefits.</div>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 px-2 text-[11px]"
+                onClick={onRetry}
+              >
+                Try again
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+              <span className="tabular-nums">
+                Est. Used Value {formatCurrencyTotals(usedBenefitTotals)}
+              </span>
+              <button
+                type="button"
+                data-benefit-toggle
+                className="font-semibold text-foreground underline-offset-4 hover:underline"
+                aria-expanded={isBenefitDetailsOpen}
+                aria-controls={BENEFIT_DETAILS_PANEL_ID}
+                onClick={onBenefitDetailsToggle}
+              >
+                {isBenefitDetailsOpen ? "Hide Details" : "View Details"}
+              </button>
+            </div>
+          )
         }
         icon={Gift}
         tone="neutral"
@@ -702,32 +979,32 @@ function WalletSummaryTile({
   return (
     <Card
       className={cn(
-        "h-full min-h-[148px] overflow-visible border-t-4 shadow-[var(--app-shadow-soft)]",
+        "h-full overflow-visible border-t-4 shadow-[var(--app-shadow-soft)] md:min-h-[148px]",
         styles.border,
         className,
       )}
     >
-      <CardContent className="flex h-full items-start justify-between gap-4 p-4">
+      <CardContent className="flex h-full items-start justify-between gap-3 p-3 md:gap-4 md:p-4">
         <div className="flex h-full min-w-0 flex-1 flex-col">
           <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             {title}
           </div>
           <div
             className={cn(
-              "mt-2 flex min-h-9 items-center text-2xl font-bold tracking-tight tabular-nums",
+              "mt-1.5 flex items-center text-xl font-bold tracking-tight tabular-nums md:mt-2 md:min-h-9 md:text-2xl",
               styles.value,
             )}
           >
             {value}
           </div>
-          <div className="mt-2 min-h-9 text-xs text-muted-foreground">
+          <div className="mt-1.5 text-xs text-muted-foreground md:mt-2 md:min-h-9">
             {helper}
           </div>
           {footer}
         </div>
         <div
           className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+            "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl md:h-10 md:w-10",
             styles.icon,
           )}
         >
@@ -736,8 +1013,11 @@ function WalletSummaryTile({
       </CardContent>
       {overlay ? (
         <div
+          id={BENEFIT_DETAILS_PANEL_ID}
           data-benefit-popover
-          className="absolute right-0 top-[calc(100%+0.75rem)] z-30 w-[min(44rem,calc(100vw-3rem))] animate-in fade-in slide-in-from-top-2 duration-300"
+          role="region"
+          aria-label="Benefit details"
+          className="absolute right-0 top-[calc(100%+0.75rem)] z-30 w-[min(44rem,calc(100vw-3rem))] animate-in fade-in slide-in-from-top-2 duration-300 md:w-[min(44rem,calc(100vw-19rem))]"
         >
           {overlay}
         </div>
@@ -758,6 +1038,7 @@ interface WalletBenefit {
 interface WalletBenefitsPanelProps {
   unusedBenefits: WalletBenefit[] | undefined;
   usedBenefits: WalletBenefit[] | undefined;
+  cardsByWalletCardId: Map<number, CreditCardData>;
   isLoading: boolean;
   isPending: boolean;
   onMarkUsed: (walletCardId: number, benefitId: number) => void;
@@ -767,6 +1048,7 @@ interface WalletBenefitsPanelProps {
 function WalletBenefitsPanel({
   unusedBenefits,
   usedBenefits,
+  cardsByWalletCardId,
   isLoading,
   isPending,
   onMarkUsed,
@@ -840,6 +1122,7 @@ function WalletBenefitsPanel({
               {activeBenefits.map((benefit) => {
                 const estimatedValue = formatEstimatedAmount(
                   benefit.annualValue,
+                  cardsByWalletCardId.get(benefit.walletCardId),
                 );
 
                 return (
@@ -1055,8 +1338,8 @@ function CardRuleDetails({
           ) : null}
           {card.rewardRuleNotes?.length ? (
             <ul className="mt-2 space-y-1 text-sm leading-relaxed text-muted-foreground">
-              {card.rewardRuleNotes.map((note) => (
-                <li key={note}>{note}</li>
+              {card.rewardRuleNotes.map((note, index) => (
+                <li key={`${index}-${note}`}>{note}</li>
               ))}
             </ul>
           ) : null}
@@ -1089,7 +1372,7 @@ function CardRuleDetails({
                 ) : null}
               </div>
               <div className="shrink-0 rounded-md bg-secondary px-2 py-1 text-xs font-bold tabular-nums text-muted-foreground">
-                {formatEarnRate(card, category.rate)}
+                {formatCompactEarnRate(card, category.rate)}
               </div>
             </div>
           ))}
@@ -1159,16 +1442,42 @@ function CardRuleDetails({
 }
 
 export default function Wallet() {
-  const { data: walletCards, isLoading } = useListWallet();
-  const { data: summary, isLoading: isLoadingSummary } =
-    useGetDashboardSummary();
-  const { data: unusedBenefits, isLoading: isLoadingBenefits } =
-    useGetUnusedBenefits();
-  const { data: usedBenefits, isLoading: isLoadingUsedBenefits } =
-    useGetUsedBenefits();
-  const { data: transactions, isLoading: isLoadingTransactions } =
-    useListTransactions();
-  const { data: billingCycles } = useGetBillingCycles();
+  const {
+    data: walletCards,
+    isLoading,
+    isError: isWalletError,
+    error: walletError,
+    refetch: refetchWallet,
+  } = useListWallet();
+  const {
+    data: summary,
+    isLoading: isLoadingSummary,
+    isError: isSummaryError,
+    refetch: refetchSummary,
+  } = useGetDashboardSummary();
+  const {
+    data: unusedBenefits,
+    isLoading: isLoadingBenefits,
+    isError: isUnusedBenefitsError,
+    refetch: refetchUnusedBenefits,
+  } = useGetUnusedBenefits();
+  const {
+    data: usedBenefits,
+    isLoading: isLoadingUsedBenefits,
+    isError: isUsedBenefitsError,
+    refetch: refetchUsedBenefits,
+  } = useGetUsedBenefits();
+  const {
+    data: transactions,
+    isLoading: isLoadingTransactions,
+    isError: isTransactionsError,
+    refetch: refetchTransactions,
+  } = useListTransactions();
+  const {
+    data: billingCycles,
+    isError: isBillingCyclesError,
+    refetch: refetchBillingCycles,
+  } = useGetBillingCycles();
   const removeFromWallet = useRemoveFromWallet();
   const markBenefitUsed = useMarkBenefitUsed();
   const markBenefitUnused = useMarkBenefitUnused();
@@ -1179,6 +1488,9 @@ export default function Wallet() {
   >(null);
   const [cashbackPeriod, setCashbackPeriod] = useState<CashbackPeriod>("12m");
   const [showBenefitDetails, setShowBenefitDetails] = useState(false);
+  const [billingSettingsCardId, setBillingSettingsCardId] = useState<
+    number | null
+  >(null);
 
   useEffect(() => {
     if (!showBenefitDetails) return;
@@ -1195,15 +1507,19 @@ export default function Wallet() {
       setShowBenefitDetails(false);
     };
 
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowBenefitDetails(false);
+    };
+
     document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, [showBenefitDetails]);
 
   const usedBenefitsCount = usedBenefits?.length ?? 0;
-  const usedBenefitValue = (usedBenefits ?? []).reduce(
-    (sum, benefit) => sum + (benefit.annualValue ?? 0),
-    0,
-  );
   const usedBenefitIdsByWalletCard = useMemo(() => {
     const grouped = new Map<number, Set<number>>();
 
@@ -1217,25 +1533,88 @@ export default function Wallet() {
   }, [usedBenefits]);
   const isBenefitMutationPending =
     markBenefitUsed.isPending || markBenefitUnused.isPending;
-  const cashbackValue = useMemo(() => {
-    const start = getCashbackPeriodStart(cashbackPeriod);
-
-    return (transactions ?? [])
-      .filter(
-        (transaction) =>
-          (transaction.transactionType ?? "purchase") !== "payment" &&
-          new Date(transaction.date) >= start,
-      )
-      .reduce((sum, transaction) => sum + transaction.cashbackEarned, 0);
-  }, [cashbackPeriod, transactions]);
   const rewardPeriodStart = useMemo(
     () => getCashbackPeriodStart(cashbackPeriod),
     [cashbackPeriod],
   );
+  const selectedCashbackPeriod =
+    CASHBACK_PERIODS.find((period) => period.id === cashbackPeriod) ??
+    CASHBACK_PERIODS[3];
 
-  const cyclesByCard = new Map(
-    (billingCycles ?? []).map((bc) => [bc.walletCardId, bc]),
+  const cardsByWalletCardId = useMemo(() => {
+    const grouped = new Map<number, CreditCardData>();
+
+    for (const walletCard of walletCards ?? []) {
+      grouped.set(walletCard.id, walletCard.card);
+    }
+
+    return grouped;
+  }, [walletCards]);
+  const transactionsByWalletCard = useMemo(() => {
+    const grouped = new Map<number, TransactionRecord[]>();
+
+    for (const transaction of transactions ?? []) {
+      const walletCardId = Number(transaction.walletCardId);
+      const cardTransactions = grouped.get(walletCardId) ?? [];
+      cardTransactions.push(transaction);
+      grouped.set(walletCardId, cardTransactions);
+    }
+
+    return grouped;
+  }, [transactions]);
+  const cyclesByCard = useMemo(
+    () => new Map((billingCycles ?? []).map((bc) => [bc.walletCardId, bc])),
+    [billingCycles],
   );
+
+  const annualFeeTotals = useMemo(() => {
+    const totals = new Map<string, CurrencyTotal>();
+
+    for (const walletCard of walletCards ?? []) {
+      addCurrencyAmount(totals, walletCard.card, walletCard.card.annualFee);
+    }
+
+    return sortCurrencyTotals(totals);
+  }, [walletCards]);
+  const cashbackTotals = useMemo(() => {
+    const totals = new Map<string, CurrencyTotal>();
+
+    for (const walletCard of walletCards ?? []) {
+      addCurrencyAmount(totals, walletCard.card, 0);
+    }
+    for (const transaction of transactions ?? []) {
+      const card = cardsByWalletCardId.get(Number(transaction.walletCardId));
+      if (!card) continue;
+      if ((transaction.transactionType ?? "purchase") === "payment") continue;
+      if (!isTransactionOnOrAfter(transaction.date, rewardPeriodStart))
+        continue;
+      addCurrencyAmount(totals, card, transaction.cashbackEarned);
+    }
+
+    return sortCurrencyTotals(totals);
+  }, [cardsByWalletCardId, rewardPeriodStart, transactions, walletCards]);
+  const usedBenefitTotals = useMemo(() => {
+    const totals = new Map<string, CurrencyTotal>();
+
+    for (const walletCard of walletCards ?? []) {
+      addCurrencyAmount(totals, walletCard.card, 0);
+    }
+    for (const benefit of usedBenefits ?? []) {
+      const card = cardsByWalletCardId.get(benefit.walletCardId);
+      if (!card) continue;
+      addCurrencyAmount(totals, card, benefit.annualValue ?? 0);
+    }
+
+    return sortCurrencyTotals(totals);
+  }, [cardsByWalletCardId, usedBenefits, walletCards]);
+
+  const handleRetrySummaryQueries = () => {
+    refetchSummary();
+    refetchUnusedBenefits();
+    refetchUsedBenefits();
+    refetchTransactions();
+    refetchBillingCycles();
+  };
 
   const toggleCardDetails = (walletCardId: number) => {
     setSelectedDetailCardId((current) =>
@@ -1354,6 +1733,37 @@ export default function Wallet() {
     );
   }
 
+  if (isWalletError) {
+    return (
+      <div className="flex min-h-[60vh] w-full max-w-full flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-destructive/40 bg-card px-6 py-12">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
+          <AlertCircle className="h-8 w-8" />
+        </div>
+        <h2 className="mb-2 text-2xl font-bold tracking-tight">
+          Couldn't load your wallet
+        </h2>
+        <p className="mb-2 max-w-[18rem] text-center leading-relaxed text-muted-foreground sm:max-w-sm">
+          Your cards are still stored on this device — reading them failed just
+          now. Try again, and export a backup from Data if it keeps happening.
+        </p>
+        <p className="mb-8 max-w-sm text-center text-xs text-muted-foreground">
+          {walletError instanceof Error
+            ? walletError.message
+            : "Unknown error."}
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <Button onClick={() => refetchWallet()}>Try again</Button>
+          <Link
+            href="/data"
+            className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Go to Data
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (!walletCards || walletCards.length === 0) {
     return (
       <div className="flex min-h-[60vh] w-full max-w-full flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed bg-card px-6 py-12">
@@ -1380,6 +1790,10 @@ export default function Wallet() {
   const selectedDetailCard =
     walletCards.find((walletCard) => walletCard.id === selectedDetailCardId) ??
     null;
+  const billingSettingsCard =
+    walletCards.find((walletCard) => walletCard.id === billingSettingsCardId) ??
+    null;
+  const now = new Date();
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1388,6 +1802,10 @@ export default function Wallet() {
           <h2 className="text-2xl font-bold tracking-tight md:text-[28px]">
             My Wallet
           </h2>
+          <p className="mt-1 text-sm text-muted-foreground md:hidden">
+            {walletCards.length} card{walletCards.length === 1 ? "" : "s"} ·{" "}
+            {formatCurrencyTotals(annualFeeTotals)}/yr in fees
+          </p>
         </div>
         <Link
           href="/cards"
@@ -1401,8 +1819,15 @@ export default function Wallet() {
         isLoading={isLoadingSummary}
         isBenefitsLoading={isLoadingUsedBenefits}
         isCashbackLoading={isLoadingTransactions}
+        isBenefitsError={
+          isUsedBenefitsError || isUnusedBenefitsError || isSummaryError
+        }
+        isCashbackError={isTransactionsError}
+        onRetry={handleRetrySummaryQueries}
         cashbackPeriod={cashbackPeriod}
-        cashbackValue={cashbackValue}
+        cashbackTotals={cashbackTotals}
+        annualFeeTotals={annualFeeTotals}
+        usedBenefitTotals={usedBenefitTotals}
         isBenefitDetailsOpen={showBenefitDetails}
         onCashbackPeriodChange={setCashbackPeriod}
         onBenefitDetailsToggle={() => setShowBenefitDetails((open) => !open)}
@@ -1411,6 +1836,7 @@ export default function Wallet() {
             <WalletBenefitsPanel
               unusedBenefits={unusedBenefits}
               usedBenefits={usedBenefits}
+              cardsByWalletCardId={cardsByWalletCardId}
               isLoading={isLoadingBenefits || isLoadingUsedBenefits}
               isPending={isBenefitMutationPending}
               onMarkUsed={handleMarkBenefitUsed}
@@ -1421,14 +1847,44 @@ export default function Wallet() {
         summary={summary}
         totalCards={walletCards.length}
         usedBenefitsCount={usedBenefitsCount}
-        usedBenefitValue={usedBenefitValue}
       />
+
+      {isBillingCyclesError ? (
+        <Card className="border-destructive/50">
+          <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
+            <span className="text-destructive">
+              Couldn't load statement cycles — due dates and balances below fall
+              back to your saved billing days.
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetchBillingCycles()}
+            >
+              Try again
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 transition-all md:grid-cols-2 xl:grid-cols-3">
         {walletCards.map((walletCard) => {
           const cycle = cyclesByCard.get(walletCard.id);
           const isSelected = selectedDetailCardId === walletCard.id;
           const detailedCard = walletCard.card as DetailedCreditCard;
+          // Which options each choice category is currently earning on. The
+          // engine resolves this: for automatic cards it depends on logged
+          // spend, which the page has no view of.
+          const choiceStateByCategoryId = new Map(
+            (walletCard.card.categoryChoices ?? []).map((choice) => [
+              choice.categoryId,
+              {
+                choice,
+                active:
+                  walletCard.activeChoiceCategories?.[choice.categoryId] ?? [],
+              },
+            ]),
+          );
           const usedBenefitIds =
             usedBenefitIdsByWalletCard.get(walletCard.id) ?? new Set<number>();
           const usedBenefitValueForCard = detailedCard.benefits.reduce(
@@ -1438,9 +1894,8 @@ export default function Wallet() {
                 : sum,
             0,
           );
-          const cardTransactions = (transactions ?? []).filter((transaction) =>
-            matchesWalletCardId(transaction, walletCard.id),
-          );
+          const cardTransactions =
+            transactionsByWalletCard.get(walletCard.id) ?? [];
           const purchasesTotal = cardTransactions
             .filter(
               (transaction) =>
@@ -1457,32 +1912,22 @@ export default function Wallet() {
             0,
             purchasesTotal - paymentsTotal,
           );
-          const currentCycleBalance = cycle
+          const cycleStart = cycle ? new Date(cycle.currentCycleStart) : null;
+          const currentCycleBalance = cycleStart
             ? Math.max(
                 0,
-                cardTransactions
-                  .filter(
-                    (transaction) =>
-                      isTransactionOnOrAfter(
-                        transaction.date,
-                        new Date(cycle.currentCycleStart),
-                      ) &&
-                      isTransactionOnOrBefore(transaction.date, new Date()) &&
-                      (transaction.transactionType ?? "purchase") !== "payment",
-                  )
-                  .reduce((sum, transaction) => sum + transaction.amount, 0) -
-                  cardTransactions
-                    .filter(
-                      (transaction) =>
-                        isTransactionOnOrAfter(
-                          transaction.date,
-                          new Date(cycle.currentCycleStart),
-                        ) &&
-                        isTransactionOnOrBefore(transaction.date, new Date()) &&
-                        (transaction.transactionType ?? "purchase") ===
-                          "payment",
-                    )
-                    .reduce((sum, transaction) => sum + transaction.amount, 0),
+                cardTransactions.reduce((sum, transaction) => {
+                  if (
+                    !isTransactionOnOrAfter(transaction.date, cycleStart) ||
+                    !isTransactionOnOrBefore(transaction.date, now)
+                  ) {
+                    return sum;
+                  }
+                  return (transaction.transactionType ?? "purchase") ===
+                    "payment"
+                    ? sum - transaction.amount
+                    : sum + transaction.amount;
+                }, 0),
               )
             : 0;
           const availableCredit =
@@ -1498,14 +1943,14 @@ export default function Wallet() {
           const hasDueDay = walletCard.paymentDueDay != null;
           const hasCreditLimit = walletCard.creditLimit != null;
           const hasVisibleBillingInfo = hasDueDay || hasCreditLimit;
-          const cardPeriodRewardValue = (transactions ?? [])
+          const cardPeriodRewardValue = cardTransactions
             .filter(
               (transaction) =>
-                matchesWalletCardId(transaction, walletCard.id) &&
                 (transaction.transactionType ?? "purchase") !== "payment" &&
-                new Date(transaction.date) >= rewardPeriodStart,
+                isTransactionOnOrAfter(transaction.date, rewardPeriodStart),
             )
             .reduce((sum, transaction) => sum + transaction.cashbackEarned, 0);
+          const hasAnnualFee = walletCard.card.annualFee > 0;
           const topBenefits = [...detailedCard.benefits]
             .sort((a, b) => {
               const aIsUnused = !usedBenefitIds.has(a.id);
@@ -1515,7 +1960,7 @@ export default function Wallet() {
               if (valueDelta !== 0) return valueDelta;
               return a.name.localeCompare(b.name);
             })
-            .slice(0, 2);
+            .slice(0, hasAnnualFee ? 1 : 2);
           const effectiveCurrentBalance =
             cycle && cycle.statementBalance <= 0
               ? Math.max(cycle.totalBalance ?? 0, currentCycleBalance)
@@ -1528,9 +1973,21 @@ export default function Wallet() {
           const hasDueAmount = Boolean(
             cycle && (hasStatementDue || effectiveCurrentBalance > 0),
           );
-          const isOverdue = Boolean(
-            cycle && cycle.daysUntilDue < 0 && hasStatementDue,
-          );
+          // The engine reports this directly. `daysUntilDue` cannot signal it:
+          // once a due date passes, nextDueDate rolls to the following cycle,
+          // so the countdown is always positive even while a statement is owed.
+          const isOverdue = Boolean(cycle?.isOverdue);
+          const daysOverdue =
+            isOverdue && cycle?.previousDueDate
+              ? Math.max(
+                  1,
+                  Math.round(
+                    (startOfLocalDay(new Date()).getTime() -
+                      startOfLocalDay(new Date(cycle.previousDueDate)).getTime()) /
+                      86_400_000,
+                  ),
+                )
+              : null;
           const visibleDaysUntilDue = cycle
             ? cycle.daysUntilDue
             : fallbackDaysUntilDue;
@@ -1542,9 +1999,9 @@ export default function Wallet() {
           );
           const dueCountdownLabel = cycle
             ? isOverdue
-              ? `Overdue by ${Math.abs(cycle.daysUntilDue)} day${
-                  Math.abs(cycle.daysUntilDue) === 1 ? "" : "s"
-                }`
+              ? daysOverdue
+                ? `Overdue by ${daysOverdue} day${daysOverdue === 1 ? "" : "s"}`
+                : "Payment overdue"
               : `Due in ${cycle.daysUntilDue} day${
                   cycle.daysUntilDue === 1 ? "" : "s"
                 }`
@@ -1656,24 +2113,32 @@ export default function Wallet() {
                 }
               />
 
-              <div className="flex h-[88px] items-center border-y bg-card px-5 py-4">
+              <div className="flex min-h-[88px] items-center border-y bg-card px-5 py-4">
                 <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
                   <div className="min-w-0 self-center">
                     <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       {walletCard.card.issuer}
                     </div>
-                    <div className="mt-1 flex min-w-0 items-start gap-2 text-base font-bold leading-snug text-foreground">
-                      <span className="line-clamp-2">
+                    {/* Stacked, not inline: side by side the nickname and the
+                        product name each clipped the other in a card tile. */}
+                    <div className="mt-1 min-w-0 text-base font-bold leading-snug text-foreground">
+                      <div
+                        className="line-clamp-2"
+                        title={walletCard.nickname || walletCard.card.name}
+                      >
                         {walletCard.nickname || walletCard.card.name}
-                      </span>
+                      </div>
                       {walletCard.nickname && (
-                        <span className="mt-0.5 max-w-[10rem] truncate text-xs font-normal text-muted-foreground">
-                          ({walletCard.card.name})
-                        </span>
+                        <div
+                          className="line-clamp-1 text-xs font-normal text-muted-foreground"
+                          title={walletCard.card.name}
+                        >
+                          {walletCard.card.name}
+                        </div>
                       )}
                     </div>
                   </div>
-                  <div className="w-[5.75rem] shrink-0 text-right">
+                  <div className="min-w-[5.75rem] shrink-0 text-right">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Earned
                     </div>
@@ -1683,92 +2148,86 @@ export default function Wallet() {
                         walletCard.totalCashbackEarned,
                       )}
                     </div>
+                    <div className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                      All Time
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <BillingSettingsDialog
-                walletCardId={walletCard.id}
-                cardName={walletCard.card.name}
-                initial={{
-                  nickname: walletCard.nickname,
-                  statementClosingDay: walletCard.statementClosingDay,
-                  paymentDueDay: walletCard.paymentDueDay,
-                  creditLimit: walletCard.creditLimit,
-                  openedAt: walletCard.openedAt,
-                }}
-                trigger={
-                  <button
-                    type="button"
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                aria-label={`Billing settings for ${walletCard.card.name}`}
+                onClick={() => setBillingSettingsCardId(walletCard.id)}
+                className={cn(
+                  "min-h-[78px] w-full border-b px-5 py-2.5 text-left transition-colors hover:bg-secondary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  billingBannerClass,
+                )}
+              >
+                <div className="flex min-h-[58px] items-center gap-3">
+                  <span
                     className={cn(
-                      "min-h-[78px] w-full border-b px-5 py-2.5 text-left transition-colors hover:bg-secondary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      billingBannerClass,
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-[var(--app-shadow-soft)]",
+                      billingIconClass,
                     )}
                   >
-                    <div className="flex min-h-[58px] items-center gap-3">
-                      <span
-                        className={cn(
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg shadow-[var(--app-shadow-soft)]",
-                          billingIconClass,
-                        )}
-                      >
-                        {isOverdue ? (
-                          <AlertCircle className="h-4 w-4" />
-                        ) : hasCreditLimit && !showDueInfo ? (
-                          <CreditCard className="h-4 w-4" />
-                        ) : (
-                          <CalendarClock className="h-4 w-4" />
-                        )}
-                      </span>
-                      <div className="flex min-w-0 flex-1 flex-col justify-center">
-                        <div
-                          className={cn(
-                            "truncate text-base font-extrabold leading-tight",
-                            billingStatusClass,
-                          )}
-                        >
-                          {billingStatusLabel}
-                        </div>
-                        {billingSubItems.length > 0 ? (
-                          <div className="mt-1.5 flex min-w-0 items-center gap-1.5 overflow-hidden">
-                            {billingSubItems.map((item, index) => (
-                              <span
-                                key={`${item}-${index}`}
-                                className={cn(
-                                  "inline-flex h-5 min-w-0 max-w-full shrink items-center rounded-md bg-card/70 px-2 text-[11px] font-semibold leading-none tabular-nums text-muted-foreground shadow-[var(--app-shadow-soft)]",
-                                  index > 0 &&
-                                    "bg-transparent px-0 shadow-none",
-                                )}
-                              >
-                                <span className="truncate">{item}</span>
-                              </span>
-                            ))}
-                          </div>
-                        ) : null}
-                      </div>
-                      {billingPrimaryMetric ? (
-                        <div className="flex w-[8.25rem] shrink-0 flex-col justify-center text-right">
-                          <div className="truncate text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                            {billingPrimaryMetric.label}
-                          </div>
-                          <div
+                    {isOverdue ? (
+                      <AlertCircle className="h-4 w-4" />
+                    ) : hasCreditLimit && !showDueInfo ? (
+                      <CreditCard className="h-4 w-4" />
+                    ) : (
+                      <CalendarClock className="h-4 w-4" />
+                    )}
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-col justify-center">
+                    <div
+                      className={cn(
+                        "truncate text-base font-extrabold leading-tight",
+                        billingStatusClass,
+                      )}
+                    >
+                      {billingStatusLabel}
+                    </div>
+                    {billingSubItems.length > 0 ? (
+                      <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
+                        {billingSubItems.map((item, index) => (
+                          <span
+                            key={`${item}-${index}`}
                             className={cn(
-                              "mt-1 truncate text-xl font-extrabold leading-none tabular-nums",
-                              billingAmountClass,
+                              "inline-flex h-5 min-w-0 max-w-full shrink items-center rounded-md bg-card/70 px-2 text-[11px] font-semibold leading-none tabular-nums text-muted-foreground shadow-[var(--app-shadow-soft)]",
+                              index > 0 && "bg-transparent px-0 shadow-none",
                             )}
                           >
-                            {billingPrimaryMetric.value}
-                          </div>
-                        </div>
-                      ) : null}
+                            <span className="truncate">{item}</span>
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                  </div>
+                  {billingPrimaryMetric ? (
+                    // Sized to its content rather than a fixed column: a fixed
+                    // width starved the status label and clipped "Due in 6 days".
+                    <div className="flex shrink-0 flex-col justify-center text-right">
+                      <div className="truncate text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                        {billingPrimaryMetric.label}
+                      </div>
+                      <div
+                        className={cn(
+                          "mt-1 truncate text-xl font-extrabold leading-none tabular-nums",
+                          billingAmountClass,
+                        )}
+                      >
+                        {billingPrimaryMetric.value}
+                      </div>
                     </div>
-                  </button>
-                }
-              />
+                  ) : null}
+                </div>
+              </button>
 
               <CardContent className="flex-1 px-5 py-4">
-                {walletCard.card.annualFee > 0 ? (
-                  <div className="h-[116px] transition-all">
+                {hasAnnualFee ? (
+                  <div className="min-h-[116px] transition-all">
                     {(() => {
                       const fee = walletCard.card.annualFee;
                       const cashbackEarned =
@@ -1781,15 +2240,10 @@ export default function Wallet() {
                       const broken = net >= 0;
                       const annualFeeTone = getAnnualFeeTone(pct, broken);
 
-                      const anchorIso =
-                        walletCard.openedAt ?? walletCard.addedAt;
-                      const anchor = new Date(anchorIso);
-                      const now = new Date();
-                      const today = new Date(
-                        now.getFullYear(),
-                        now.getMonth(),
-                        now.getDate(),
-                      );
+                      const anchor = walletCard.openedAt
+                        ? parseCalendarDate(walletCard.openedAt)
+                        : new Date(walletCard.addedAt);
+                      const today = startOfLocalDay(now);
                       const anchorMonth = anchor.getMonth();
                       const anchorDay = anchor.getDate();
                       const clampDay = (y: number, m: number, d: number) =>
@@ -1815,7 +2269,7 @@ export default function Wallet() {
 
                       return (
                         <div
-                          className={`h-full rounded-md border px-3 py-2.5 ${annualFeeTone.panel}`}
+                          className={`rounded-md border px-3 py-2.5 ${annualFeeTone.panel}`}
                         >
                           <div className="mb-1.5 flex items-center justify-between gap-2">
                             <div className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1848,48 +2302,49 @@ export default function Wallet() {
                             </span>
                             <span>{pct.toFixed(0)}%</span>
                           </div>
-                          <div className="mt-0.5 truncate text-xs text-muted-foreground tabular-nums">
-                            Includes{" "}
-                            {formatCardAmount(walletCard.card, cashbackEarned)}{" "}
-                            Cashback
-                            {usedBenefitValueForCard > 0
-                              ? ` + ${formatCardAmount(walletCard.card, usedBenefitValueForCard)} Used Benefits`
-                              : ""}
+                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground tabular-nums">
+                            <span>
+                              Includes{" "}
+                              {formatCardAmount(
+                                walletCard.card,
+                                cashbackEarned,
+                              )}{" "}
+                              Cashback
+                            </span>
+                            {usedBenefitValueForCard > 0 ? (
+                              <span>
+                                +{" "}
+                                {formatCardAmount(
+                                  walletCard.card,
+                                  usedBenefitValueForCard,
+                                )}{" "}
+                                Used Benefits
+                              </span>
+                            ) : null}
                           </div>
-                          <BillingSettingsDialog
-                            walletCardId={walletCard.id}
-                            cardName={walletCard.card.name}
-                            initial={{
-                              nickname: walletCard.nickname,
-                              statementClosingDay:
-                                walletCard.statementClosingDay,
-                              paymentDueDay: walletCard.paymentDueDay,
-                              creditLimit: walletCard.creditLimit,
-                              openedAt: walletCard.openedAt,
-                            }}
-                            trigger={
-                              <button
-                                type="button"
-                                className="mt-1.5 flex h-6 w-full items-center gap-1.5 border-t border-border/50 pt-1.5 text-left text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                              >
-                                <CalendarClock className="h-3.5 w-3.5 shrink-0" />
-                                {hasOpenedDate ? (
-                                  <span className="min-w-0 truncate">
-                                    Next {formatAnnualFee(walletCard.card)} fee
-                                    in{" "}
-                                    <span className="font-semibold text-foreground tabular-nums">
-                                      {daysUntil} day
-                                      {daysUntil === 1 ? "" : "s"}
-                                    </span>
-                                  </span>
-                                ) : (
-                                  <span className="min-w-0 truncate">
-                                    Add account-opened date
-                                  </span>
-                                )}
-                              </button>
+                          <button
+                            type="button"
+                            aria-haspopup="dialog"
+                            onClick={() =>
+                              setBillingSettingsCardId(walletCard.id)
                             }
-                          />
+                            className="mt-1.5 flex min-h-6 w-full items-center gap-1.5 border-t border-border/50 pt-1.5 text-left text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          >
+                            <CalendarClock className="h-3.5 w-3.5 shrink-0" />
+                            {hasOpenedDate ? (
+                              <span className="min-w-0">
+                                Next {formatAnnualFee(walletCard.card)} fee in{" "}
+                                <span className="font-semibold text-foreground tabular-nums">
+                                  {daysUntil} day
+                                  {daysUntil === 1 ? "" : "s"}
+                                </span>
+                              </span>
+                            ) : (
+                              <span className="min-w-0">
+                                Add account-opened date
+                              </span>
+                            )}
+                          </button>
                         </div>
                       );
                     })()}
@@ -1897,45 +2352,66 @@ export default function Wallet() {
                 ) : null}
 
                 <div
-                  className={cn(
-                    "min-h-[132px]",
-                    walletCard.card.annualFee > 0 ? "mt-3" : "",
-                  )}
+                  className={cn("min-h-[132px]", hasAnnualFee ? "mt-3" : "")}
                 >
-                  <div className="mb-2 flex items-center justify-between gap-3">
+                  <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                       <TrendingUp className="w-4 h-4 text-foreground" />
                       Top Rewards
                     </div>
-                    <div className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold tabular-nums text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
-                      {formatCompactRewardTotal(
-                        detailedCard,
-                        cardPeriodRewardValue,
-                      )}
+                    <div className="shrink-0 text-right">
+                      <div className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold tabular-nums text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
+                        {formatCompactRewardTotal(
+                          detailedCard,
+                          cardPeriodRewardValue,
+                        )}
+                      </div>
+                      <div className="mt-0.5 text-[10px] font-medium text-muted-foreground">
+                        {selectedCashbackPeriod.helper}
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-1.5">
                     {[...walletCard.card.cashbackCategories]
                       .sort((a, b) => b.rate - a.rate)
                       .slice(0, 3)
-                      .map((cat) => (
-                        <div
-                          key={cat.id}
-                          className="flex h-8 items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-3 text-sm shadow-[var(--app-shadow-soft)]"
-                        >
-                          <span className="min-w-0 truncate font-medium text-foreground">
-                            {formatCompactRewardCategory(cat.category)}
-                          </span>
-                          <span className="shrink-0 rounded-md bg-secondary px-2 py-1 text-xs font-bold tabular-nums text-muted-foreground">
-                            {formatCompactEarnRate(detailedCard, cat.rate)}
-                          </span>
-                        </div>
-                      ))}
+                      .map((cat) => {
+                        const choice = choiceStateByCategoryId.get(cat.id);
+                        return (
+                          <div
+                            key={cat.id}
+                            className="flex h-8 items-center justify-between gap-3 rounded-lg border border-card-border bg-card px-3 text-sm shadow-[var(--app-shadow-soft)]"
+                          >
+                            <span className="min-w-0 truncate font-medium text-foreground">
+                              {choice?.active.length
+                                ? choice.active.join(", ")
+                                : formatCompactRewardCategory(cat.category)}
+                            </span>
+                            {choice && !choice.active.length ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setBillingSettingsCardId(walletCard.id)
+                                }
+                                className="shrink-0 rounded-md bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
+                              >
+                                Choose
+                              </button>
+                            ) : (
+                              <span className="shrink-0 rounded-md bg-secondary px-2 py-1 text-xs font-bold tabular-nums text-muted-foreground">
+                                {formatCompactEarnRate(detailedCard, cat.rate)}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
 
-                {walletCard.card.annualFee <= 0 && topBenefits.length > 0 ? (
-                  <div className="mt-5 min-h-[118px]">
+                {topBenefits.length > 0 ? (
+                  <div
+                    className={cn("mt-5", hasAnnualFee ? "" : "min-h-[118px]")}
+                  >
                     <div className="mb-2 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Gift className="h-4 w-4 text-foreground" />
@@ -1994,7 +2470,7 @@ export default function Wallet() {
                     className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-foreground hover:bg-secondary hover:no-underline"
                   >
                     <ReceiptText className="h-3.5 w-3.5" />
-                    Activity
+                    All Activity
                   </Link>
                 </div>
                 <AlertDialog>
@@ -2002,7 +2478,8 @@ export default function Wallet() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                      aria-label={`Remove ${walletCard.card.name} from wallet`}
+                      className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
@@ -2055,17 +2532,17 @@ export default function Wallet() {
                 const reviewedAt = formatReviewedDate(
                   detailedCard.lastReviewedAt,
                 );
-                const selectedPeriod =
-                  CASHBACK_PERIODS.find(
-                    (period) => period.id === cashbackPeriod,
-                  ) ?? CASHBACK_PERIODS[3];
-                const selectedCardPeriodRewardValue = (transactions ?? [])
+                const selectedCardPeriodRewardValue = (
+                  transactionsByWalletCard.get(selectedDetailCard.id) ?? []
+                )
                   .filter(
                     (transaction) =>
-                      matchesWalletCardId(transaction, selectedDetailCard.id) &&
                       (transaction.transactionType ?? "purchase") !==
                         "payment" &&
-                      new Date(transaction.date) >= rewardPeriodStart,
+                      isTransactionOnOrAfter(
+                        transaction.date,
+                        rewardPeriodStart,
+                      ),
                   )
                   .reduce(
                     (sum, transaction) => sum + transaction.cashbackEarned,
@@ -2143,13 +2620,13 @@ export default function Wallet() {
                               Rewards Earned
                             </div>
                             <div className="mt-1 text-lg font-bold text-emerald-900 dark:text-emerald-200">
-                              {formatCardRewardTotal(
+                              {formatCompactRewardTotal(
                                 detailedCard,
                                 selectedCardPeriodRewardValue,
                               )}
                             </div>
                             <div className="mt-1 text-xs font-medium text-muted-foreground">
-                              {selectedPeriod.helper}
+                              {selectedCashbackPeriod.helper}
                             </div>
                           </div>
                           <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
@@ -2195,6 +2672,13 @@ export default function Wallet() {
             : null}
         </SheetContent>
       </Sheet>
+
+      <BillingSettingsDialog
+        walletCard={billingSettingsCard}
+        onOpenChange={(open) => {
+          if (!open) setBillingSettingsCardId(null);
+        }}
+      />
     </div>
   );
 }

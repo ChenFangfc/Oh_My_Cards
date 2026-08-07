@@ -34,9 +34,17 @@ export function formatCompactRewardTotal(card: RewardCard, rewardValue: number):
   return `${units} ${getCompactRewardUnitName(card)}`;
 }
 
+function formatEarnRateValue(rate: number): string {
+  // Round in integer space first: rate * 100 leaves float dust (0.14 -> 14.000000000000002).
+  const percent = Math.round(rate * 1e6) / 1e4;
+  return String(Number(percent.toFixed(2)));
+}
+
 export function formatCompactEarnRate(card: RewardCard, rate: number): string {
-  const multiplier = rate * 100;
-  const value = Number.isInteger(multiplier) ? multiplier.toFixed(0) : multiplier.toFixed(1);
+  const earnsRewards = Boolean(card.rewardType ?? card.rewardUnitName);
+  if (!earnsRewards || !Number.isFinite(rate) || rate <= 0) return "—";
+
+  const value = formatEarnRateValue(rate);
   return card.rewardType === "cashback" ? `${value}%` : `${value}x`;
 }
 
@@ -51,7 +59,41 @@ function toTitleCase(value: string): string {
     .join(" ");
 }
 
+const SPEND_CAP_PATTERN = /\b(?:up to|first)\s+([A-Za-z]{0,3}\$)\s*([\d,]+)\s*(?:\/|\s+per\s+)?(month|monthly|quarter|quarterly|yr|year|annual|annually)?/i;
+
+const CAP_PERIOD_LABELS: Array<[RegExp, string]> = [
+  [/^month/i, "/mo"],
+  [/^quarter/i, "/qtr"],
+  [/^(?:yr|year|annual)/i, "/yr"],
+];
+
+function formatCapAmount(symbol: string, digits: string): string {
+  const amount = Number(digits.replace(/,/g, ""));
+  if (!Number.isFinite(amount) || amount <= 0) return "";
+  if (amount >= 1_000_000) return `${symbol}${Number((amount / 1_000_000).toFixed(1))}M`;
+  if (amount >= 1_000) return `${symbol}${Number((amount / 1_000).toFixed(1))}k`;
+  return `${symbol}${amount}`;
+}
+
+/** Compact form of a spending cap, e.g. "$6k/yr", so caps survive label normalization. */
+function extractSpendCap(category: string): string {
+  const match = SPEND_CAP_PATTERN.exec(category);
+  if (!match) return "";
+
+  const amount = formatCapAmount(match[1], match[2]);
+  if (!amount) return "";
+
+  const period = CAP_PERIOD_LABELS.find(([pattern]) => pattern.test(match[3] ?? ""))?.[1] ?? "";
+  return `${amount}${period}`;
+}
+
+function withSpendCap(label: string, cap: string): string {
+  if (!cap || label.includes("$")) return label;
+  return `${label} · to ${cap}`;
+}
+
 export function formatCompactRewardCategory(category: string): string {
+  const spendCap = extractSpendCap(category);
   const normalized = category
     .replace(/\([^)]*\)/g, "")
     .replace(/\b(?:up to|first)\s+\$[\d,]+(?:\/|\s+per\s+)?(?:month|monthly|quarter|quarterly|yr|year|annual|annually)?/gi, "")
@@ -76,6 +118,7 @@ export function formatCompactRewardCategory(category: string): string {
     [/gas.*ev charging.*office supplies|gas.*ev charging.*cell phone/i, "Gas & Business"],
     [/streaming.*watsons.*ev charging/i, "Streaming & Watsons"],
     [/eligible gas|gas.*costco/i, "Eligible Gas"],
+    [/gas.*ev charging/i, "Gas & EV"],
     [/eligible ev charging|ev charging/i, "EV Charging"],
     [/grocery stores.*wholesale|groceries.*wholesale/i, "Groceries & Wholesale"],
     [/groceries.*rideshare.*food delivery/i, "Groceries & Daily"],
@@ -94,14 +137,13 @@ export function formatCompactRewardCategory(category: string): string {
     [/bank of america travel center/i, "Travel Center"],
     [/travel via .*rewards centre/i, "Travel Portal"],
     [/capital one business travel/i, "Business Travel"],
-    [/capital one entertainment/i, "Entertainment"],
+    [/capital one entertainment/i, "Entertainment Portal"],
     [/amazon business.*whole foods/i, "Amazon & Whole Foods"],
     [/expedia.*hotels\.com.*vrbo/i, "Expedia Group"],
     [/restaurants.*food delivery|dining.*food delivery/i, "Dining & Delivery"],
     [/restaurants.*worldwide/i, "Restaurants"],
     [/gas.*transit.*ride share|gas.*transit.*rideshare/i, "Gas & Transit"],
     [/local transit.*commuting|local transit|transit.*rideshare|rideshare.*transit|gas.*transit/i, "Transit"],
-    [/gas.*ev charging/i, "Gas & EV"],
     [/streaming subscriptions/i, "Streaming"],
     [/streaming.*internet.*cable.*phone|telecom.*cable.*satellite|streaming.*cable/i, "Streaming & Phone"],
     [/marketing.*advertising.*utilities/i, "Marketing & Utilities"],
@@ -119,7 +161,7 @@ export function formatCompactRewardCategory(category: string): string {
   ];
 
   for (const [pattern, label] of directRules) {
-    if (pattern.test(normalized)) return label;
+    if (pattern.test(normalized)) return withSpendCap(label, spendCap);
   }
 
   let compact = normalized
@@ -149,5 +191,5 @@ export function formatCompactRewardCategory(category: string): string {
   }
   compact = compact.replace(/[,&/\s]+$/g, "").trim();
 
-  return toTitleCase(compact || lower || category);
+  return withSpendCap(toTitleCase(compact || lower || category), spendCap);
 }

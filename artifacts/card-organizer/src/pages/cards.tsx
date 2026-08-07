@@ -3,18 +3,28 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Check, Search, CreditCard as CreditCardIcon, X } from "lucide-react";
+import {
+  Plus,
+  Check,
+  ChevronDown,
+  Search,
+  SlidersHorizontal,
+  CreditCard as CreditCardIcon,
+  TriangleAlert,
+  X,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { getListWalletQueryKey } from "@workspace/api-client-react";
 import { Input } from "@/components/ui/input";
-import { type ReactNode, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type ReactNode, useDeferredValue, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CardArt, IssuerBrandChip, NetworkBadge } from "@/components/bank-logo";
 import { formatAnnualFee, formatCardAmount } from "@/lib/card-format";
 import {
   formatCompactEarnRate,
   formatCompactRewardCategory,
 } from "@/lib/reward-display";
+import { cn } from "@/lib/utils";
 
 type CardTypeId =
   | "travel"
@@ -34,10 +44,21 @@ type FilterOption = {
   count: number;
 };
 
+/**
+ * Catalog-only fields that are not part of the shared CreditCard wire type.
+ * Read defensively — every one of them is optional in the catalog.
+ */
 type CatalogCard = CreditCard & {
   market?: string | null;
   sourceUrl?: string | null;
+  availability?: string | null;
+  availabilityChangedAt?: string | null;
 };
+
+const PAGE_SIZE = 24;
+
+/** Scroll depth past which the filter panel collapses on its own. */
+const COLLAPSE_SCROLL_THRESHOLD = 24;
 
 const CARD_TYPES: Array<{ id: CardTypeId; label: string }> = [
   { id: "travel", label: "Travel" },
@@ -51,6 +72,13 @@ const CARD_TYPES: Array<{ id: CardTypeId; label: string }> = [
   { id: "retail", label: "Retail" },
   { id: "student", label: "Student" },
 ];
+
+const MARKET_ORDER = ["US", "Canada", "Hong Kong", "Singapore"];
+
+const AVAILABILITY_LABELS: Record<string, string> = {
+  "closed-to-new-applicants": "Closed to new applicants",
+  discontinued: "No longer offered",
+};
 
 const BANK_MATCHERS: Array<{ label: string; match: (issuer: string) => boolean }> = [
   { label: "American Express", match: (issuer) => issuer.includes("american express") },
@@ -138,6 +166,7 @@ const BANK_SCALE_ORDER: Record<string, number> = {
   Bilt: 40,
 };
 
+/** Keys must match `card.name` in the catalog exactly, otherwise the boost silently never applies. */
 const POPULAR_CARD_RANKS: Record<string, number> = {
   "Chase Sapphire Preferred": 1,
   "Chase Sapphire Reserve": 2,
@@ -155,12 +184,12 @@ const POPULAR_CARD_RANKS: Record<string, number> = {
   "Discover it Cash Back": 14,
   "Capital One Savor Rewards": 15,
   "Capital One Venture Rewards": 16,
-  "Blue Cash Preferred Card from American Express": 17,
-  "Blue Cash Everyday Card from American Express": 18,
+  "Amex Blue Cash Preferred": 17,
+  "Amex Blue Cash Everyday": 18,
   "Prime Visa": 19,
-  "Costco Anywhere Visa Card by Citi": 20,
+  "Costco Anywhere Visa by Citi": 20,
   "American Express Business Gold": 21,
-  "The Business Platinum Card from American Express": 22,
+  "American Express Business Platinum": 22,
   "Chase Ink Business Preferred": 23,
   "Chase Ink Business Cash": 24,
   "Chase Ink Business Unlimited": 25,
@@ -172,7 +201,7 @@ const POPULAR_CARD_RANKS: Record<string, number> = {
   "Delta SkyMiles Gold American Express": 31,
   "Delta SkyMiles Platinum American Express": 32,
   "Citi Strata Premier": 33,
-  "U.S. Bank Cash+ Visa Signature": 34,
+  "US Bank Cash+": 34,
   "Bank of America Customized Cash Rewards": 35,
   "Bank of America Premium Rewards": 36,
   "PayPal Cashback Mastercard": 37,
@@ -200,23 +229,11 @@ function getPrimaryBank(issuer: string): string {
   return BANK_MATCHERS.find((bank) => bank.match(normalized))?.label ?? issuer.split("/")[0].trim();
 }
 
-function getCardText(card: CreditCard): string {
-  return [
-    card.name,
-    card.issuer,
-    card.network,
-    card.signupBonus ?? "",
-    ...card.cashbackCategories.map((category) => category.category),
-    ...card.benefits.flatMap((benefit) => [benefit.name, benefit.description]),
-  ].join(" ").toLowerCase();
-}
-
 function hasAny(text: string, terms: string[]): boolean {
   return terms.some((term) => text.includes(term));
 }
 
-function getCardTypes(card: CreditCard): CardTypeId[] {
-  const text = getCardText(card);
+function getCardTypes(text: string): CardTypeId[] {
   const types = new Set<CardTypeId>();
 
   if (hasAny(text, [
@@ -314,12 +331,46 @@ function getCardMarket(card: CreditCard): string {
   return (card as CatalogCard).market ?? "US";
 }
 
-function getCardPopularityScore(card: CreditCard): number {
+function getCardAvailability(card: CreditCard): string {
+  return (card as CatalogCard).availability ?? "open";
+}
+
+/**
+ * Everything derived from a single card that the filter, sort and search passes
+ * need. Built once per catalog load so no keystroke ever re-serializes a card.
+ */
+type CardMeta = {
+  bank: string;
+  market: string;
+  availability: string;
+  types: CardTypeId[];
+  nameText: string;
+  issuerText: string;
+  categoryText: string;
+  fullText: string;
+  score: number;
+};
+
+function buildCardMeta(card: CreditCard): CardMeta {
+  const nameText = card.name.toLowerCase();
+  const issuerText = `${card.issuer} ${card.network}`.toLowerCase();
+  const categoryText = card.cashbackCategories
+    .map((category) => category.category)
+    .join(" ")
+    .toLowerCase();
+  const fullText = [
+    nameText,
+    issuerText,
+    (card.signupBonus ?? "").toLowerCase(),
+    categoryText,
+    ...card.benefits.flatMap((benefit) => [benefit.name.toLowerCase(), benefit.description.toLowerCase()]),
+  ].join(" ");
+
   const bank = getPrimaryBank(card.issuer);
-  const bankRank = BANK_SCALE_ORDER[bank] ?? 60;
-  const types = getCardTypes(card);
-  const bestRewardRate = Math.max(0, ...card.cashbackCategories.map((category) => category.rate));
+  const types = getCardTypes(fullText);
   const market = getCardMarket(card);
+  const bankRank = BANK_SCALE_ORDER[bank] ?? 60;
+  const bestRewardRate = Math.max(0, ...card.cashbackCategories.map((category) => category.rate));
   let score = 15_000 - bankRank * 80;
 
   score += ({
@@ -346,13 +397,31 @@ function getCardPopularityScore(card: CreditCard): number {
     score += Math.max(0, 24_000 - explicitRank * 220);
   }
 
-  return score;
+  return { bank, market, availability: getCardAvailability(card), types, nameText, issuerText, categoryText, fullText, score };
 }
 
-function compareCardsByPopularity(a: CreditCard, b: CreditCard): number {
-  const scoreDelta = getCardPopularityScore(b) - getCardPopularityScore(a);
-  if (scoreDelta !== 0) return scoreDelta;
-  return a.name.localeCompare(b.name);
+/**
+ * Higher is a better match. Benefit prose still matches so the result set is
+ * unchanged, but it ranks below anything that matched the card's own identity.
+ */
+function getSearchRelevance(meta: CardMeta, term: string): number {
+  if (term.length === 0) return 0;
+  if (meta.nameText.startsWith(term)) return 5;
+  if (meta.nameText.includes(term)) return 4;
+  if (meta.issuerText.includes(term)) return 3;
+  if (meta.categoryText.includes(term)) return 2;
+  if (meta.fullText.includes(term)) return 1;
+  return 0;
+}
+
+function findScrollParent(node: HTMLElement | null): HTMLElement | null {
+  let current = node?.parentElement ?? null;
+  while (current) {
+    const overflowY = window.getComputedStyle(current).overflowY;
+    if (overflowY === "auto" || overflowY === "scroll") return current;
+    current = current.parentElement;
+  }
+  return null;
 }
 
 interface FilterGroupProps {
@@ -413,7 +482,7 @@ function FilterGroup({ label, allLabel, options, selected, onSelect, action }: F
 }
 
 export default function Cards() {
-  const { data: cards, isLoading } = useListCards();
+  const { data: cards, isLoading, isError, refetch } = useListCards();
   const { data: wallet } = useListWallet();
   const addToWallet = useAddToWallet();
   const { toast } = useToast();
@@ -421,7 +490,9 @@ export default function Cards() {
   const [search, setSearch] = useState("");
   const [selectedBank, setSelectedBank] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<CardTypeId | null>(null);
-  const cardListRef = useRef<HTMLDivElement | null>(null);
+  const [selectedMarket, setSelectedMarket] = useState<string | null>(null);
+  const [showDiscontinued, setShowDiscontinued] = useState(false);
+  const pageRef = useRef<HTMLDivElement | null>(null);
   const scrollPositionsRef = useRef<Record<string, number>>({});
   const suppressScrollSaveRef = useRef(false);
 
@@ -442,11 +513,18 @@ export default function Cards() {
 
   const walletCardIds = new Set(wallet?.map(w => w.cardId) || []);
 
+  const cardMeta = useMemo(() => {
+    const meta = new Map<number, CardMeta>();
+    for (const card of cards ?? []) {
+      meta.set(card.id, buildCardMeta(card));
+    }
+    return meta;
+  }, [cards]);
+
   const bankOptions = useMemo<FilterOption[]>(() => {
     const counts = new Map<string, number>();
-    for (const card of cards ?? []) {
-      const bank = getPrimaryBank(card.issuer);
-      counts.set(bank, (counts.get(bank) ?? 0) + 1);
+    for (const meta of cardMeta.values()) {
+      counts.set(meta.bank, (counts.get(meta.bank) ?? 0) + 1);
     }
     return Array.from(counts.entries())
       .map(([id, count]) => ({ id, label: id, count }))
@@ -455,35 +533,124 @@ export default function Cards() {
         if (rankDelta !== 0) return rankDelta;
         return b.count - a.count || a.label.localeCompare(b.label);
       });
-  }, [cards]);
+  }, [cardMeta]);
 
   const typeOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const meta of cardMeta.values()) {
+      for (const type of meta.types) {
+        counts.set(type, (counts.get(type) ?? 0) + 1);
+      }
+    }
     return CARD_TYPES.map((type) => ({
       id: type.id,
       label: type.label,
-      count: (cards ?? []).filter((card) => getCardTypes(card).includes(type.id)).length,
+      count: counts.get(type.id) ?? 0,
     })).filter((type) => type.count > 0);
-  }, [cards]);
+  }, [cardMeta]);
+
+  const marketOptions = useMemo<FilterOption[]>(() => {
+    const counts = new Map<string, number>();
+    for (const meta of cardMeta.values()) {
+      counts.set(meta.market, (counts.get(meta.market) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([id, count]) => ({ id, label: id, count }))
+      .sort((a, b) => {
+        const orderDelta = (MARKET_ORDER.indexOf(a.id) + 1 || 99) - (MARKET_ORDER.indexOf(b.id) + 1 || 99);
+        return orderDelta !== 0 ? orderDelta : a.label.localeCompare(b.label);
+      });
+  }, [cardMeta]);
+
+  const retiredCount = useMemo(() => {
+    let count = 0;
+    for (const meta of cardMeta.values()) {
+      if (meta.availability === "discontinued") count += 1;
+    }
+    return count;
+  }, [cardMeta]);
+
+  const deferredSearch = useDeferredValue(search);
+  const searchTerm = deferredSearch.trim().toLowerCase();
 
   const filteredCards = useMemo(() => {
-    const searchTerm = search.trim().toLowerCase();
+    const ranked: Array<{ card: CreditCard; relevance: number; score: number; name: string }> = [];
 
-    const visibleCards = (cards ?? []).filter((card) => {
-      const cardTypes = getCardTypes(card);
-      const matchesSearch = searchTerm.length === 0 || getCardText(card).includes(searchTerm);
-      const matchesBank = selectedBank == null || getPrimaryBank(card.issuer) === selectedBank;
-      const matchesType = selectedType == null || cardTypes.includes(selectedType);
-      return matchesSearch && matchesBank && matchesType;
+    for (const card of cards ?? []) {
+      const meta = cardMeta.get(card.id);
+      if (!meta) continue;
+      if (!showDiscontinued && meta.availability === "discontinued") continue;
+      if (selectedBank != null && meta.bank !== selectedBank) continue;
+      if (selectedType != null && !meta.types.includes(selectedType)) continue;
+      if (selectedMarket != null && meta.market !== selectedMarket) continue;
+
+      const relevance = searchTerm.length === 0 ? 0 : getSearchRelevance(meta, searchTerm);
+      if (searchTerm.length > 0 && relevance === 0) continue;
+
+      ranked.push({ card, relevance, score: meta.score, name: card.name });
+    }
+
+    ranked.sort((a, b) => {
+      if (a.relevance !== b.relevance) return b.relevance - a.relevance;
+      if (a.score !== b.score) return b.score - a.score;
+      return a.name.localeCompare(b.name);
     });
 
-    return [...visibleCards].sort(compareCardsByPopularity);
-  }, [cards, search, selectedBank, selectedType]);
+    return ranked.map((entry) => entry.card);
+  }, [cards, cardMeta, searchTerm, selectedBank, selectedType, selectedMarket, showDiscontinued]);
 
-  const activeFilterCount = (selectedBank == null ? 0 : 1) + (selectedType == null ? 0 : 1);
-  const scrollKey = `${selectedBank ?? "all-banks"}|${selectedType ?? "all-types"}|${search.trim().toLowerCase()}`;
+  const activeFilterCount =
+    (selectedBank == null ? 0 : 1) + (selectedType == null ? 0 : 1) + (selectedMarket == null ? 0 : 1);
+
+  // Shown in place of the chip rows while collapsed, so the applied filters
+  // stay visible and removable without expanding the panel.
+  const activeFilterSummary = [
+    selectedType
+      ? {
+          label: CARD_TYPES.find((type) => type.id === selectedType)?.label ?? selectedType,
+          clear: () => setSelectedType(null),
+        }
+      : null,
+    selectedMarket
+      ? { label: selectedMarket, clear: () => setSelectedMarket(null) }
+      : null,
+    selectedBank
+      ? { label: selectedBank, clear: () => setSelectedBank(null) }
+      : null,
+  ].filter((entry): entry is { label: string; clear: () => void } => entry !== null);
+  const scrollKey = `${selectedBank ?? "all-banks"}|${selectedType ?? "all-types"}|${selectedMarket ?? "all-markets"}|${showDiscontinued}|${searchTerm}`;
+
+  // Paging resets whenever the result set changes, without an extra render pass.
+  const [pageState, setPageState] = useState({ key: scrollKey, count: PAGE_SIZE });
+  const visibleCount = pageState.key === scrollKey ? pageState.count : PAGE_SIZE;
+  const visibleCards = filteredCards.slice(0, visibleCount);
+  const remainingCount = filteredCards.length - visibleCards.length;
+
+  // The filter panel is four rows of chips tall, which covers most of a phone
+  // screen once it sticks. It collapses itself as soon as the grid scrolls, and
+  // a manual toggle overrides that until the user returns to the top — so
+  // opening it to change a filter 100 cards down does not immediately re-close.
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [manualExpanded, setManualExpanded] = useState<boolean | null>(null);
+  const filtersExpanded = manualExpanded ?? !isScrolled;
+
+  useLayoutEffect(() => {
+    const scroller = findScrollParent(pageRef.current);
+    if (!scroller) return;
+
+    const syncCollapse = () => {
+      const scrolled = scroller.scrollTop > COLLAPSE_SCROLL_THRESHOLD;
+      setIsScrolled(scrolled);
+      if (!scrolled) setManualExpanded(null);
+    };
+
+    syncCollapse();
+    scroller.addEventListener("scroll", syncCollapse, { passive: true });
+    return () => scroller.removeEventListener("scroll", syncCollapse);
+  }, []);
 
   const saveCurrentScrollPosition = () => {
-    const scroller = cardListRef.current;
+    const scroller = findScrollParent(pageRef.current);
     if (scroller) {
       scrollPositionsRef.current[scrollKey] = scroller.scrollTop;
     }
@@ -495,104 +662,187 @@ export default function Cards() {
   };
 
   useLayoutEffect(() => {
-    const scroller = cardListRef.current;
+    const scroller = findScrollParent(pageRef.current);
     if (!scroller) return;
 
-    const key = scrollKey;
-    let frame = 0;
-    let secondFrame = 0;
     const restoreScroll = () => {
-      const savedTop = scrollPositionsRef.current[key] ?? 0;
+      const savedTop = scrollPositionsRef.current[scrollKey] ?? 0;
       scroller.scrollTop = Math.min(savedTop, Math.max(0, scroller.scrollHeight - scroller.clientHeight));
     };
 
     restoreScroll();
-    frame = requestAnimationFrame(() => {
+    const frame = requestAnimationFrame(() => {
       restoreScroll();
-      secondFrame = requestAnimationFrame(() => {
-        restoreScroll();
-        suppressScrollSaveRef.current = false;
-      });
+      suppressScrollSaveRef.current = false;
     });
+
+    const handleScroll = () => {
+      if (suppressScrollSaveRef.current) return;
+      scrollPositionsRef.current[scrollKey] = scroller.scrollTop;
+    };
+    scroller.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
       cancelAnimationFrame(frame);
-      cancelAnimationFrame(secondFrame);
+      suppressScrollSaveRef.current = false;
+      scroller.removeEventListener("scroll", handleScroll);
     };
-  }, [scrollKey, filteredCards?.length]);
+  }, [scrollKey, filteredCards.length]);
 
   return (
-    <div className="flex h-[calc(100vh-5.5rem)] min-h-0 min-w-0 flex-col gap-5 animate-in fade-in slide-in-from-bottom-4 duration-500 md:h-[calc(100vh-3rem)]">
-      <div className="min-w-0 flex-none space-y-4">
-        <h2 className="text-2xl font-bold tracking-tight md:text-[28px]">Card Library</h2>
+    <div ref={pageRef} className="flex min-w-0 flex-col gap-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <h2 className="min-w-0 text-2xl font-bold tracking-tight md:text-[28px]">Card Library</h2>
 
-        {!isLoading && (
-          <div className="w-full min-w-0 max-w-[calc(100vw-2rem)] space-y-3 overflow-hidden rounded-lg border border-card-border bg-card p-3 shadow-[var(--app-shadow-soft)] md:max-w-none">
-            <div className="flex min-w-0 flex-col gap-2 border-b border-card-border/70 pb-2 sm:flex-row sm:items-center sm:justify-between">
-              <div className="relative w-full min-w-0 sm:max-w-md">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search cards or banks..."
-                  className="pl-9 bg-card"
-                  value={search}
-                  onChange={(e) => {
-                    prepareFilterChange();
-                    setSearch(e.target.value);
-                  }}
-                />
-              </div>
-              <span className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground sm:text-right">
-                {filteredCards.length} shown
-              </span>
+      {!isLoading && !isError && (
+        // Negative insets on all four sides so the opaque backdrop covers the
+        // page gutter. The negative `top` matters most: sticky pins to the
+        // scroll container's *content* box, so `top-0` would leave its padding
+        // strip uncovered and card art would scroll through it.
+        <div className="sticky -top-4 z-20 -mx-4 -mt-4 bg-background px-4 pb-3 pt-4 md:-top-6 md:-mx-6 md:-mt-6 md:px-6 md:pt-6">
+        <div className="w-full min-w-0 space-y-3 overflow-hidden rounded-lg border border-card-border bg-card p-3 shadow-[var(--app-shadow-soft)]">
+          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative w-full min-w-0 sm:max-w-md">
+              <Search aria-hidden="true" className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                aria-label="Search cards or banks"
+                placeholder="Search cards or banks..."
+                className="pl-9 bg-card"
+                value={search}
+                onChange={(e) => {
+                  prepareFilterChange();
+                  setSearch(e.target.value);
+                }}
+              />
             </div>
-            <FilterGroup
-              label="Type"
-              allLabel="All types"
-              options={typeOptions}
-              selected={selectedType}
-              onSelect={(type) => {
-                prepareFilterChange();
-                setSelectedType(type as CardTypeId | null);
-              }}
-              action={activeFilterCount > 0 ? (
+            <div className="flex shrink-0 items-center gap-2 sm:justify-end">
+              {retiredCount > 0 ? (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant={showDiscontinued ? "secondary" : "ghost"}
                   size="sm"
-                  className="h-7 px-2 text-xs"
+                  aria-pressed={showDiscontinued}
+                  className="h-8 px-2.5 text-xs"
                   onClick={() => {
                     prepareFilterChange();
-                    setSelectedBank(null);
-                    setSelectedType(null);
+                    setShowDiscontinued((previous) => !previous);
                   }}
                 >
-                  <X className="mr-1 h-3 w-3" />
-                  Clear
+                  {showDiscontinued ? "Hide retired" : `Show retired (${retiredCount})`}
                 </Button>
               ) : null}
-            />
+              <span
+                aria-live="polite"
+                className="text-xs font-medium tabular-nums text-muted-foreground"
+              >
+                {filteredCards.length} shown
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                aria-expanded={filtersExpanded}
+                aria-controls="card-filters"
+                className="h-8 gap-1 px-2 text-xs"
+                onClick={() => setManualExpanded(!filtersExpanded)}
+              >
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                Filters
+                {activeFilterCount > 0 ? (
+                  <span className="rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+                    {activeFilterCount}
+                  </span>
+                ) : null}
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn(
+                    "h-3.5 w-3.5 transition-transform",
+                    filtersExpanded && "rotate-180",
+                  )}
+                />
+              </Button>
+            </div>
+          </div>
+
+          {!filtersExpanded && activeFilterSummary.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5 border-t border-card-border/70 pt-2">
+              {activeFilterSummary.map((entry) => (
+                <button
+                  key={entry.label}
+                  type="button"
+                  aria-label={`Clear ${entry.label} filter`}
+                  onClick={() => {
+                    prepareFilterChange();
+                    entry.clear();
+                  }}
+                  className="inline-flex h-7 items-center gap-1 rounded-md border border-transparent bg-primary px-2.5 text-xs font-semibold text-primary-foreground"
+                >
+                  {entry.label}
+                  <X aria-hidden="true" className="h-3 w-3" />
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          <div
+            id="card-filters"
+            hidden={!filtersExpanded}
+            className="space-y-3 border-t border-card-border/70 pt-2"
+          >
+          <FilterGroup
+            label="Type"
+            allLabel="All types"
+            options={typeOptions}
+            selected={selectedType}
+            onSelect={(type) => {
+              prepareFilterChange();
+              setSelectedType(type as CardTypeId | null);
+            }}
+            action={activeFilterCount > 0 ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs"
+                onClick={() => {
+                  prepareFilterChange();
+                  setSelectedBank(null);
+                  setSelectedType(null);
+                  setSelectedMarket(null);
+                }}
+              >
+                <X className="mr-1 h-3 w-3" />
+                Clear
+              </Button>
+            ) : null}
+          />
+          {marketOptions.length > 1 ? (
             <FilterGroup
-              label="Bank"
-              allLabel="All banks"
-              options={bankOptions}
-              selected={selectedBank}
-              onSelect={(bank) => {
+              label="Market"
+              allLabel="All markets"
+              options={marketOptions}
+              selected={selectedMarket}
+              onSelect={(market) => {
                 prepareFilterChange();
-                setSelectedBank(bank);
+                setSelectedMarket(market);
               }}
             />
+          ) : null}
+          <FilterGroup
+            label="Bank"
+            allLabel="All banks"
+            options={bankOptions}
+            selected={selectedBank}
+            onSelect={(bank) => {
+              prepareFilterChange();
+              setSelectedBank(bank);
+            }}
+          />
           </div>
-        )}
-      </div>
+        </div>
+        </div>
+      )}
 
-      <div
-        ref={cardListRef}
-        className="min-h-0 flex-1 overflow-y-auto pr-1 md:pr-2"
-        onScroll={(event) => {
-          if (suppressScrollSaveRef.current) return;
-          scrollPositionsRef.current[scrollKey] = event.currentTarget.scrollTop;
-        }}
-      >
+      <div className="min-w-0">
         {isLoading ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -603,17 +853,33 @@ export default function Cards() {
             </Card>
           ))}
           </div>
-        ) : filteredCards?.length === 0 ? (
+        ) : isError ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/40 bg-destructive/5 py-12 text-center shadow-[var(--app-shadow-soft)]">
+            <TriangleAlert className="mb-4 h-12 w-12 text-destructive opacity-70" />
+            <h3 className="text-lg font-medium">Couldn't load the card library</h3>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Your saved cards are safe. Retry to load the catalog again.
+            </p>
+            <Button type="button" variant="outline" className="mt-4" onClick={() => refetch()}>
+              Try again
+            </Button>
+          </div>
+        ) : filteredCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center border rounded-lg bg-card/70 border-dashed shadow-[var(--app-shadow-soft)]">
           <CreditCardIcon className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
           <h3 className="text-lg font-medium">No cards found</h3>
           <p className="text-muted-foreground">Try adjusting your search or filter.</p>
           </div>
         ) : (
+          <div className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredCards?.map((card) => {
+          {visibleCards.map((card) => {
             const inWallet = walletCardIds.has(card.id) || card.inWallet;
-            const sourceUrl = (card as CatalogCard).sourceUrl;
+            const isAdding = addToWallet.isPending && addToWallet.variables?.data.cardId === card.id;
+            const catalogCard = card as CatalogCard;
+            const sourceUrl = catalogCard.sourceUrl;
+            const availability = getCardAvailability(card);
+            const availabilityLabel = AVAILABILITY_LABELS[availability];
             return (
               <Card key={card.id} className="overflow-hidden flex flex-col transition-colors hover:border-primary/30">
                 {/* Card visual: actual product image when available, gradient + branded header otherwise. */}
@@ -642,7 +908,7 @@ export default function Cards() {
 
                 <CardHeader className="pb-2 flex-none">
                   <div className="flex justify-between items-start gap-3">
-                    <CardTitle className="min-w-0 text-base leading-snug">
+                    <CardTitle as="h3" className="min-w-0 text-base leading-snug">
                       {sourceUrl ? (
                         <a
                           href={sourceUrl}
@@ -661,6 +927,20 @@ export default function Cards() {
                     </Badge>
                   </div>
                   <CardDescription>{card.issuer}</CardDescription>
+                  {availabilityLabel ? (
+                    <Badge
+                      variant="outline"
+                      title={catalogCard.availabilityChangedAt ? `Since ${catalogCard.availabilityChangedAt}` : undefined}
+                      className={cn(
+                        "w-fit text-[11px] font-semibold",
+                        availability === "discontinued"
+                          ? "border-destructive/40 bg-destructive/10 text-destructive"
+                          : "border-amber-500/40 bg-amber-500/10 text-amber-700",
+                      )}
+                    >
+                      {availabilityLabel}
+                    </Badge>
+                  ) : null}
                 </CardHeader>
 
                 <CardContent className="flex-1 pb-3 text-sm space-y-3">
@@ -679,7 +959,7 @@ export default function Cards() {
                   <div>
                     <div className="font-medium text-xs uppercase tracking-wider text-muted-foreground mb-2">Top Rewards</div>
                     <div className="flex flex-wrap gap-1.5">
-                      {card.cashbackCategories
+                      {[...card.cashbackCategories]
                         .sort((a, b) => b.rate - a.rate)
                         .slice(0, 4)
                         .map(cat => (
@@ -695,7 +975,8 @@ export default function Cards() {
                   <Button
                     className="w-full font-medium"
                     variant={inWallet ? "secondary" : "default"}
-                    disabled={inWallet || addToWallet.isPending}
+                    disabled={inWallet || isAdding}
+                    aria-label={inWallet ? `${card.name} is already in your wallet` : `Add ${card.name} to wallet`}
                     onClick={() => handleAdd(card.id)}
                   >
                     {inWallet ? (
@@ -708,6 +989,22 @@ export default function Cards() {
               </Card>
             );
           })}
+          </div>
+          {remainingCount > 0 ? (
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 px-6"
+                onClick={() => setPageState({ key: scrollKey, count: visibleCount + PAGE_SIZE })}
+              >
+                Show {Math.min(PAGE_SIZE, remainingCount)} more
+                <span className="ml-2 text-xs font-normal tabular-nums text-muted-foreground">
+                  {remainingCount} left
+                </span>
+              </Button>
+            </div>
+          ) : null}
           </div>
         )}
       </div>

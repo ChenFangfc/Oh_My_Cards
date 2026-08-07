@@ -10,6 +10,21 @@ const serviceWorkerPath = path.join(distRoot, "service-worker.js");
 
 const excludedFileNames = new Set([".DS_Store", "service-worker.js"]);
 
+// The shell is everything needed to boot the app offline. Card artwork and the
+// full-size app icon are deliberately excluded: 22 MB of images would otherwise
+// be force-downloaded on install and again on every redeploy, so they are left
+// to the runtime cacheFirst handler.
+const coreShellPatterns = [/^index\.html$/, /^assets\/.+\.(?:js|css)$/];
+const optionalShellPatterns = [
+  /^manifest\.webmanifest$/,
+  /^favicon-\d+\.png$/,
+  /^icon-(?:192|512|maskable-512)\.png$/,
+];
+
+function matchesAny(patterns, urlPath) {
+  return patterns.some((pattern) => pattern.test(urlPath));
+}
+
 async function collectFiles(directory) {
   const entries = await fs.readdir(directory, { withFileTypes: true });
   const files = [];
@@ -46,13 +61,30 @@ const files = (await collectFiles(distRoot)).sort((left, right) =>
 );
 
 const versionHash = createHash("sha256");
-const urls = ["./"];
+const coreUrls = ["./"];
+const optionalUrls = [];
 
+// The version covers the whole published tree, not just the shell, so that any
+// deploy produces a byte-different service worker and reaches installed clients.
 for (const file of files) {
   const urlPath = toUrlPath(file);
-  urls.push(urlPath);
   versionHash.update(urlPath);
   versionHash.update(await hashFile(file));
+
+  if (matchesAny(coreShellPatterns, urlPath)) {
+    coreUrls.push(urlPath);
+    continue;
+  }
+
+  if (matchesAny(optionalShellPatterns, urlPath)) {
+    optionalUrls.push(urlPath);
+  }
+}
+
+if (coreUrls.length === 1) {
+  throw new Error(
+    `No core shell assets found in ${distRoot}. Run the Vite build first.`,
+  );
 }
 
 const version = versionHash.digest("hex").slice(0, 16);
@@ -61,10 +93,23 @@ const serviceWorker = `const CACHE_PREFIX = "oh-my-cards";
 const CACHE_VERSION = "${version}";
 const PRECACHE_CACHE = \`\${CACHE_PREFIX}-precache-\${CACHE_VERSION}\`;
 const RUNTIME_CACHE = \`\${CACHE_PREFIX}-runtime-\${CACHE_VERSION}\`;
-const PRECACHE_URLS = ${JSON.stringify(urls, null, 2)};
+// Card artwork is addressed by a stable filename and never changes between
+// deploys, so it lives outside the versioned caches and survives activation.
+const MEDIA_CACHE = \`\${CACHE_PREFIX}-media\`;
+const RETAINED_CACHES = [PRECACHE_CACHE, RUNTIME_CACHE, MEDIA_CACHE];
+const CORE_URLS = ${JSON.stringify(coreUrls, null, 2)};
+const OPTIONAL_URLS = ${JSON.stringify(optionalUrls, null, 2)};
 
 function scopedUrl(path) {
   return new URL(path, self.registration.scope).toString();
+}
+
+// Hashed build output is immutable, so it can come from the HTTP cache. The
+// unhashed shell must bypass it or a redeploy would precache the stale copy.
+function precacheRequest(url) {
+  return /^assets\\//.test(url)
+    ? new Request(scopedUrl(url))
+    : new Request(scopedUrl(url), { cache: "reload" });
 }
 
 function shouldBypassCache(request) {
@@ -74,22 +119,40 @@ function shouldBypassCache(request) {
   return /card-rules|rules-manifest|rule-set|catalog-update/i.test(url.pathname);
 }
 
-async function cacheAll(urls) {
+async function precacheShell() {
   const cache = await caches.open(PRECACHE_CACHE);
+
+  // Rejects if any core asset fails, which fails install and leaves the
+  // previous — working — service worker in control.
+  await cache.addAll(CORE_URLS.map(precacheRequest));
+
   await Promise.allSettled(
-    urls.map((url) =>
-      cache.add(new Request(scopedUrl(url), { cache: "reload" })),
-    ),
+    OPTIONAL_URLS.map((url) => cache.add(precacheRequest(url))),
   );
 }
 
-async function networkFirst(request) {
-  const cache = await caches.open(RUNTIME_CACHE);
+function runtimeCacheName(request) {
+  return request.destination === "image" || request.destination === "font"
+    ? MEDIA_CACHE
+    : RUNTIME_CACHE;
+}
 
+// Storage quota is finite and card artwork alone exceeds it on some devices, so
+// a failed write must never turn a good network response into an error.
+async function cacheResponse(request, response) {
+  try {
+    const cache = await caches.open(runtimeCacheName(request));
+    await cache.put(request, response);
+  } catch {
+    // Best effort only.
+  }
+}
+
+async function networkFirst(request) {
   try {
     const response = await fetch(request);
     if (response.ok) {
-      await cache.put(request, response.clone());
+      await cacheResponse(request, response.clone());
     }
     return response;
   } catch (error) {
@@ -111,14 +174,13 @@ async function cacheFirst(request) {
 
   const response = await fetch(request);
   if (response.ok) {
-    const cache = await caches.open(RUNTIME_CACHE);
-    await cache.put(request, response.clone());
+    await cacheResponse(request, response.clone());
   }
   return response;
 }
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(cacheAll(PRECACHE_URLS).then(() => self.skipWaiting()));
+  event.waitUntil(precacheShell().then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (event) => {
@@ -129,7 +191,7 @@ self.addEventListener("activate", (event) => {
         Promise.all(
           keys
             .filter((key) => key.startsWith(CACHE_PREFIX))
-            .filter((key) => key !== PRECACHE_CACHE && key !== RUNTIME_CACHE)
+            .filter((key) => !RETAINED_CACHES.includes(key))
             .map((key) => caches.delete(key)),
         ),
       )
@@ -159,5 +221,5 @@ self.addEventListener("fetch", (event) => {
 
 await fs.writeFile(serviceWorkerPath, `${serviceWorker}\n`);
 console.log(
-  `Generated service-worker.js with ${urls.length} precached URLs (${version}).`,
+  `Generated service-worker.js precaching ${coreUrls.length} core and ${optionalUrls.length} optional shell URLs (${version}).`,
 );
