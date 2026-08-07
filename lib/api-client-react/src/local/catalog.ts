@@ -4,6 +4,20 @@ export type CardMarket = "US" | "Canada" | "Hong Kong" | "Singapore";
 export type CardRuleCurrency = "USD" | "CAD" | "HKD" | "SGD";
 export type CardRuleDataConfidence = "official" | "needs-review";
 
+/**
+ * Whether the product can still be obtained.
+ *
+ * `closed-to-new-applicants` matters because existing cardholders keep earning
+ * on these rules — the card belongs in a wallet, but recommending it to someone
+ * who does not have it is useless advice.
+ * `discontinued` means no accounts remain; the row exists only so an old
+ * wallet entry still resolves to a name instead of vanishing.
+ */
+export type CardAvailability =
+  | "open"
+  | "closed-to-new-applicants"
+  | "discontinued";
+
 export type VerifiedCreditCard = CreditCard & {
   market?: CardMarket;
   currency?: CardRuleCurrency;
@@ -11,9 +25,13 @@ export type VerifiedCreditCard = CreditCard & {
   imageSourceUrl?: string | null;
   lastReviewedAt?: string;
   dataConfidence?: CardRuleDataConfidence;
+  /** Absent means "open" — only closed/retired products carry this. */
+  availability?: CardAvailability;
+  /** ISO date the product stopped accepting new applications. */
+  availabilityChangedAt?: string;
 };
 
-export const BUILTIN_RULESET_VERSION = "2026.05.21.1";
+export const BUILTIN_RULESET_VERSION = "2026.08.07.1";
 
 export const BUILTIN_CARDS = [
   {
@@ -22,8 +40,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Chase",
     "network": "Visa",
     "annualFee": 95,
-    "signupBonus": "75,000 points after $5,000 spend in 3 months",
-    "signupBonusValue": 938,
+    "signupBonus": "100,000 points after $5,000 spend in 3 months",
+    "signupBonusValue": 1250,
     "color": "linear-gradient(135deg, #1a2744, #2d4a8c)",
     "logoUrl": "https://logo.clearbit.com/chase.com",
     "cardImageUrl": "/card-images/01-chase-sapphire-preferred.png",
@@ -78,6 +96,20 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9116,
+        "cardId": 1,
+        "category": "Gas and EV Charging",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9117,
+        "cardId": 1,
+        "category": "Vacation Home Rentals",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -85,15 +117,8 @@ export const BUILTIN_CARDS = [
         "id": 269,
         "cardId": 1,
         "name": "Annual Hotel Credit",
-        "description": "Up to $50 in statement credits each account anniversary year for hotels booked through Chase Travel.",
-        "annualValue": 50
-      },
-      {
-        "id": 270,
-        "cardId": 1,
-        "name": "10% Anniversary Points Boost",
-        "description": "Earn bonus points equal to 10% of total purchases made the previous account anniversary year.",
-        "annualValue": 75
+        "description": "Up to $100 in statement credits each account anniversary year for hotels booked through Chase Travel.",
+        "annualValue": 100
       },
       {
         "id": 271,
@@ -108,6 +133,27 @@ export const BUILTIN_CARDS = [
         "name": "Trip Cancellation / Interruption Insurance",
         "description": "Coverage for eligible prepaid travel when a covered reason applies.",
         "annualValue": 200
+      },
+      {
+        "id": 704,
+        "cardId": 1,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 in statement credits toward Global Entry, TSA PreCheck or NEXUS every four years.",
+        "annualValue": 30
+      },
+      {
+        "id": 705,
+        "cardId": 1,
+        "name": "DashPass Membership",
+        "description": "Complimentary DashPass membership plus up to $10 per month in DoorDash credits on groceries and daily essentials.",
+        "annualValue": 120
+      },
+      {
+        "id": 706,
+        "cardId": 1,
+        "name": "Emergency Evacuation and Transportation",
+        "description": "Up to $100,000 in emergency evacuation and transportation coverage when a covered reason applies.",
+        "annualValue": 0
       }
     ],
     "inWallet": false,
@@ -115,7 +161,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
     "imageSourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -359,8 +405,22 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
     "imageSourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 14,
+        "mode": "rotating-calendar",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Q1 2026: Dining and select charities",
+          "Q2 2026: Amazon and Chase Travel",
+          "Q3 2026: Gas, public transit, EV charging and select live entertainment",
+          "Q4 2026: not yet announced"
+        ]
+      }
+    ]
   },
   {
     "id": 5,
@@ -514,8 +574,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Citi",
     "network": "Mastercard",
     "annualFee": 0,
-    "signupBonus": "$200 cash back after $1,500 spend in 6 months",
-    "signupBonusValue": 200,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f3460, #16213e)",
     "logoUrl": "https://logo.clearbit.com/citi.com",
     "cardImageUrl": "/card-images/07-citi-custom-cash.webp",
@@ -525,10 +585,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Citi cards in this catalog earn ThankYou Points or cash-equivalent ThankYou rewards; this app uses 1 cent per point for cash-value calculations unless a product-specific rule says otherwise.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Cap or timing language appears in the official earning categories: Top Eligible Category (up to $500/month); Other.",
-      "5% applies to the top eligible spend category each billing cycle up to $500 in purchases, then 1%."
+      "Closed to new applicants since 2026-05-28. Existing cardholders keep the card and its current earning structure.",
+      "The 5% bonus applies to one eligible category per billing cycle, on up to $500 of spend in that cycle."
     ],
     "cashbackCategories": [
       {
@@ -567,8 +625,30 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-05-28",
+    "categoryChoices": [
+      {
+        "categoryId": 26,
+        "mode": "automatic-top-spend",
+        "picks": 1,
+        "resets": "month",
+        "options": [
+          "Restaurants",
+          "Gas stations",
+          "Grocery stores",
+          "Select travel",
+          "Select transit",
+          "Select streaming services",
+          "Drugstores",
+          "Home improvement stores",
+          "Fitness clubs",
+          "Live entertainment"
+        ]
+      }
+    ]
   },
   {
     "id": 8,
@@ -1208,7 +1288,7 @@ export const BUILTIN_CARDS = [
     "name": "Capital One SavorOne",
     "issuer": "Capital One",
     "network": "Mastercard",
-    "annualFee": 0,
+    "annualFee": 39,
     "signupBonus": "$200 cash bonus after $500 spend in 3 months",
     "signupBonusValue": 200,
     "color": "linear-gradient(135deg, #9d174d, #ec4899)",
@@ -1280,7 +1360,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/savorone/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/savorone/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -1338,7 +1418,7 @@ export const BUILTIN_CARDS = [
   {
     "id": 17,
     "name": "Discover it Cash Back",
-    "issuer": "Discover",
+    "issuer": "Capital One / Discover",
     "network": "Discover",
     "annualFee": 0,
     "signupBonus": "Cashback Match — Discover matches all cash back earned in the first year",
@@ -1398,15 +1478,29 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.discover.com/credit-cards/cash-back/it-card.html",
+    "sourceUrl": "https://www.discover.com/credit-cards/cash-back/it-card/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/cash-back/it-card.html",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 63,
+        "mode": "rotating-calendar",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+          "Q2 2026: Restaurants and home improvement stores",
+          "Q3 2026: Gas stations, transportation and drug stores",
+          "Q4 2026: not yet announced"
+        ]
+      }
+    ]
   },
   {
     "id": 18,
     "name": "Discover it Miles",
-    "issuer": "Discover",
+    "issuer": "Capital One / Discover",
     "network": "Discover",
     "annualFee": 0,
     "signupBonus": "Miles Match — Discover matches all miles earned in the first year",
@@ -1460,8 +1554,8 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/travel/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/travel/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review"
   },
   {
     "id": 19,
@@ -1766,23 +1860,22 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Cap or timing language appears in the official earning categories: Choice Category first year (then 3%); Grocery Stores & Wholesale Clubs (up to $2,500/quarter); Other.",
-      "First-year enhanced earning is account-age dependent; the app uses the account-opened date when a supported first-year rule is implemented.",
-      "The 3% choice-category / 2% grocery and wholesale category has a combined $2,500 quarterly cap, then earns 1%; first-year 6% choice-category earning depends on account age."
+      "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
+      "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
+      "Preferred Rewards members earn 25-75% more than the rates shown."
     ],
     "cashbackCategories": [
       {
         "id": 77,
         "cardId": 23,
-        "category": "Choice Category first year (then 3%)",
-        "rate": 0.06,
+        "category": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)",
+        "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 78,
         "cardId": 23,
-        "category": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter)",
+        "category": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter combined with choice category)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -1815,8 +1908,24 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-07",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 77,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "month",
+        "options": [
+          "Gas and EV charging stations",
+          "Online shopping including cable, internet, phone plans and streaming",
+          "Dining",
+          "Travel",
+          "Drug stores and pharmacies",
+          "Home improvement and furnishings"
+        ]
+      }
+    ]
   },
   {
     "id": 24,
@@ -1883,8 +1992,41 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 80,
+        "mode": "user-selected",
+        "picks": 2,
+        "resets": "quarter",
+        "options": [
+          "Cell phone providers",
+          "Department stores",
+          "Electronics stores",
+          "Fast food",
+          "Furniture stores",
+          "Ground transportation",
+          "Gym and fitness centers",
+          "Home utilities",
+          "Movie theaters",
+          "Select clothing stores",
+          "Sporting goods stores",
+          "TV, internet and streaming services"
+        ]
+      },
+      {
+        "categoryId": 81,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Gas stations and EV charging stations",
+          "Grocery stores and grocery delivery",
+          "Restaurants"
+        ]
+      }
+    ]
   },
   {
     "id": 25,
@@ -3499,7 +3641,7 @@ export const BUILTIN_CARDS = [
     "name": "Wyndham Rewards Earner+ Card",
     "issuer": "Barclays / Wyndham Rewards",
     "network": "Visa",
-    "annualFee": 75,
+    "annualFee": 95,
     "signupBonus": "45,000 points",
     "signupBonusValue": 450,
     "color": "linear-gradient(135deg, #00407a, #002b54)",
@@ -3578,7 +3720,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://cards.barclaycardus.com/banking/cards/wyndham-rewards-earner-plus-card/",
     "imageSourceUrl": "https://www.uscreditcardguide.com/barclaycard-wyndham-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -3809,9 +3951,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.citi.com/credit-cards/citi-costco-anywhere-visa-credit-card",
+    "sourceUrl": "https://www.citi.com/credit-cards/costco-anywhere-visa-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-costco-anywhere-visa-credit-card",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -3831,7 +3973,9 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.25,
     "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "The Wells Fargo-issued Bilt Mastercard was discontinued on 2026-02-07.",
+      "Bilt Card 2.0 (Blue / Silver / Gold / Platinum tiers, issued by Column N.A. and serviced by Cardless) is a separate product with a different fee and earning structure. It is not yet in this catalog.",
+      "The rates below describe the retired Wells Fargo product and should not be used for planning."
     ],
     "cashbackCategories": [
       {
@@ -3896,10 +4040,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.biltrewards.com/card",
+    "sourceUrl": "https://newsroom.biltrewards.com/meetbiltcard2.0",
     "imageSourceUrl": "https://www.uscreditcardguide.com/bilt-mastercard-credit-card/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "discontinued",
+    "availabilityChangedAt": "2026-02-07"
   },
   {
     "id": 46,
@@ -4804,8 +4950,24 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 207,
+        "mode": "automatic-top-spend",
+        "picks": 2,
+        "resets": "month",
+        "options": [
+          "Advertising with U.S. media providers",
+          "U.S. electronic goods retailers and software and cloud providers",
+          "U.S. monthly wireless telephone service",
+          "U.S. gas stations",
+          "U.S. restaurants",
+          "Transit"
+        ]
+      }
+    ]
   },
   {
     "id": 57,
@@ -5122,7 +5284,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 322,
         "cardId": 60,
-        "category": "Select streaming",
+        "category": "Self-Select Category",
         "rate": 0.03,
         "isDefault": false
       },
@@ -5155,8 +5317,23 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-strata-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-strata-credit-card",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 322,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Select streaming services",
+          "Fitness clubs",
+          "Live entertainment",
+          "Cosmetic stores, barber shops and hair salons",
+          "Pet supply stores"
+        ]
+      }
+    ]
   },
   {
     "id": 61,
@@ -5226,7 +5403,7 @@ export const BUILTIN_CARDS = [
   },
   {
     "id": 62,
-    "name": "Citi / AAdvantage Executive World Elite",
+    "name": "Citi / AAdvantage Executive World Legend Mastercard",
     "issuer": "Citi / American Airlines",
     "network": "Mastercard",
     "annualFee": 595,
@@ -5241,7 +5418,9 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.3,
     "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Annual fee rises from $595 to $695 for new applicants on 2026-08-23. Existing cardmembers are notified in Aug/Sep 2026; the catalog still carries $595 because that is today's fee.",
+      "Rebranded from World Elite to World Legend Mastercard effective 2026-08-23."
     ],
     "cashbackCategories": [
       {
@@ -5292,9 +5471,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card",
+    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -5390,8 +5569,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Barclays / Hawaiian Airlines",
     "network": "Mastercard",
     "annualFee": 99,
-    "signupBonus": "Legacy Barclays product; current public application and card art require manual review",
-    "signupBonusValue": 910,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #6d2077, #c8102e)",
     "logoUrl": "https://logo.clearbit.com/hawaiianairlines.com",
     "cardImageUrl": "/card-images/64-hawaiian-airlines-world-elite-mastercard.png",
@@ -5401,7 +5580,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "HawaiianMiles value varies by itinerary and redemption path; this app uses an estimated 1.00 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program.",
+      "Earning and redemption now run through Atmos Rewards; the rates below describe the legacy HawaiianMiles structure and need re-verification."
     ],
     "cashbackCategories": [
       {
@@ -5468,8 +5648,10 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://cards.barclaycardus.com/",
     "imageSourceUrl": "https://cards.barclaycardus.com/banking/credit-card/hawaiian-airlines/child/hcl-control/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2025-10-01"
   },
   {
     "id": 65,
@@ -5477,8 +5659,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Barclays / American Airlines",
     "network": "Mastercard",
     "annualFee": 99,
-    "signupBonus": "Legacy Barclays AAdvantage product; availability is changing as Citi takes over the portfolio",
-    "signupBonusValue": 900,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #b22234, #e53935)",
     "logoUrl": "https://logo.clearbit.com/barclays.com",
     "cardImageUrl": "/card-images/aadvantage-aviator-red.webp",
@@ -5488,7 +5670,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.3,
     "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Discontinued on 2026-04-24. All Aviator Red accounts were converted to the Citi / AAdvantage Platinum Select World Elite Mastercard (catalog #34).",
+      "This row is retained only so existing wallet entries still resolve to a name."
     ],
     "cashbackCategories": [
       {
@@ -5534,8 +5717,10 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://cards.barclaycardus.com/",
     "imageSourceUrl": "https://financebuzz.com/credit-cards/barclaycard-aadvantage-aviator-red-world-elite-mastercard",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "discontinued",
+    "availabilityChangedAt": "2026-04-24"
   },
   {
     "id": 66,
@@ -5623,8 +5808,8 @@ export const BUILTIN_CARDS = [
     "issuer": "US Bank",
     "network": "Visa",
     "annualFee": 400,
-    "signupBonus": "Legacy product; official page redirects to U.S. Bank card catalog",
-    "signupBonusValue": 750,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0c3766, #2a6db1)",
     "logoUrl": "https://logo.clearbit.com/usbank.com",
     "cardImageUrl": "/card-images/67-us-bank-altitude-reserve.webp",
@@ -5692,10 +5877,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/credit-cards/altitude-reserve-visa-infinite-credit-card.html",
+    "sourceUrl": "https://www.usbank.com/credit-cards.html",
     "imageSourceUrl": "https://www.cardsandpoints.com/us-bank-altitude-reserve/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2024-11-11"
   },
   {
     "id": 68,
@@ -5854,9 +6041,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.discover.com/credit-cards/cash-back/chrome.html",
+    "sourceUrl": "https://www.discover.com/credit-cards/cash-back/chrome/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/cash-back/chrome.html",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -5922,10 +6109,24 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.discover.com/credit-cards/student-credit-card/it-card.html",
+    "sourceUrl": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
     "imageSourceUrl": "https://wallethub.com/d/discover-it-for-students-credit-card-802c",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 256,
+        "mode": "rotating-calendar",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+          "Q2 2026: Restaurants and home improvement stores",
+          "Q3 2026: Gas stations, transportation and drug stores",
+          "Q4 2026: not yet announced"
+        ]
+      }
+    ]
   },
   {
     "id": 71,
@@ -6368,7 +6569,7 @@ export const BUILTIN_CARDS = [
     "issuer": "Capital One / Walmart",
     "network": "Mastercard",
     "annualFee": 0,
-    "signupBonus": "Closed to new applicants after the Capital One and Walmart partnership ended; legacy cardholder terms may vary",
+    "signupBonus": null,
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0071ce, #ffc220)",
     "logoUrl": "https://logo.clearbit.com/walmart.com",
@@ -6379,7 +6580,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Discontinued. Applications closed 2024-05-24 and all remaining accounts were converted to the Capital One Quicksilver Cash Rewards Mastercard (catalog #16).",
+      "This row is retained only so existing wallet entries still resolve to a name."
     ],
     "cashbackCategories": [
       {
@@ -6437,10 +6639,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://investor.capitalone.com/news-releases/news-release-details/capital-one-and-walmart-announce-end-consumer-card-partnership",
+    "sourceUrl": "https://www.capitalone.com/credit-cards/quicksilver/",
     "imageSourceUrl": "https://www.cardsandpoints.com/walmart-rewards-card/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "discontinued",
+    "availabilityChangedAt": "2024-05-24"
   },
   {
     "id": 78,
@@ -7064,9 +7268,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "Canada",
     "currency": "CAD",
-    "sourceUrl": "https://www.rogersbank.com/en/rogers_worldelite_mastercard_details",
+    "sourceUrl": "https://www.rogersbank.com/en/rogers_red_worldelite_mastercard_details/",
     "imageSourceUrl": "https://www.rogersbank.com/en/rogers_worldelite_mastercard_details",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -7256,7 +7460,7 @@ export const BUILTIN_CARDS = [
     "issuer": "American Express",
     "network": "Amex",
     "annualFee": 150,
-    "signupBonus": "See issuer page for current public offer",
+    "signupBonus": null,
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #244234, #7fb28b)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
@@ -7267,7 +7471,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Membership Rewards redemption value varies by redemption path; this app uses a conservative 1.00 cent per point estimate for annual-fee progress and keeps earned points visible separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since 2026-07-23, when American Express removed the product page. Existing cardholders keep the card.",
+      "Availability confirmed from secondary reporting only — American Express has published no statement."
     ],
     "cashbackCategories": [
       {
@@ -7318,10 +7523,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/en-us/account/get-started/green/uncover-your-benefits",
+    "sourceUrl": "https://www.doctorofcredit.com/american-express-removes-green-card-from-website/",
     "imageSourceUrl": "https://www.americanexpress.com/en-us/account/get-started/green/uncover-your-benefits",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-07-23"
   },
   {
     "id": 89,
@@ -7784,10 +7991,28 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
+    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt-business",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 389,
+        "mode": "automatic-top-spend",
+        "picks": 3,
+        "resets": "quarter",
+        "options": [
+          "Dining",
+          "Shipping",
+          "Airline tickets purchased directly with the airline",
+          "Local transit and commuting",
+          "Social media and search engine advertising",
+          "Car rental agencies",
+          "Gas stations",
+          "Internet, cable and phone services"
+        ]
+      }
+    ]
   },
   {
     "id": 96,
@@ -8562,23 +8787,22 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Cap or timing language appears in the official earning categories: Choice category first year; Groceries and wholesale clubs; Other.",
-      "First-year enhanced earning is account-age dependent; the app uses the account-opened date when a supported first-year rule is implemented.",
-      "The 3% choice-category / 2% grocery and wholesale category has a combined $2,500 quarterly cap, then earns 1%; first-year 6% choice-category earning depends on account age."
+      "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
+      "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
+      "Secured accounts are not eligible for a welcome bonus or an introductory APR."
     ],
     "cashbackCategories": [
       {
         "id": 422,
         "cardId": 107,
-        "category": "Choice category first year",
-        "rate": 0.06,
+        "category": "Choice Category (up to $2,500/quarter combined with groceries and wholesale clubs)",
+        "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 423,
         "cardId": 107,
-        "category": "Groceries and wholesale clubs",
+        "category": "Grocery Stores & Wholesale Clubs (up to $2,500/quarter combined with choice category)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -8611,8 +8835,24 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-secured-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-secured-credit-card/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-07",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 422,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "month",
+        "options": [
+          "Gas and EV charging stations",
+          "Online shopping including cable, internet, phone plans and streaming",
+          "Dining",
+          "Travel",
+          "Drug stores and pharmacies",
+          "Home improvement and furnishings"
+        ]
+      }
+    ]
   },
   {
     "id": 108,
@@ -8693,7 +8933,7 @@ export const BUILTIN_CARDS = [
     "issuer": "Wells Fargo",
     "network": "Mastercard",
     "annualFee": 0,
-    "signupBonus": "See issuer page for current public offer",
+    "signupBonus": null,
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #064e3b, #a7f3d0)",
     "logoUrl": "https://logo.clearbit.com/wellsfargo.com",
@@ -8704,7 +8944,7 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Wells Fargo Rewards value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since approximately 2026-06-15. Existing cardholders keep the card."
     ],
     "cashbackCategories": [
       {
@@ -8741,10 +8981,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.wellsfargo.com/attune-credit-card/",
+    "sourceUrl": "https://creditcards.wellsfargo.com/",
     "imageSourceUrl": "https://creditcards.wellsfargo.com/attune-credit-card/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-06-15"
   },
   {
     "id": 110,
@@ -8900,8 +9142,8 @@ export const BUILTIN_CARDS = [
     "issuer": "U.S. Bank",
     "network": "Visa",
     "annualFee": 95,
-    "signupBonus": "$250 bonus after $2,000 spend in 120 days",
-    "signupBonusValue": 250,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #7f1d1d, #f97316)",
     "logoUrl": "https://logo.clearbit.com/usbank.com",
     "cardImageUrl": "/card-images/112-u-s-bank-shopper-cash-rewards-visa-signature.png",
@@ -8911,10 +9153,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Retailer and everyday-category bonuses are subject to issuer quarterly spend caps before base earning applies.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Closed to new applicants since 2026-06-22. Existing cardholders keep the card and all reward categories.",
+      "The official product page has been removed; this row is retained so existing wallet entries still resolve."
     ],
     "cashbackCategories": [
       {
@@ -8972,10 +9212,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/credit-cards/shopper-cash-rewards-visa-signature-credit-card.html",
+    "sourceUrl": "https://www.usbank.com/credit-cards.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/shopper-cash-rewards-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-06-22"
   },
   {
     "id": 113,
@@ -9024,9 +9266,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/credit-cards/visa-platinum-credit-card.html",
+    "sourceUrl": "https://www.usbank.com/credit-cards/shield-visa-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/visa-platinum-credit-card.html",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -9167,10 +9409,39 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html",
+    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-visa-signature-card.html",
     "imageSourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 448,
+        "mode": "automatic-top-spend",
+        "picks": 2,
+        "resets": "month",
+        "options": [
+          "Advertising firms",
+          "Airlines",
+          "Auto rental and transport providers",
+          "Cable, satellite, TV and radio providers",
+          "Computer service providers",
+          "Computer stores",
+          "Department, book and novelty stores",
+          "Discount stores and wholesale clubs",
+          "Drug stores and pharmacies",
+          "Entertainment places",
+          "Gas stations and fuel dealers",
+          "Grocery stores and supermarkets",
+          "Home improvement service and supply",
+          "Hotels",
+          "Pet supply stores",
+          "Restaurants",
+          "Stationery and office supply stores",
+          "Telecom service providers",
+          "Utility companies"
+        ]
+      }
+    ]
   },
   {
     "id": 116,
@@ -9500,7 +9771,7 @@ export const BUILTIN_CARDS = [
     "name": "Wyndham Rewards Earner Business Card",
     "issuer": "Barclays / Wyndham Rewards",
     "network": "Visa",
-    "annualFee": 95,
+    "annualFee": 149,
     "signupBonus": "45,000 bonus points after $3,000 spend and paying the annual fee in 90 days",
     "signupBonusValue": 270,
     "color": "linear-gradient(135deg, #111827, #00a3e0)",
@@ -9565,7 +9836,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
     "imageSourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -9574,8 +9845,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Barclays / Hawaiian Airlines",
     "network": "Mastercard",
     "annualFee": 99,
-    "signupBonus": "50,000 bonus miles after $4,000 spend and paying the annual fee in 90 days",
-    "signupBonusValue": 500,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #4c1d95, #ec4899)",
     "logoUrl": "https://logo.clearbit.com/hawaiianairlines.com",
     "cardImageUrl": "/card-images/122-hawaiian-airlines-business-mastercard.png",
@@ -9585,7 +9856,7 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "HawaiianMiles value varies by itinerary and redemption path; this app uses an estimated 1.00 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program."
     ],
     "cashbackCategories": [
       {
@@ -9636,10 +9907,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.hawaiianairlines.com/hawaiianmiles2/credit-card-business",
+    "sourceUrl": "https://cards.barclaycardus.com/",
     "imageSourceUrl": "https://www.hawaiianairlines.com/hawaiianmiles2/credit-card-business",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2025-10-01"
   },
   {
     "id": 123,
@@ -11145,10 +11418,38 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-card",
+    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-card",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 537,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Dining",
+          "Entertainment",
+          "Gas",
+          "Grocery Stores",
+          "Travel"
+        ]
+      },
+      {
+        "categoryId": 538,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Dining",
+          "Entertainment",
+          "Gas",
+          "Grocery Stores",
+          "Travel"
+        ]
+      }
+    ]
   },
   {
     "id": 145,
@@ -11264,10 +11565,38 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/secured-credit-card/",
+    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-secured",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/secured-credit-card/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 541,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Dining",
+          "Entertainment",
+          "Gas",
+          "Grocery Stores",
+          "Travel"
+        ]
+      },
+      {
+        "categoryId": 542,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Dining",
+          "Entertainment",
+          "Gas",
+          "Grocery Stores",
+          "Travel"
+        ]
+      }
+    ]
   },
   {
     "id": 147,
@@ -11323,7 +11652,7 @@ export const BUILTIN_CARDS = [
   },
   {
     "id": 148,
-    "name": "CitiBusiness / AAdvantage Business World Elite Mastercard",
+    "name": "Citi / AAdvantage Business World Elite Mastercard",
     "issuer": "Citi",
     "network": "Mastercard",
     "annualFee": 99,
@@ -11396,9 +11725,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.citi.com/credit-cards/citibusiness-aadvantage-platinum-select-credit-card/",
+    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-business-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citibusiness-aadvantage-platinum-select-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-08-06",
     "dataConfidence": "official"
   },
   {
@@ -12154,20 +12483,21 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "The 3% choice category and the 2% dining rate share one $50,000 combined cap per calendar year; spend beyond it earns 1%.",
+      "Bank of America does not publish how often the business choice category can be changed."
     ],
     "cashbackCategories": [
       {
         "id": 583,
         "cardId": 160,
-        "category": "Selected business category",
+        "category": "Selected business category (up to $50,000/year combined with dining)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 584,
         "cardId": 160,
-        "category": "Dining",
+        "category": "Dining (up to $50,000/year combined with selected business category)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -12198,10 +12528,26 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards",
+    "sourceUrl": "https://business.bankofamerica.com/en/small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard",
     "imageSourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-07",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 583,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "unknown",
+        "options": [
+          "Gas stations and EV charging stations",
+          "Office supply stores",
+          "Travel",
+          "TV, telecom and wireless",
+          "Computer services",
+          "Business consulting services"
+        ]
+      }
+    ]
   },
   {
     "id": 161,
@@ -12561,8 +12907,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Capital One",
     "network": "Visa",
     "annualFee": 95,
-    "signupBonus": "50,000 miles after $4,500 spend in the first 3 months",
-    "signupBonusValue": 500,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f172a, #38bdf8)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
     "cardImageUrl": "/card-images/166-capital-one-spark-2x-miles.avif",
@@ -12572,9 +12918,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hotels and rental cars through Capital One Business Travel; Other.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Discontinued on 2026-04-14 and relaunched as the Capital One Venture Business (catalog #99).",
+      "This row is retained only so existing wallet entries still resolve to a name."
     ],
     "cashbackCategories": [
       {
@@ -12611,10 +12956,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-miles/",
+    "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/travel-and-miles/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-miles/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "discontinued",
+    "availabilityChangedAt": "2026-04-14"
   },
   {
     "id": 167,
@@ -12622,8 +12969,8 @@ export const BUILTIN_CARDS = [
     "issuer": "Capital One",
     "network": "Visa",
     "annualFee": 0,
-    "signupBonus": "50,000 miles after $4,500 spend in the first 3 months",
-    "signupBonusValue": 500,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #1e3a8a, #93c5fd)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
     "cardImageUrl": "/card-images/167-capital-one-spark-1-5x-miles-select.avif",
@@ -12633,9 +12980,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hotels and rental cars through Capital One Business Travel; Other.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Discontinued on 2026-04-14 and rebranded as the Capital One VentureOne Business (catalog #155).",
+      "This row is retained only so existing wallet entries still resolve to a name."
     ],
     "cashbackCategories": [
       {
@@ -12672,10 +13018,12 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-miles-select/",
+    "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/travel-and-miles/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-miles-select/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "availability": "discontinued",
+    "availabilityChangedAt": "2026-04-14"
   },
   {
     "id": 168,
@@ -12951,7 +13299,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 618,
         "cardId": 172,
-        "category": "Selected Lifestyle and Overseas Spend",
+        "category": "Rewards of Your Choice Category",
         "rate": 0.024,
         "isDefault": false
       },
@@ -12984,8 +13332,23 @@ export const BUILTIN_CARDS = [
     "currency": "HKD",
     "sourceUrl": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
     "imageSourceUrl": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-08-06",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 618,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "unknown",
+        "options": [
+          "Dining",
+          "Home",
+          "Lifestyle",
+          "Shopping",
+          "Overseas and Mainland China spending"
+        ]
+      }
+    ]
   },
   {
     "id": 173,

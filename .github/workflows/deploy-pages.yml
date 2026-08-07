@@ -39,10 +39,31 @@ jobs:
         run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm exec tsc -p lib/api-client-react/tsconfig.json
 
       - name: Typecheck
-        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir artifacts/card-organizer typecheck
+        run: |
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir lib/api-client-react typecheck
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir artifacts/card-organizer typecheck
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts typecheck
+
+      # The reward engine decides every number the app shows, and a category
+      # matcher regression is invisible until someone checks their statement.
+      - name: Test reward engine
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir lib/api-client-react test
+
+      # Emits public/card-rules/{manifest.json,<version>.json} so already-installed
+      # PWAs can pull new card rules without waiting for an app update.
+      - name: Publish card rules feed
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:publish
 
       - name: Build
+        env:
+          VITE_CARD_RULES_MANIFEST_URL: /Oh_My_Cards/card-rules/manifest.json
         run: COREPACK_ENABLE_AUTO_PIN=0 PORT=19957 BASE_PATH=/Oh_My_Cards/ corepack pnpm --dir artifacts/card-organizer build
+
+      # GitHub Pages has no rewrite rules, so a deep link or hard refresh on a
+      # client-routed path (/wallet, /cards, ...) must be served the app shell
+      # through the 404 handler instead of GitHub's own error page.
+      - name: Add SPA fallback
+        run: cp artifacts/card-organizer/dist/public/index.html artifacts/card-organizer/dist/public/404.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

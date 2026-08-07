@@ -1,8 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { BUILTIN_CARDS, BUILTIN_RULESET_VERSION } from "./catalog";
+import { CreditCardNetwork } from "../generated/api.schemas";
 import type {
   AddToWalletBody,
   BenefitUsage,
+  CardCategoryChoice,
+  CardCategoryChoiceReset,
+  CashbackCategory,
   BestCardForCategory,
   BillingCycle,
   CardSuggestion,
@@ -39,6 +43,11 @@ export interface LocalWalletCard {
   paymentDueDay?: number | null;
   creditLimit?: number | null;
   openedAt?: string | null;
+  /**
+   * Chosen options for the card's selectable bonus categories, keyed by the
+   * `cashbackCategories` row id they fill in.
+   */
+  selectedCategories?: Record<number, string[]> | null;
 }
 
 export interface LocalBenefitUsage {
@@ -197,7 +206,32 @@ function normalizeWalletCardRecord(
     paymentDueDay: normalizeDayOfMonth(value.paymentDueDay),
     creditLimit: toNullableFiniteNumber(value.creditLimit),
     openedAt: toTrimmedString(value.openedAt) || null,
+    selectedCategories: normalizeSelectedCategories(value.selectedCategories),
   };
+}
+
+function normalizeSelectedCategories(
+  value: unknown,
+): Record<number, string[]> | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+
+  const normalized: Record<number, string[]> = {};
+  for (const [key, options] of Object.entries(value)) {
+    const categoryId = Number(key);
+    if (!Number.isInteger(categoryId) || categoryId <= 0) continue;
+    if (!Array.isArray(options)) continue;
+
+    const cleaned = [
+      ...new Set(
+        options
+          .map((option) => toTrimmedString(option))
+          .filter((option) => option.length > 0),
+      ),
+    ];
+    if (cleaned.length) normalized[categoryId] = cleaned;
+  }
+
+  return Object.keys(normalized).length ? normalized : null;
 }
 
 function normalizeTransactionRecord(value: Partial<Transaction>): Transaction {
@@ -253,11 +287,27 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
           (walletCard): walletCard is LocalWalletCard => walletCard !== null,
         )
     : [];
-  const transactions = Array.isArray(parsed.transactions)
+  const rawTransactions = Array.isArray(parsed.transactions)
     ? parsed.transactions
         .map((transaction) => normalizeTransactionRecord(transaction))
         .filter((transaction) => transaction.walletCardId > 0)
     : [];
+
+  // Ids address a transaction for deletion, so duplicates (or the 0 that a
+  // record with no id normalizes to) would make one delete remove several.
+  const usedTransactionIds = new Set<number>();
+  let nextFreeTransactionId =
+    rawTransactions.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+  const transactions = rawTransactions.map((transaction) => {
+    if (transaction.id > 0 && !usedTransactionIds.has(transaction.id)) {
+      usedTransactionIds.add(transaction.id);
+      return transaction;
+    }
+    const id = nextFreeTransactionId;
+    nextFreeTransactionId += 1;
+    usedTransactionIds.add(id);
+    return { ...transaction, id };
+  });
   const benefitUsage = Array.isArray(parsed.benefitUsage)
     ? parsed.benefitUsage
         .map((usage) => normalizeBenefitUsageRecord(usage))
@@ -286,8 +336,26 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
     walletCards,
     transactions,
     benefitUsage,
-    catalogOverride: parsed.catalogOverride ?? null,
+    catalogOverride: normalizeCatalogOverride(parsed.catalogOverride),
   };
+}
+
+/**
+ * A stored override replaces the entire catalog, so a corrupted or hand-edited
+ * one would crash every page that prices a card. Anything that does not survive
+ * normalization is dropped in favour of the built-in rules.
+ */
+function normalizeCatalogOverride(
+  override: LocalState["catalogOverride"],
+): LocalState["catalogOverride"] {
+  if (!override?.version || !Array.isArray(override.cards)) return null;
+
+  try {
+    const cards = normalizeRemoteCatalog(override.cards);
+    return cards.length ? { ...override, cards } : null;
+  } catch {
+    return null;
+  }
 }
 
 function openLocalDatabase(): Promise<IDBDatabase> {
@@ -371,12 +439,12 @@ function queueIndexedDbWrite(state: LocalState): void {
 }
 
 function readLocalStorageState(): LocalState | null {
-  if (!canUseLocalStorage()) return defaultState();
-
-  const raw = window.localStorage.getItem(STORAGE_KEY);
-  if (!raw) return null;
+  if (!canUseLocalStorage()) return null;
 
   try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+
     const parsed = JSON.parse(raw) as Partial<LocalState>;
     if (parsed.schemaVersion !== 1) return null;
     return normalizeLocalState(parsed);
@@ -385,15 +453,61 @@ function readLocalStorageState(): LocalState | null {
   }
 }
 
+/**
+ * Last state this tab wrote, used only when no storage backend is readable.
+ *
+ * Reads have to be synchronous because every query hook is synchronous, but
+ * neither backend is guaranteed: private-mode Safari throws on localStorage
+ * writes, and IndexedDB is async. This fallback keeps such a session usable
+ * instead of silently discarding every mutation while reporting success.
+ *
+ * It is deliberately NOT a cache in front of localStorage. Serving it ahead of
+ * storage made a second tab keep its boot-time snapshot forever, so its next
+ * write clobbered everything the first tab had saved in between.
+ */
+let lastWrittenState: LocalState | null = null;
+
+/** Set when a write could not reach any durable backend. */
+let persistenceFailure: string | null = null;
+
+export function getPersistenceFailure(): string | null {
+  return persistenceFailure;
+}
+
 function readState(): LocalState {
-  return readLocalStorageState() ?? defaultState();
+  return readLocalStorageState() ?? lastWrittenState ?? defaultState();
 }
 
 function writeState(state: LocalState): void {
-  if (!canUseLocalStorage()) return;
   const normalized = normalizeLocalState(state);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
-  queueIndexedDbWrite(normalized);
+  lastWrittenState = normalized;
+
+  let storedSomewhere = false;
+
+  if (canUseLocalStorage()) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      storedSomewhere = true;
+      persistenceFailure = null;
+    } catch (error) {
+      // Quota is the common case. IndexedDB has a far larger budget, so the
+      // write below may still succeed — do not bail out here.
+      persistenceFailure =
+        error instanceof Error && error.name === "QuotaExceededError"
+          ? "Browser storage is full. Export a backup and remove old transactions."
+          : "This browser blocked local storage. Data will not survive a reload.";
+    }
+  }
+
+  if (canUseIndexedDb()) {
+    queueIndexedDbWrite(normalized);
+    storedSomewhere = true;
+  }
+
+  if (!storedSomewhere) {
+    persistenceFailure =
+      "No browser storage is available. Data will be lost when this tab closes.";
+  }
 }
 
 async function requestPersistentBrowserStorage(): Promise<void> {
@@ -406,26 +520,48 @@ async function requestPersistentBrowserStorage(): Promise<void> {
   }
 }
 
+/**
+ * Hydrates the in-memory state before the first render.
+ *
+ * This runs on the boot path, so it must never reject and never hang: a
+ * rejected promise here leaves a blank page, and an IndexedDB request that
+ * never settles (a blocked upgrade, a suspended tab) does the same.
+ */
 export async function initializeLocalDataStore(): Promise<void> {
-  if (!canUseLocalStorage()) return;
-
   try {
-    await requestPersistentBrowserStorage();
     const localStorageState = readLocalStorageState();
     if (localStorageState) {
-      await writeIndexedDbState(localStorageState);
-      return;
+      lastWrittenState = localStorageState;
+    } else {
+      const indexedDbState = await withTimeout(readIndexedDbState(), 3_000);
+      if (indexedDbState) {
+        lastWrittenState = indexedDbState;
+        try {
+          window.localStorage?.setItem(
+            STORAGE_KEY,
+            JSON.stringify(indexedDbState),
+          );
+        } catch {
+          // Mirroring back is an optimisation, not a requirement.
+        }
+      }
     }
 
-    const indexedDbState = await readIndexedDbState();
-    if (indexedDbState) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(indexedDbState));
-      return;
-    }
-    await writeIndexedDbState(readState());
+    await withTimeout(requestPersistentBrowserStorage(), 3_000);
+    await withTimeout(writeIndexedDbState(readState()), 3_000);
   } catch {
-    // The app can still run with localStorage if IndexedDB is unavailable.
+    // Rendering with an empty wallet beats not rendering at all.
   }
+}
+
+async function withTimeout<T>(
+  work: Promise<T>,
+  ms: number,
+): Promise<T | null> {
+  return Promise.race([
+    work,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), ms)),
+  ]).catch(() => null);
 }
 
 export function createLocalDataBackup(): LocalDataBackup {
@@ -532,6 +668,8 @@ export interface CardRulesManifest {
   url: string;
   notes?: string;
   publishedAt?: string;
+  /** sha256 of the rules payload, as published by `cards:publish`. */
+  sha256?: string;
 }
 
 export interface CardRulesUpdateResult {
@@ -542,6 +680,11 @@ export interface CardRulesUpdateResult {
 
 export function getCurrentRuleSetVersion(): string {
   return getCatalogOverride()?.version ?? BUILTIN_RULESET_VERSION;
+}
+
+/** Exposed for tests: this is the one place a published ruleset can lose data. */
+export function normalizeRemoteCatalogForTests(value: unknown): CreditCard[] {
+  return normalizeRemoteCatalog(value);
 }
 
 function normalizeRemoteCatalog(value: unknown): CreditCard[] {
@@ -574,8 +717,16 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       throw new Error(`Card ${candidate.name} is missing benefits.`);
     }
 
+    const cardId = candidate.id ?? index + 1;
+
+    // Spread first, then coerce. Rebuilding from a fixed field list silently
+    // dropped every field added since it was written — rewardUnitValueCents,
+    // rewardType, categoryChoices — which would corrupt rates and disable
+    // choice categories the moment a published ruleset was applied.
     return {
-      id: candidate.id ?? index + 1,
+      ...candidate,
+      ...metadata,
+      id: cardId,
       name: candidate.name,
       issuer: candidate.issuer,
       network: candidate.network,
@@ -588,27 +739,14 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       color: candidate.color ?? "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
       logoUrl: candidate.logoUrl ?? null,
       cardImageUrl: candidate.cardImageUrl ?? null,
-      market: typeof metadata.market === "string" ? metadata.market : undefined,
-      currency:
-        typeof metadata.currency === "string" ? metadata.currency : undefined,
-      sourceUrl:
-        typeof metadata.sourceUrl === "string" ? metadata.sourceUrl : undefined,
-      imageSourceUrl:
-        typeof metadata.imageSourceUrl === "string"
-          ? metadata.imageSourceUrl
-          : null,
-      lastReviewedAt:
-        typeof metadata.lastReviewedAt === "string"
-          ? metadata.lastReviewedAt
-          : undefined,
-      dataConfidence:
-        typeof metadata.dataConfidence === "string"
-          ? metadata.dataConfidence
-          : undefined,
+      rewardUnitValueCents:
+        candidate.rewardUnitValueCents == null
+          ? null
+          : Number(candidate.rewardUnitValueCents),
       cashbackCategories: candidate.cashbackCategories.map(
         (category, catIndex) => ({
           id: category.id ?? catIndex + 1,
-          cardId: category.cardId ?? candidate.id ?? index + 1,
+          cardId: category.cardId ?? cardId,
           category: category.category,
           rate: Number(category.rate),
           isDefault: Boolean(category.isDefault),
@@ -616,15 +754,34 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       ),
       benefits: candidate.benefits.map((benefit, benefitIndex) => ({
         id: benefit.id ?? benefitIndex + 1,
-        cardId: benefit.cardId ?? candidate.id ?? index + 1,
+        cardId: benefit.cardId ?? cardId,
         name: benefit.name,
         description: benefit.description,
         annualValue:
           benefit.annualValue == null ? null : Number(benefit.annualValue),
       })),
+      categoryChoices: Array.isArray(candidate.categoryChoices)
+        ? candidate.categoryChoices.filter(
+            (choice) =>
+              typeof choice?.categoryId === "number" &&
+              Array.isArray(choice.options),
+          )
+        : undefined,
       inWallet: false,
-    };
+    } as CreditCard;
   });
+}
+
+async function sha256Hex(value: string): Promise<string | null> {
+  if (typeof crypto === "undefined" || !crypto.subtle) return null;
+
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value),
+  );
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 export async function checkForCardRulesUpdate(
@@ -643,17 +800,38 @@ export async function checkForCardRulesUpdate(
   }
 
   const currentVersion = getCurrentRuleSetVersion();
-  if (manifest.version === currentVersion) {
+  // Only ever move forward. An older manifest — stale CDN copy, rolled-back
+  // deploy — must not downgrade rules the app already has.
+  if (compareRuleSetVersions(manifest.version, currentVersion) <= 0) {
     return { updated: false, version: currentVersion };
   }
 
-  const rulesUrl = new URL(manifest.url, manifestUrl).toString();
-  const rulesResponse = await fetch(rulesUrl, { cache: "no-store" });
+  const pageUrl =
+    typeof window !== "undefined" ? window.location.href : undefined;
+  const manifestOrigin = new URL(manifestUrl, pageUrl).origin;
+  const rulesUrl = new URL(manifest.url, new URL(manifestUrl, pageUrl));
+  // The payload replaces every reward rule in the app, so it has to come from
+  // the same origin as the manifest that vouched for it.
+  if (rulesUrl.origin !== manifestOrigin) {
+    throw new Error("Card rules must be served from the manifest's origin.");
+  }
+
+  const rulesResponse = await fetch(rulesUrl.toString(), { cache: "no-store" });
   if (!rulesResponse.ok) {
     throw new Error(`Could not fetch card rules: ${rulesResponse.status}`);
   }
 
-  const cards = normalizeRemoteCatalog(await rulesResponse.json());
+  const body = await rulesResponse.text();
+  if (manifest.sha256) {
+    const digest = await sha256Hex(body);
+    if (digest && digest !== manifest.sha256) {
+      throw new Error("Card rules failed their integrity check.");
+    }
+  }
+
+  const cards = normalizeRemoteCatalog(JSON.parse(body));
+  if (!cards.length) throw new Error("Card rules contained no cards.");
+
   const state = readState();
   writeState({
     ...state,
@@ -683,23 +861,400 @@ function sortByDateDesc(transactions: Transaction[]): Transaction[] {
   );
 }
 
+/**
+ * The categories a logged transaction can carry.
+ *
+ * Every entry must be resolvable by `getCategoryTags`, because that is how a
+ * transaction is matched to a card's bonus category. Adding a label here only
+ * helps if the catalog actually prices that kind of spend.
+ */
+export const TRANSACTION_CATEGORIES = [
+  "Groceries",
+  "Online Groceries",
+  "Warehouse Clubs",
+  "Dining",
+  "Food Delivery",
+  "Gas",
+  "EV Charging",
+  "Transit",
+  "Rideshare",
+  "Travel",
+  "Flights",
+  "Hotels",
+  "Rental Cars",
+  "Entertainment",
+  "Streaming",
+  "Drugstores",
+  "Home Improvement",
+  "Office Supplies",
+  "Phone and Internet",
+  "Utilities",
+  "Online Retail",
+  "Advertising",
+  "Shipping",
+  "Rent",
+  "Fitness",
+  "Other",
+] as const;
+
+export type TransactionCategory = (typeof TRANSACTION_CATEGORIES)[number];
+
+/**
+ * Tags describing *what* was bought. A catalog category and a transaction have
+ * to agree on at least one of these before any bonus rate can apply.
+ */
+const SUBJECT_TAGS = new Set([
+  "grocery",
+  "dining",
+  "food_delivery",
+  "gas",
+  "ev_charging",
+  "transit",
+  "rideshare",
+  "travel",
+  "airfare",
+  "hotel",
+  "rental_car",
+  "entertainment",
+  "streaming",
+  "drugstore",
+  "home_improvement",
+  "office_supplies",
+  "phone",
+  "utilities",
+  "online_retail",
+  "advertising",
+  "shipping",
+  "rent",
+  "fitness",
+  "warehouse_club",
+]);
+
+/**
+ * Tags that narrow a bonus to a channel, merchant or brand. A plain logged
+ * transaction says nothing about any of these, so a catalog category carrying
+ * one it did not ask for must not win — "10x hotels via Capital One Travel"
+ * cannot be assumed for a hotel stay booked anywhere else.
+ *
+ */
+const NARROWING_TAGS = new Set([
+  "travel_portal",
+  "chase_travel",
+  "capital_one_travel",
+  "amex_travel",
+  "citi_travel",
+  "travel_center",
+  "renowned_hotels",
+  "ota",
+  "expedia_group",
+  "online",
+  "mobile_wallet",
+  "apple_pay",
+  "foreign",
+  "business",
+  "amazon",
+  "whole_foods",
+  "walmart",
+  "target",
+  "apple",
+  "nike",
+  "ace_hardware",
+  "booking_com",
+  "paypal",
+  "verizon",
+  "uber",
+  "lyft",
+  "marriott",
+  "hilton",
+  "hyatt",
+  "ihg",
+  "wyndham",
+  "choice",
+  "united",
+  "delta",
+  "american_airlines",
+  "southwest",
+  "alaska",
+  "hawaiian",
+  "jetblue",
+  "air_canada",
+  "cathay",
+  "citi_nights",
+]);
+
+/**
+ * `getCategoryTags` adds the umbrella `travel` tag alongside the specific one,
+ * so "Flights booked direct" and "Hotels" both carry it. Treating that as an
+ * ordinary shared subject would let a flights-only bonus pay out on a hotel
+ * stay, so travel is matched through {@link travelSubjectsOverlap} instead.
+ */
+const TRAVEL_SUBTYPE_TAGS = new Set(["airfare", "hotel", "rental_car"]);
+
+function partitionTags(tags: string[]): {
+  subjects: Set<string>;
+  narrowing: Set<string>;
+} {
+  const subjects = new Set<string>();
+  const narrowing = new Set<string>();
+
+  for (const tag of tags) {
+    if (SUBJECT_TAGS.has(tag)) subjects.add(tag);
+    if (NARROWING_TAGS.has(tag)) narrowing.add(tag);
+  }
+
+  return { subjects, narrowing };
+}
+
+function hasTravelSubtype(subjects: Set<string>): boolean {
+  return [...TRAVEL_SUBTYPE_TAGS].some((tag) => subjects.has(tag));
+}
+
+/**
+ * A bonus written as plain "Travel" covers every kind of trip, but one written
+ * as "Flights" covers only flights — and a transaction logged as plain "Travel"
+ * cannot be assumed to be either.
+ */
+function travelSubjectsOverlap(
+  category: Set<string>,
+  transaction: Set<string>,
+): boolean {
+  const categorySubtypes = hasTravelSubtype(category);
+  const transactionSubtypes = hasTravelSubtype(transaction);
+
+  if (categorySubtypes && transactionSubtypes) {
+    return [...TRAVEL_SUBTYPE_TAGS].some(
+      (tag) => category.has(tag) && transaction.has(tag),
+    );
+  }
+
+  // Generic on the category side is a wildcard; generic on the transaction side
+  // is an unknown, and an unknown must not claim a narrower bonus.
+  if (!categorySubtypes && category.has("travel")) {
+    return transactionSubtypes || transaction.has("travel");
+  }
+
+  return false;
+}
+
+/**
+ * Decides whether a card's bonus category covers a logged transaction.
+ *
+ * The catalog writes categories the way issuers do — "Groceries (US
+ * supermarkets, up to $6,000/yr)", "Restaurants worldwide", "Flights and
+ * Hotels" — so comparing those strings to a transaction's category by equality
+ * matched almost nothing and silently paid the default rate instead. Matching
+ * on derived tags is what makes those categories reachable.
+ */
+function categoryCovers(
+  categoryLabel: string,
+  transactionLabel: string,
+): boolean {
+  const category = partitionTags(getCategoryTags(categoryLabel));
+  const transaction = partitionTags(getCategoryTags(transactionLabel));
+
+  if (!category.subjects.size || !transaction.subjects.size) return false;
+
+  const sharesNonTravelSubject = [...category.subjects].some(
+    (tag) =>
+      tag !== "travel" &&
+      !TRAVEL_SUBTYPE_TAGS.has(tag) &&
+      transaction.subjects.has(tag),
+  );
+
+  if (
+    !sharesNonTravelSubject &&
+    !travelSubjectsOverlap(category.subjects, transaction.subjects)
+  ) {
+    return false;
+  }
+
+  // A category naming both a portal and direct booking covers either channel,
+  // so its portal tags stop being a restriction.
+  const coversAnyChannel = getCategoryTags(categoryLabel).includes(
+    "direct_booking",
+  );
+
+  return [...category.narrowing].every((tag) => {
+    if (coversAnyChannel && PORTAL_TAGS.includes(tag)) return true;
+    if (coversAnyChannel && tag === "travel_portal") return true;
+    return transaction.narrowing.has(tag);
+  });
+}
+
+/**
+ * Picks the best-paying bonus category on `card` for a transaction, falling
+ * back to the card's default category.
+ *
+ * Ties break toward the more specific category (more matched subject tags) so
+ * that "Online Groceries" beats a plain grocery bonus for an online order at
+ * equal rates.
+ */
+/**
+ * What a choice-bearing category needs in order to be resolvable.
+ *
+ * Without it — the card library, a card the user does not hold — a category
+ * like "Choice Category" cannot be known to apply, so it is skipped rather
+ * than credited.
+ */
+export interface CategoryChoiceContext {
+  walletCard?: LocalWalletCard | null;
+  state?: LocalState;
+  onDate?: Date;
+  /** The purchase being priced, which counts toward an automatic choice. */
+  pending?: { category: string; amount: number };
+}
+
+function choicePeriodStart(
+  reset: CardCategoryChoiceReset,
+  onDate: Date,
+  walletCard?: LocalWalletCard | null,
+): Date {
+  if (reset === "month") {
+    return new Date(onDate.getFullYear(), onDate.getMonth(), 1);
+  }
+  if (reset === "quarter") return getQuarterStart(onDate);
+  if (reset === "year") return new Date(onDate.getFullYear(), 0, 1);
+  if (reset === "anniversary" && walletCard) {
+    return cycleStartForAnnualFee(walletCard, onDate);
+  }
+  return new Date(0);
+}
+
+/**
+ * Works out which options are currently earning the bonus.
+ *
+ * For a user-selected choice that is whatever the cardholder saved. For an
+ * automatic one the issuer applies the bonus to the eligible categories you
+ * spent the most in, which the app can derive from its own transaction log —
+ * including the purchase being priced right now, since that spend counts too.
+ */
+function getActiveChoiceOptions(
+  choice: CardCategoryChoice,
+  context: CategoryChoiceContext,
+): string[] {
+  const { walletCard, state } = context;
+  if (!walletCard) return [];
+
+  if (choice.mode !== "automatic-top-spend") {
+    const selected = walletCard.selectedCategories?.[choice.categoryId] ?? [];
+    return selected.filter((option) => choice.options.includes(option));
+  }
+
+  if (!state) return [];
+
+  const onDate = context.onDate ?? new Date();
+  const periodStart = choicePeriodStart(choice.resets, onDate, walletCard);
+  const totals = new Map<string, number>();
+
+  const credit = (label: string, amount: number) => {
+    for (const option of choice.options) {
+      if (!categoryCovers(option, label)) continue;
+      totals.set(option, (totals.get(option) ?? 0) + amount);
+    }
+  };
+
+  for (const transaction of state.transactions) {
+    if (!matchesWalletCardId(transaction, walletCard.id)) continue;
+    if (!isPurchaseTransaction(transaction)) continue;
+    if (!isInLocalDateRange(transaction.date, periodStart, onDate)) continue;
+    credit(transaction.category, transaction.amount);
+  }
+  if (context.pending) {
+    credit(context.pending.category, context.pending.amount);
+  }
+
+  return [...totals.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, Math.max(1, choice.picks))
+    .map(([option]) => option);
+}
+
+/** The options a card's choice row is currently earning on, for display. */
+export function getChoiceCategoryState(
+  card: CreditCard,
+  context: CategoryChoiceContext,
+): Array<{ choice: CardCategoryChoice; active: string[] }> {
+  return (card.categoryChoices ?? []).map((choice) => ({
+    choice,
+    active: getActiveChoiceOptions(choice, context),
+  }));
+}
+
+export function resolveCashbackCategory(
+  card: CreditCard,
+  category: string,
+  context: CategoryChoiceContext = {},
+) {
+  return getCashbackCategory(card, category, context);
+}
+
+function getCashbackCategory(
+  card: CreditCard,
+  category: string,
+  context: CategoryChoiceContext = {},
+) {
+  const fallback = card.cashbackCategories.find((c) => c.isDefault) ?? null;
+  const label = category.trim();
+  if (!label) return fallback;
+
+  const choicesByCategoryId = new Map(
+    (card.categoryChoices ?? []).map((choice) => [choice.categoryId, choice]),
+  );
+
+  /**
+   * A choice row's own name ("Choice Category") describes no spend, so it can
+   * only match through whichever options are currently active.
+   */
+  const rowApplies = (row: CashbackCategory): boolean => {
+    const choice = choicesByCategoryId.get(row.id);
+    if (!choice) return categoryCovers(row.category, label);
+
+    return getActiveChoiceOptions(choice, context).some((option) =>
+      categoryCovers(option, label),
+    );
+  };
+
+  const exact = card.cashbackCategories.find(
+    (c) =>
+      c.category.toLowerCase() === label.toLowerCase() &&
+      !c.isDefault &&
+      !choicesByCategoryId.has(c.id),
+  );
+  if (exact) return exact;
+
+  const transactionSubjects = partitionTags(getCategoryTags(label)).subjects;
+
+  const candidates = card.cashbackCategories
+    .filter((c) => !c.isDefault && rowApplies(c))
+    .map((c) => {
+      const subjects = partitionTags(getCategoryTags(c.category)).subjects;
+      const overlap = [...subjects].filter((tag) =>
+        transactionSubjects.has(tag),
+      ).length;
+      return { category: c, overlap };
+    })
+    .sort(
+      (a, b) =>
+        b.category.rate - a.category.rate ||
+        b.overlap - a.overlap ||
+        a.category.category.localeCompare(b.category.category),
+    );
+
+  const best = candidates[0]?.category;
+  if (!best) return fallback;
+
+  // A "bonus" that pays no better than the default is not a bonus, and
+  // treating it as one would wrongly subject the spend to that row's cap.
+  if (fallback && best.rate <= fallback.rate) return fallback;
+
+  return best;
+}
+
 function getCashbackRate(cardId: number, category: string): number {
   const card = getCard(cardId);
   if (!card) return 0;
 
-  const match = card.cashbackCategories.find(
-    (c) => c.category.toLowerCase() === category.toLowerCase() && !c.isDefault,
-  );
-  if (match) return match.rate;
-
-  return card.cashbackCategories.find((c) => c.isDefault)?.rate ?? 0;
-}
-
-function getCashbackCategory(card: CreditCard, category: string) {
-  const match = card.cashbackCategories.find(
-    (c) => c.category.toLowerCase() === category.toLowerCase() && !c.isDefault,
-  );
-  return match ?? card.cashbackCategories.find((c) => c.isDefault) ?? null;
+  return getCashbackCategory(card, category)?.rate ?? 0;
 }
 
 function getRewardUnitValueMultiplier(card: CreditCard): number {
@@ -784,8 +1339,9 @@ function transactionMatchesSpendCapGroup(
   card: CreditCard,
   transaction: Transaction,
   capGroup: string,
+  context: CategoryChoiceContext = {},
 ): boolean {
-  const category = getCashbackCategory(card, transaction.category);
+  const category = getCashbackCategory(card, transaction.category, context);
   const cap = category ? parseSpendCap(category.category) : null;
   if (!category || !cap) return false;
   return normalizeCapGroup(category.category, cap) === capGroup;
@@ -806,50 +1362,6 @@ function getQuarterStart(date: Date): Date {
   return new Date(date.getFullYear(), Math.floor(date.getMonth() / 3) * 3, 1);
 }
 
-function isBankOfAmericaCustomizedCash(card: CreditCard): boolean {
-  return (
-    card.issuer === "Bank of America" &&
-    card.name.toLowerCase().includes("customized cash")
-  );
-}
-
-function isBoaCustomizedCashBonusCategory(category: string): boolean {
-  const normalized = category.toLowerCase();
-  return [
-    "choice",
-    "gas",
-    "ev charging",
-    "online",
-    "dining",
-    "travel",
-    "drug",
-    "home improvement",
-    "furnishings",
-    "grocery",
-    "wholesale",
-  ].some((keyword) => normalized.includes(keyword));
-}
-
-function getBoaCustomizedCashBonusRate(
-  walletCard: LocalWalletCard,
-  category: string,
-  transactionDate: Date,
-): number | null {
-  if (!isBoaCustomizedCashBonusCategory(category)) return null;
-
-  const normalized = category.toLowerCase();
-  if (normalized.includes("grocery") || normalized.includes("wholesale")) {
-    return 0.02;
-  }
-
-  if (!walletCard.openedAt) return 0.03;
-
-  const openedAt = new Date(walletCard.openedAt);
-  const firstYearEnd = new Date(openedAt);
-  firstYearEnd.setFullYear(firstYearEnd.getFullYear() + 1);
-  return transactionDate < firstYearEnd ? 0.06 : 0.03;
-}
-
 function calculateCashback(
   state: LocalState,
   walletCard: LocalWalletCard,
@@ -857,69 +1369,52 @@ function calculateCashback(
   data: CreateTransactionBody,
   transactionDate: Date,
 ): { cashbackEarned: number; cashbackRate: number } {
-  if (isBankOfAmericaCustomizedCash(card)) {
-    const bonusRate = getBoaCustomizedCashBonusRate(
-      walletCard,
-      data.category,
-      transactionDate,
-    );
-
-    if (bonusRate !== null) {
-      const quarterStart = getQuarterStart(transactionDate);
-      const cappedSpendUsed = state.transactions
-        .filter((transaction) => {
-          const date = new Date(transaction.date);
-          return (
-            matchesWalletCardId(transaction, walletCard.id) &&
-            isPurchaseTransaction(transaction) &&
-            date >= quarterStart &&
-            date <= transactionDate &&
-            isBoaCustomizedCashBonusCategory(transaction.category)
-          );
-        })
-        .reduce((sum, transaction) => sum + transaction.amount, 0);
-
-      const capRemaining = Math.max(0, 2500 - cappedSpendUsed);
-      const bonusAmount = Math.min(data.amount, capRemaining);
-      const baseAmount = data.amount - bonusAmount;
-      const cashbackEarned = Number(
-        (bonusAmount * bonusRate + baseAmount * 0.01).toFixed(4),
-      );
-
-      return {
-        cashbackEarned,
-        cashbackRate: Number((cashbackEarned / data.amount).toFixed(4)),
-      };
-    }
+  if (!Number.isFinite(data.amount) || data.amount <= 0) {
+    return { cashbackEarned: 0, cashbackRate: 0 };
   }
 
-  const matchedCategory = getCashbackCategory(card, data.category);
-  const cashbackRate =
-    matchedCategory?.rate ?? getCashbackRate(walletCard.cardId, data.category);
+  const choiceContext: CategoryChoiceContext = {
+    walletCard,
+    state,
+    onDate: transactionDate,
+    pending: { category: data.category, amount: data.amount },
+  };
+  const matchedCategory = getCashbackCategory(
+    card,
+    data.category,
+    choiceContext,
+  );
+  const defaultCategory = getDefaultCategory(card);
+  const cashbackRate = matchedCategory?.rate ?? defaultCategory?.rate ?? 0;
   const spendCap = matchedCategory
     ? parseSpendCap(matchedCategory.category)
     : null;
   const unitValueMultiplier = getRewardUnitValueMultiplier(card);
+  const baseRate = defaultCategory?.rate ?? 0;
 
-  if (matchedCategory && spendCap && cashbackRate > 0.01) {
+  if (matchedCategory && spendCap && cashbackRate > baseRate) {
     const periodStart = spendCapPeriodStart(transactionDate, spendCap.period);
     const capGroup = normalizeCapGroup(matchedCategory.category, spendCap);
     const cappedSpendUsed = state.transactions
-      .filter((transaction) => {
-        const date = new Date(transaction.date);
-        return (
+      .filter(
+        (transaction) =>
           matchesWalletCardId(transaction, walletCard.id) &&
           isPurchaseTransaction(transaction) &&
-          date >= periodStart &&
-          date <= transactionDate &&
-          transactionMatchesSpendCapGroup(card, transaction, capGroup)
-        );
-      })
+          isInLocalDateRange(transaction.date, periodStart, transactionDate) &&
+          transactionMatchesSpendCapGroup(
+            card,
+            transaction,
+            capGroup,
+            choiceContext,
+          ),
+      )
       .reduce((sum, transaction) => sum + transaction.amount, 0);
     const capRemaining = Math.max(0, spendCap.amount - cappedSpendUsed);
     const bonusAmount = Math.min(data.amount, capRemaining);
     const baseAmount = data.amount - bonusAmount;
-    const rawReward = bonusAmount * cashbackRate + baseAmount * 0.01;
+    // Spend past the cap drops to the card's own default rate, which is 2% on
+    // cards like Citi Double Cash — not a universal 1%.
+    const rawReward = bonusAmount * cashbackRate + baseAmount * baseRate;
     const cashbackEarned = Number((rawReward * unitValueMultiplier).toFixed(4));
 
     return {
@@ -935,33 +1430,76 @@ function calculateCashback(
   };
 }
 
-function cycleStartForAnnualFee(walletCard: LocalWalletCard): Date {
-  const anchor = new Date(walletCard.openedAt ?? walletCard.addedAt);
-  const now = new Date();
+/**
+ * A bare `YYYY-MM-DD` parses as UTC midnight, which reads back as the previous
+ * day everywhere west of Greenwich. Reading the calendar fields directly keeps
+ * an anniversary on the date the user typed, in every timezone.
+ */
+function parseCalendarDate(value: string): Date {
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return new Date(value);
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function cycleStartForAnnualFee(
+  walletCard: LocalWalletCard,
+  today = new Date(),
+): Date {
+  const anchor = parseCalendarDate(walletCard.openedAt ?? walletCard.addedAt);
+  if (Number.isNaN(anchor.getTime())) return startOfLocalDay(today);
+
   const anchorMonth = anchor.getMonth();
   const anchorDay = anchor.getDate();
-  const clampDay = (year: number, month: number, day: number) =>
-    Math.min(day, new Date(year, month + 1, 0).getDate());
 
-  const cycleStart = new Date(
-    now.getFullYear(),
+  // `dateOnDayOfMonth` clamps into the target month, so a Feb 29 anniversary
+  // lands on Feb 28 in a common year rather than rolling into March.
+  let cycleStart = dateOnDayOfMonth(
+    today.getFullYear(),
     anchorMonth,
-    clampDay(now.getFullYear(), anchorMonth, anchorDay),
+    anchorDay,
   );
-  if (cycleStart > now) {
-    const prevYear = cycleStart.getFullYear() - 1;
-    cycleStart.setFullYear(prevYear);
-    cycleStart.setDate(clampDay(prevYear, anchorMonth, anchorDay));
+  if (cycleStart > startOfLocalDay(today)) {
+    cycleStart = dateOnDayOfMonth(
+      today.getFullYear() - 1,
+      anchorMonth,
+      anchorDay,
+    );
   }
   return cycleStart;
+}
+
+/**
+ * Stands in for a card the active catalog no longer contains — a discontinued
+ * product, or a rules update that dropped the row. Without it, one unresolvable
+ * wallet entry threw and rendered the entire wallet as empty.
+ */
+function placeholderCard(cardId: number): CreditCard {
+  return {
+    id: cardId,
+    name: "Unavailable card",
+    issuer: "Unknown",
+    network: CreditCardNetwork.Visa,
+    annualFee: 0,
+    signupBonus: null,
+    signupBonusValue: null,
+    color: "linear-gradient(135deg, #4b5563, #6b7280)",
+    logoUrl: null,
+    cardImageUrl: null,
+    cashbackCategories: [],
+    benefits: [],
+    inWallet: true,
+    rewardRuleNotes: [
+      "This card is not in the current card rules, so its rewards cannot be calculated. Your transactions and settings for it are unchanged.",
+    ],
+  } as CreditCard;
 }
 
 function buildWalletCard(
   walletCard: LocalWalletCard,
   state = readState(),
 ): WalletCard {
-  const card = getCard(walletCard.cardId);
-  if (!card) throw new Error(`Card ${walletCard.cardId} not found`);
+  const card = getCard(walletCard.cardId) ?? placeholderCard(walletCard.cardId);
 
   const cardTransactions = state.transactions.filter((t) =>
     matchesWalletCardId(t, walletCard.id),
@@ -972,15 +1510,45 @@ function buildWalletCard(
   );
   const currentYearStart = cycleStartForAnnualFee(walletCard);
   const currentYearCashback = cardTransactions
-    .filter((t) => new Date(t.date) >= currentYearStart)
+    .filter((t) => isOnOrAfterLocalDate(t.date, currentYearStart))
     .reduce((sum, t) => sum + t.cashbackEarned, 0);
+
+  const activeChoiceCategories: Record<number, string[]> = {};
+  for (const { choice, active } of getChoiceCategoryState(card, {
+    walletCard,
+    state,
+  })) {
+    activeChoiceCategories[choice.categoryId] = active;
+  }
 
   return {
     ...walletCard,
     totalCashbackEarned,
     currentYearCashback,
+    activeChoiceCategories,
     card: { ...card, inWallet: true },
   };
+}
+
+/**
+ * Wallet cards denominated in the currency most of the wallet uses.
+ *
+ * Benefit values cannot be summed across currencies, so the dashboard totals
+ * and the benefit lists must both narrow to the same population or the count
+ * on the tile will not match the list behind it.
+ */
+function inDominantCurrency(walletCards: WalletCard[]): WalletCard[] {
+  const counts = new Map<string, number>();
+  for (const walletCard of walletCards) {
+    const currency = getCardCurrency(walletCard.card) ?? "USD";
+    counts.set(currency, (counts.get(currency) ?? 0) + 1);
+  }
+
+  const dominant =
+    [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "USD";
+  return walletCards.filter(
+    (walletCard) => (getCardCurrency(walletCard.card) ?? "USD") === dominant,
+  );
 }
 
 function listWalletCards(state = readState()): WalletCard[] {
@@ -1019,6 +1587,24 @@ function ensureBenefitUsageRows(
     : state.benefitUsage;
 }
 
+/**
+ * Whether a benefit counts as used *in the current benefit year*.
+ *
+ * Card benefits are annual allowances that reset on the account anniversary.
+ * Treating the stored `used` flag as permanent made every credit vanish from
+ * the unused list the first time it was claimed and never come back.
+ */
+function isBenefitUsedThisYear(
+  usage: LocalBenefitUsage,
+  walletCard: LocalWalletCard | undefined,
+): boolean {
+  if (!usage.used) return false;
+  if (!walletCard) return usage.used;
+  if (!usage.usedAt) return true;
+
+  return isOnOrAfterLocalDate(usage.usedAt, cycleStartForAnnualFee(walletCard));
+}
+
 function buildBenefitUsage(
   usage: LocalBenefitUsage,
   state = readState(),
@@ -1027,6 +1613,7 @@ function buildBenefitUsage(
   const benefit = getCard(walletCard?.cardId ?? -1)?.benefits.find(
     (b) => b.id === usage.benefitId,
   );
+  const used = isBenefitUsedThisYear(usage, walletCard);
 
   return {
     benefitId: usage.benefitId,
@@ -1034,8 +1621,8 @@ function buildBenefitUsage(
     name: benefit?.name ?? "Unknown Benefit",
     description: benefit?.description ?? "",
     annualValue: benefit?.annualValue ?? null,
-    used: usage.used,
-    usedAt: usage.usedAt ?? null,
+    used,
+    usedAt: used ? (usage.usedAt ?? null) : null,
   };
 }
 
@@ -1155,6 +1742,10 @@ export const useUpdateWalletCard = () =>
             : existing.creditLimit,
         openedAt:
           "openedAt" in data ? (data.openedAt ?? null) : existing.openedAt,
+        selectedCategories:
+          "selectedCategories" in data
+            ? normalizeSelectedCategories(data.selectedCategories)
+            : existing.selectedCategories,
       };
 
       if (
@@ -1173,10 +1764,24 @@ export const useUpdateWalletCard = () =>
         throw new Error("creditLimit must be a non-negative number");
       }
 
-      const nextState = {
+      // Only a changed choice selection affects pricing, and only from the
+      // start of the period it applies to — a rename or a credit-limit edit
+      // must not touch recorded cashback at all.
+      const choiceChanged =
+        JSON.stringify(existing.selectedCategories ?? null) !==
+        JSON.stringify(next.selectedCategories ?? null);
+
+      const withCard = {
         ...state,
         walletCards: state.walletCards.map((w) => (w.id === id ? next : w)),
       };
+      const nextState = choiceChanged
+        ? recalculateCardCashback(
+            withCard,
+            id,
+            earliestChoicePeriodStart(getCard(next.cardId), next),
+          )
+        : withCard;
       writeState(nextState);
 
       return buildWalletCard(next, nextState);
@@ -1225,12 +1830,110 @@ export function useListTransactions(params?: ListTransactionsParams) {
   });
 }
 
+/**
+ * Recomputes cashback for one card's purchases in date order.
+ *
+ * Spend caps make each purchase's rate depend on everything logged before it,
+ * so a rate recorded once at insert time goes stale as soon as the history
+ * changes — backdating a purchase, or deleting one that had consumed the cap,
+ * would otherwise leave every later transaction frozen at the wrong rate.
+ */
+/**
+ * Start of the current period for the card's soonest-resetting choice row.
+ *
+ * A new selection takes effect from the period it belongs to, so that is how
+ * far back a re-price may reach.
+ */
+function earliestChoicePeriodStart(
+  card: CreditCard | undefined,
+  walletCard: LocalWalletCard,
+  onDate = new Date(),
+): Date | undefined {
+  const choices = card?.categoryChoices ?? [];
+  if (!choices.length) return undefined;
+
+  const starts = choices.map((choice) =>
+    choicePeriodStart(choice.resets, onDate, walletCard).getTime(),
+  );
+  return new Date(Math.max(...starts));
+}
+
+function recalculateCardCashback(
+  state: LocalState,
+  walletCardId: number,
+  /**
+   * Transactions before this date keep the rate they were recorded at, but
+   * still count toward cap consumption. Changing a choice category must not
+   * retroactively re-price months the old selection was actually earning.
+   */
+  since?: Date,
+): LocalState {
+  const walletCard = state.walletCards.find((w) => w.id === walletCardId);
+  if (!walletCard) return state;
+
+  const card = getCard(walletCard.cardId);
+  if (!card) return state;
+
+  const ordered = state.transactions
+    .filter((t) => matchesWalletCardId(t, walletCardId))
+    .sort(
+      (a, b) =>
+        new Date(a.date).getTime() - new Date(b.date).getTime() || a.id - b.id,
+    );
+
+  const recalculated = new Map<number, Transaction>();
+  const replayed: Transaction[] = [];
+
+  for (const transaction of ordered) {
+    if (since && !isOnOrAfterLocalDate(transaction.date, since)) {
+      replayed.push(transaction);
+      continue;
+    }
+
+    if (isPaymentTransaction(transaction)) {
+      recalculated.set(transaction.id, {
+        ...transaction,
+        cashbackEarned: 0,
+        cashbackRate: 0,
+      });
+      replayed.push(transaction);
+      continue;
+    }
+
+    const { cashbackEarned, cashbackRate } = calculateCashback(
+      { ...state, transactions: replayed },
+      walletCard,
+      card,
+      {
+        walletCardId,
+        amount: transaction.amount,
+        category: transaction.category,
+        description: transaction.description,
+      },
+      new Date(transaction.date),
+    );
+
+    const next = { ...transaction, cashbackEarned, cashbackRate };
+    recalculated.set(transaction.id, next);
+    replayed.push(next);
+  }
+
+  return {
+    ...state,
+    transactions: state.transactions.map(
+      (transaction) => recalculated.get(transaction.id) ?? transaction,
+    ),
+  };
+}
+
 export const useCreateTransaction = () =>
   useMutation({
     mutationFn: async ({ data }: { data: CreateTransactionBody }) => {
       const state = readState();
       const walletCardId = toFiniteNumber(data.walletCardId, -1);
       const amount = toFiniteNumber(data.amount);
+      if (amount <= 0) throw new Error("Amount must be greater than zero");
+
       const walletCard = state.walletCards.find((w) => w.id === walletCardId);
       if (!walletCard) throw new Error("Wallet card not found");
 
@@ -1238,18 +1941,13 @@ export const useCreateTransaction = () =>
       if (!card) throw new Error("Card not found");
 
       const transactionType = data.transactionType ?? "purchase";
-      const isPayment = transactionType === "payment";
-      const category = isPayment ? "Payment" : data.category;
+      const category =
+        transactionType === "payment" ? "Payment" : data.category;
       const transactionDate = new Date(data.date ?? new Date().toISOString());
-      const { cashbackEarned, cashbackRate } = isPayment
-        ? { cashbackEarned: 0, cashbackRate: 0 }
-        : calculateCashback(
-            state,
-            walletCard,
-            card,
-            { ...data, walletCardId, amount, category },
-            transactionDate,
-          );
+      if (Number.isNaN(transactionDate.getTime())) {
+        throw new Error("Transaction date is not a valid date");
+      }
+
       const transaction: Transaction = {
         id: state.nextTransactionId,
         walletCardId,
@@ -1257,8 +1955,8 @@ export const useCreateTransaction = () =>
         description: data.description,
         amount,
         category,
-        cashbackEarned,
-        cashbackRate,
+        cashbackEarned: 0,
+        cashbackRate: 0,
         date: transactionDate.toISOString(),
         cardName: card.name,
         merchantName: data.merchantName ?? null,
@@ -1267,13 +1965,20 @@ export const useCreateTransaction = () =>
         longitude: data.longitude ?? null,
       };
 
-      writeState({
-        ...state,
-        nextTransactionId: state.nextTransactionId + 1,
-        transactions: [...state.transactions, transaction],
-      });
+      const nextState = recalculateCardCashback(
+        {
+          ...state,
+          nextTransactionId: state.nextTransactionId + 1,
+          transactions: [...state.transactions, transaction],
+        },
+        walletCardId,
+      );
+      writeState(nextState);
 
-      return transaction;
+      return (
+        nextState.transactions.find((t) => t.id === transaction.id) ??
+        transaction
+      );
     },
   });
 
@@ -1281,13 +1986,18 @@ export const useDeleteTransaction = () =>
   useMutation({
     mutationFn: async ({ id }: { id: number }) => {
       const state = readState();
-      if (!state.transactions.some((t) => t.id === id)) {
-        throw new Error("Transaction not found");
-      }
-      writeState({
-        ...state,
-        transactions: state.transactions.filter((t) => t.id !== id),
-      });
+      const removed = state.transactions.find((t) => t.id === id);
+      if (!removed) throw new Error("Transaction not found");
+
+      writeState(
+        recalculateCardCashback(
+          {
+            ...state,
+            transactions: state.transactions.filter((t) => t.id !== id),
+          },
+          removed.walletCardId,
+        ),
+      );
       return undefined;
     },
   });
@@ -1360,31 +2070,66 @@ export function useGetDashboardSummary() {
     queryFn: async (): Promise<DashboardSummary> => {
       const state = readState();
       const walletCards = listWalletCards(state);
-      const totalAnnualFees = walletCards.reduce(
+
+      // Adding a HK$2,000 fee to a US$95 one and printing "$2,095" is worse
+      // than showing less. Totals cover the wallet's dominant currency only,
+      // and say so when cards were left out.
+      const currencyCounts = new Map<string, number>();
+      for (const walletCard of walletCards) {
+        const currency = getCardCurrency(walletCard.card) ?? "USD";
+        currencyCounts.set(currency, (currencyCounts.get(currency) ?? 0) + 1);
+      }
+      const currency =
+        [...currencyCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ??
+        "USD";
+      const mixedCurrency = currencyCounts.size > 1;
+      const inCurrency = walletCards.filter(
+        (walletCard) => (getCardCurrency(walletCard.card) ?? "USD") === currency,
+      );
+      const countedWalletCardIds = new Set(
+        inCurrency.map((walletCard) => walletCard.id),
+      );
+
+      const totalAnnualFees = inCurrency.reduce(
         (sum, walletCard) => sum + walletCard.card.annualFee,
         0,
       );
-      const totalCashbackEarned = state.transactions.reduce(
-        (sum, transaction) => sum + transaction.cashbackEarned,
-        0,
-      );
+      const totalCashbackEarned = state.transactions
+        .filter((transaction) =>
+          countedWalletCardIds.has(transaction.walletCardId),
+        )
+        .reduce((sum, transaction) => sum + transaction.cashbackEarned, 0);
 
       const startOfMonth = new Date();
       startOfMonth.setDate(1);
       startOfMonth.setHours(0, 0, 0, 0);
+      const now = new Date();
       const thisMonthCashback = state.transactions
-        .filter((transaction) => new Date(transaction.date) >= startOfMonth)
+        .filter(
+          (transaction) =>
+            countedWalletCardIds.has(transaction.walletCardId) &&
+            isInLocalDateRange(transaction.date, startOfMonth, now),
+        )
         .reduce((sum, transaction) => sum + transaction.cashbackEarned, 0);
 
       let totalBenefitValue = 0;
       let unusedBenefitsCount = 0;
-      for (const walletCard of walletCards) {
-        const usages = state.benefitUsage.filter(
-          (usage) => usage.walletCardId === walletCard.id && usage.used,
+      for (const walletCard of inCurrency) {
+        const localCard = state.walletCards.find(
+          (card) => card.id === walletCard.id,
         );
-        const usedBenefitIds = new Set(usages.map((usage) => usage.benefitId));
+        const usedBenefitIds = new Set(
+          state.benefitUsage
+            .filter(
+              (usage) =>
+                usage.walletCardId === walletCard.id &&
+                isBenefitUsedThisYear(usage, localCard),
+            )
+            .map((usage) => usage.benefitId),
+        );
         for (const benefit of walletCard.card.benefits) {
-          totalBenefitValue += benefit.annualValue ?? 0;
+          if (!benefit.annualValue) continue;
+          totalBenefitValue += benefit.annualValue;
           if (!usedBenefitIds.has(benefit.id)) unusedBenefitsCount += 1;
         }
       }
@@ -1397,6 +2142,8 @@ export function useGetDashboardSummary() {
         totalBenefitValue,
         unusedBenefitsCount,
         thisMonthCashback,
+        currency,
+        mixedCurrency,
       };
     },
   });
@@ -1559,6 +2306,7 @@ function computeBillingCycle(
     nextDueDate: previousDueHasPassed
       ? dueDateForCycleEnd(currentCycleEnd, closingDay, dueDay)
       : previousDueDate,
+    previousDueDate,
     previousDueHasPassed,
   };
 }
@@ -1603,20 +2351,23 @@ export function useGetBillingCycles() {
               ),
             )
             .reduce((sum, t) => sum + t.amount, 0);
+          // Payments from the statement period onward pay the statement down.
+          // They keep counting after the due date: an unpaid statement stays
+          // unpaid, and zeroing it would hide exactly the debt worth showing.
           const paymentsApplied = payments
             .filter(
               (t) =>
-                !cycle.previousDueHasPassed &&
                 isOnOrAfterLocalDate(t.date, cycle.dueCycleStart) &&
                 isOnOrBeforeLocalDate(t.date, today),
             )
             .reduce((sum, t) => sum + t.amount, 0);
-          const statementSpend = cycle.previousDueHasPassed
-            ? 0
-            : statementSpendBeforePayments;
-          const statementBalance = cycle.previousDueHasPassed
-            ? 0
-            : Math.max(0, statementSpend - paymentsApplied);
+          const statementSpend = statementSpendBeforePayments;
+          const statementBalance = Math.max(
+            0,
+            statementSpend - paymentsApplied,
+          );
+          const isOverdue =
+            cycle.previousDueHasPassed && statementBalance > 0.005;
           const currentCycleSpend = purchases
             .filter(
               (t) =>
@@ -1624,26 +2375,18 @@ export function useGetBillingCycles() {
                 isOnOrBeforeLocalDate(t.date, today),
             )
             .reduce((sum, t) => sum + t.amount, 0);
-          const outstandingStart = cycle.previousDueHasPassed
-            ? cycle.currentCycleStart
-            : cycle.dueCycleStart;
-          const purchasesSincePreviousCycleStart = purchases
-            .filter(
-              (t) =>
-                isOnOrAfterLocalDate(t.date, outstandingStart) &&
-                isOnOrBeforeLocalDate(t.date, today),
-            )
+          // What is actually owed is every purchase ever logged minus every
+          // payment ever logged. Restarting the sum at a cycle boundary drops
+          // carried-over debt and lets an old payment cancel new spend.
+          const lifetimePurchases = purchases
+            .filter((t) => isOnOrBeforeLocalDate(t.date, today))
             .reduce((sum, t) => sum + t.amount, 0);
-          const paymentsSincePreviousCycleStart = payments
-            .filter(
-              (t) =>
-                isOnOrAfterLocalDate(t.date, outstandingStart) &&
-                isOnOrBeforeLocalDate(t.date, today),
-            )
+          const lifetimePayments = payments
+            .filter((t) => isOnOrBeforeLocalDate(t.date, today))
             .reduce((sum, t) => sum + t.amount, 0);
           const totalBalance = Math.max(
             0,
-            purchasesSincePreviousCycleStart - paymentsSincePreviousCycleStart,
+            lifetimePurchases - lifetimePayments,
           );
           const minimumPayment =
             statementBalance <= 0
@@ -1659,8 +2402,13 @@ export function useGetBillingCycles() {
             creditLimit !== null
               ? Math.max(0, creditLimit - totalBalance)
               : null;
-          const daysUntilDue = Math.ceil(
-            (cycle.nextDueDate.getTime() - today.getTime()) / 86400000,
+          // Both sides must be local midnight: measuring from a wall-clock
+          // "now" to a midnight date shifts the count by a day across a DST
+          // boundary, and reads as a fractional day the rest of the time.
+          const daysUntilDue = Math.round(
+            (startOfLocalDay(cycle.nextDueDate).getTime() -
+              startOfLocalDay(today).getTime()) /
+              86400000,
           );
 
           return {
@@ -1675,6 +2423,8 @@ export function useGetBillingCycles() {
             nextDueDate: cycle.nextDueDate.toISOString(),
             daysUntilDue,
             statementBalance: Number(statementBalance.toFixed(2)),
+            isOverdue,
+            previousDueDate: cycle.previousDueDate.toISOString(),
             statementSpend: Number(statementSpend.toFixed(2)),
             paymentsApplied: Number(
               Math.min(paymentsApplied, statementSpend).toFixed(2),
@@ -1776,23 +2526,27 @@ export function useGetSpendingStats() {
         });
       }
 
+      // "This month" must end today, not run to the end of time: a
+      // future-dated transaction would otherwise inflate every period total.
       return {
         thisMonth: buildStatsPeriod(
           state.transactions,
           walletCards,
-          (t) => new Date(t.date) >= startOfMonth,
+          (t) => isInLocalDateRange(t.date, startOfMonth, now),
         ),
         thisQuarter: buildStatsPeriod(
           state.transactions,
           walletCards,
-          (t) => new Date(t.date) >= startOfQuarter,
+          (t) => isInLocalDateRange(t.date, startOfQuarter, now),
         ),
         thisYear: buildStatsPeriod(
           state.transactions,
           walletCards,
-          (t) => new Date(t.date) >= startOfYear,
+          (t) => isInLocalDateRange(t.date, startOfYear, now),
         ),
-        lifetime: buildStatsPeriod(state.transactions, walletCards, () => true),
+        lifetime: buildStatsPeriod(state.transactions, walletCards, (t) =>
+          isOnOrBeforeLocalDate(t.date, now),
+        ),
         monthlyTrend,
       };
     },
@@ -1807,15 +2561,23 @@ export function useGetUnusedBenefits() {
       const walletCards = listWalletCards(state);
       const result: UnusedBenefit[] = [];
 
-      for (const walletCard of walletCards) {
+      for (const walletCard of inDominantCurrency(walletCards)) {
+        const localCard = state.walletCards.find(
+          (card) => card.id === walletCard.id,
+        );
         const usedBenefitIds = new Set(
           state.benefitUsage
             .filter(
-              (usage) => usage.walletCardId === walletCard.id && usage.used,
+              (usage) =>
+                usage.walletCardId === walletCard.id &&
+                isBenefitUsedThisYear(usage, localCard),
             )
             .map((usage) => usage.benefitId),
         );
         for (const benefit of walletCard.card.benefits) {
+          // A "No Annual Fee" style row carries no allowance to spend, so
+          // listing it as an unused benefit is just noise on the dashboard.
+          if (!benefit.annualValue) continue;
           if (!usedBenefitIds.has(benefit.id)) {
             result.push({
               benefitId: benefit.id,
@@ -1842,11 +2604,16 @@ export function useGetUsedBenefits() {
       const walletCards = listWalletCards(state);
       const result: UnusedBenefit[] = [];
 
-      for (const walletCard of walletCards) {
+      for (const walletCard of inDominantCurrency(walletCards)) {
+        const localCard = state.walletCards.find(
+          (card) => card.id === walletCard.id,
+        );
         const usedBenefitIds = new Set(
           state.benefitUsage
             .filter(
-              (usage) => usage.walletCardId === walletCard.id && usage.used,
+              (usage) =>
+                usage.walletCardId === walletCard.id &&
+                isBenefitUsedThisYear(usage, localCard),
             )
             .map((usage) => usage.benefitId),
         );
@@ -1882,6 +2649,30 @@ type PurchaseAlias = {
   travelProvider?: string;
   location?: string;
 };
+
+/**
+ * Phrases that read as a brand in one context and an ordinary word in another.
+ *
+ * These are checked wherever a phrase is matched against a purchase
+ * description — both the alias table and the catalog-category scan, since the
+ * catalog contains a bonus category named exactly "United" and would otherwise
+ * price "shipping to the United States" as airfare.
+ */
+const AMBIGUOUS_TERMS: Array<{ term: string; notWhen: RegExp }> = [
+  {
+    term: "united",
+    notWhen: /\bunited\s+(?:states|kingdom|nations|way|healthcare|arab)\b/,
+  },
+  { term: "delta", notWhen: /\bdelta\s+(?:faucet|dental|force|variant)\b/ },
+  { term: "alaska", notWhen: /\balaska\s+(?:time|state|native|residents?)\b/ },
+];
+
+function termIsFalseMatch(text: string, term: string): boolean {
+  const normalized = term.trim().toLowerCase();
+  return AMBIGUOUS_TERMS.some(
+    (entry) => entry.term === normalized && entry.notWhen.test(text),
+  );
+}
 
 type ParsedPurchaseContext = PurchaseContext & {
   confidence: MatchConfidence;
@@ -2132,7 +2923,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
       "youtube premium",
       "youtube tv",
       "hbo",
-      "max",
+      "hbo max",
       "paramount",
       "peacock",
       "audible",
@@ -2189,7 +2980,8 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
       "car rental",
       "hertz",
       "avis",
-      "enterprise",
+      "enterprise rent",
+      "enterprise car",
       "budget rental",
     ],
     tags: ["rental_car", "travel"],
@@ -2307,7 +3099,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["united airlines", "united flight", "ua flight", "united"],
-    tags: ["airfare", "airline", "united", "direct_booking"],
+    tags: ["airfare", "airline", "united"],
     merchant: "United",
     purchaseType: "airfare",
     travelProvider: "United",
@@ -2315,7 +3107,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["delta airlines", "delta flight", "delta"],
-    tags: ["airfare", "airline", "delta", "direct_booking"],
+    tags: ["airfare", "airline", "delta"],
     merchant: "Delta",
     purchaseType: "airfare",
     travelProvider: "Delta",
@@ -2323,7 +3115,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["american airlines", "aa flight", "aadvantage"],
-    tags: ["airfare", "airline", "american_airlines", "direct_booking"],
+    tags: ["airfare", "airline", "american_airlines"],
     merchant: "American Airlines",
     purchaseType: "airfare",
     travelProvider: "American Airlines",
@@ -2331,7 +3123,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["southwest airlines", "southwest flight", "southwest"],
-    tags: ["airfare", "airline", "southwest", "direct_booking"],
+    tags: ["airfare", "airline", "southwest"],
     merchant: "Southwest",
     purchaseType: "airfare",
     travelProvider: "Southwest",
@@ -2339,7 +3131,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["alaska airlines", "alaska flight"],
-    tags: ["airfare", "airline", "alaska", "direct_booking"],
+    tags: ["airfare", "airline", "alaska"],
     merchant: "Alaska Airlines",
     purchaseType: "airfare",
     travelProvider: "Alaska Airlines",
@@ -2347,7 +3139,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["hawaiian airlines", "hawaiian flight"],
-    tags: ["airfare", "airline", "hawaiian", "direct_booking"],
+    tags: ["airfare", "airline", "hawaiian"],
     merchant: "Hawaiian Airlines",
     purchaseType: "airfare",
     travelProvider: "Hawaiian Airlines",
@@ -2355,7 +3147,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["jetblue", "jetblue flight"],
-    tags: ["airfare", "airline", "jetblue", "direct_booking"],
+    tags: ["airfare", "airline", "jetblue"],
     merchant: "JetBlue",
     purchaseType: "airfare",
     travelProvider: "JetBlue",
@@ -2363,7 +3155,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["air canada", "aeroplan"],
-    tags: ["airfare", "airline", "air_canada", "direct_booking"],
+    tags: ["airfare", "airline", "air_canada"],
     merchant: "Air Canada",
     purchaseType: "airfare",
     travelProvider: "Air Canada",
@@ -2371,7 +3163,7 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
   },
   {
     terms: ["cathay", "asia miles"],
-    tags: ["airfare", "airline", "cathay", "direct_booking"],
+    tags: ["airfare", "airline", "cathay"],
     merchant: "Cathay Pacific",
     purchaseType: "airfare",
     travelProvider: "Cathay Pacific",
@@ -2637,12 +3429,30 @@ function phraseMatches(text: string, phrase: string): boolean {
   return new RegExp(`(^|[^a-z0-9])${pattern}(?=$|[^a-z0-9])`, "i").test(text);
 }
 
+/**
+ * Reads a spend amount out of free text.
+ *
+ * Handles the currency symbols the catalog actually uses, a trailing unit
+ * ("1.2k", "3 dollars") and a bare number, so "HK$800 dinner" and "spent 1.2k
+ * on flights" both parse instead of silently dropping the amount and quoting an
+ * uncapped rate.
+ */
 function parseAmountFromDescription(description: string): number | null {
   const match = description.match(
-    /(?:\$|usd\s*)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)/i,
+    /(?:hk\$|s\$|us\$|c\$|\$|usd|hkd|sgd|cad)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(k|m)?/i,
+  ) ??
+  description.match(
+    /\b([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(k|m)?\s*(?:dollars?|bucks|usd|hkd|sgd|cad)\b/i,
   );
   if (!match) return null;
-  const amount = Number(match[1].replace(/,/g, ""));
+
+  const magnitude =
+    match[2]?.toLowerCase() === "m"
+      ? 1_000_000
+      : match[2]?.toLowerCase() === "k"
+        ? 1_000
+        : 1;
+  const amount = Number(match[1].replace(/,/g, "")) * magnitude;
   return Number.isFinite(amount) && amount > 0 ? amount : null;
 }
 
@@ -2690,6 +3500,7 @@ function parsePurchaseContext(
   for (const entry of PURCHASE_ALIASES) {
     for (const term of entry.terms) {
       if (!phraseMatches(text, term)) continue;
+      if (termIsFalseMatch(text, term)) continue;
       matchedTerms.push(term);
       const matchScore = entry.weight + term.length;
       score += matchScore;
@@ -2736,7 +3547,7 @@ function parsePurchaseContext(
 
   for (const category of availableCategories) {
     const lower = category.toLowerCase();
-    if (phraseMatches(text, lower)) {
+    if (phraseMatches(text, lower) && !termIsFalseMatch(text, lower)) {
       categoryHints.push(category);
       score += 70 + lower.length;
       getCategoryTags(category).forEach((tag) => tags.add(tag));
@@ -2822,7 +3633,8 @@ function getCategoryTags(category: string): string[] {
   if (/citi nights/.test(text)) addTag(tags, "citi_nights");
   if (/food delivery|uber eats|doordash/.test(text))
     addTag(tags, "food_delivery");
-  if (/gas|fuel|petrol|exxon|mobil/.test(text)) addTag(tags, "gas");
+  // \b on `mobil` keeps it from firing inside "Mobile Payment".
+  if (/\b(?:gas|fuel|petrol|exxon|mobil)\b/.test(text)) addTag(tags, "gas");
   if (/ev charging|chargepoint/.test(text)) addTag(tags, "ev_charging");
   if (/streaming|digital media|spotify|netflix|hulu/.test(text))
     addTag(tags, "streaming");
@@ -2851,7 +3663,9 @@ function getCategoryTags(category: string): string[] {
   if (/hyatt/.test(text)) addTag(tags, "hyatt");
   if (/ihg/.test(text)) addTag(tags, "ihg");
   if (/wyndham/.test(text)) addTag(tags, "wyndham");
-  if (/choice/.test(text)) addTag(tags, "choice");
+  // "Choice Privileges" is the hotel brand; "Choice Category" is Bank of
+  // America's pick-your-own-category bonus and has nothing to do with hotels.
+  if (/choice (?:privileges|hotels)/.test(text)) addTag(tags, "choice");
   if (
     /flight|airline|airfare|air canada|aeroplan|united|delta|southwest|american airlines|alaska|hawaiian|jetblue|cathay/.test(
       text,
@@ -3144,10 +3958,14 @@ function findBestCategoryMatch(
 }
 
 function getDefaultCategory(card: CreditCard) {
-  return (
-    card.cashbackCategories.find((category) => category.isDefault) ??
-    card.cashbackCategories.reduce((a, b) => (a.rate <= b.rate ? a : b))
-  );
+  const flagged = card.cashbackCategories.find((category) => category.isDefault);
+  if (flagged) return flagged;
+
+  // `reduce` without a seed throws on an empty list, which would take down
+  // every page that prices this card rather than just this one row.
+  return card.cashbackCategories.length
+    ? card.cashbackCategories.reduce((a, b) => (a.rate <= b.rate ? a : b))
+    : null;
 }
 
 function getCardMarket(card: CreditCard): string {
@@ -3158,18 +3976,37 @@ function getCardCurrency(card: CreditCard): string | null {
   return (card as CreditCardMetadata).currency ?? null;
 }
 
-function getPreferredMarket(context: ParsedPurchaseContext): string {
+function getPreferredMarket(
+  context: ParsedPurchaseContext,
+  walletMarkets: string[],
+): string {
   if (context.tags.includes("market_canada")) return "Canada";
   if (context.tags.includes("market_hong_kong")) return "Hong Kong";
   if (context.tags.includes("market_singapore")) return "Singapore";
-  return "US";
+  if (context.tags.includes("market_us")) return "US";
+
+  // With nothing in the description to go on, the wallet is the best available
+  // signal — defaulting to "US" recommended cards a Hong Kong or Singapore user
+  // could not apply for. An empty or mixed wallet still needs *a* market
+  // though: dropping the filter entirely offers every market at once, which is
+  // worse than a wrong-but-coherent default.
+  const counts = new Map<string, number>();
+  for (const market of walletMarkets) {
+    counts.set(market, (counts.get(market) ?? 0) + 1);
+  }
+  if (!counts.size) return "US";
+
+  return [...counts.entries()].sort(
+    (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+  )[0]![0];
 }
 
 function getMarketScopedCatalog(
   cards: CreditCard[],
   context: ParsedPurchaseContext,
+  walletMarkets: string[],
 ): CreditCard[] {
-  const preferredMarket = getPreferredMarket(context);
+  const preferredMarket = getPreferredMarket(context, walletMarkets);
   const scopedCards = cards.filter(
     (card) => getCardMarket(card) === preferredMarket,
   );
@@ -3189,7 +4026,12 @@ function formatNativeRewardEstimate(
 ): string | null {
   if (amount == null) return null;
   if (card.rewardType === "cashback") {
-    return `$${(amount * rawRate).toFixed(2)} Cash Back`;
+    const currency = getCardCurrency(card) ?? "USD";
+    const value = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+    }).format(amount * rawRate);
+    return `${value} Cash Back`;
   }
   const units = Math.round(amount * rawRate * 100).toLocaleString("en-US");
   return `${units} ${getRewardUnitName(card)}`;
@@ -3204,40 +4046,52 @@ function applySpendCapToRate(
 ): { rawRate: number; rulesApplied: string[] } {
   const rulesApplied: string[] = [];
   const spendCap = parseSpendCap(category.category);
-  if (!spendCap || amount == null || amount <= 0 || category.rate <= 0.01) {
-    if (spendCap)
-      rulesApplied.push(
-        `Cap may apply: first $${spendCap.amount.toLocaleString("en-US")} per ${spendCap.period}`,
-      );
+  const defaultRate = getDefaultCategory(card)?.rate ?? 0;
+
+  if (!spendCap || category.rate <= defaultRate) {
     return { rawRate: category.rate, rulesApplied };
   }
 
+  // With no amount there is nothing to split across the cap, but the cap may
+  // already be spent — quoting the headline rate on an exhausted category is
+  // the wrong answer, so check consumption before deciding.
   const periodStart = spendCapPeriodStart(new Date(), spendCap.period);
   const capGroup = normalizeCapGroup(category.category, spendCap);
+  const now = new Date();
   const cappedSpendUsed = walletCard
     ? state.transactions
-        .filter((transaction) => {
-          const date = new Date(transaction.date);
-          return (
+        .filter(
+          (transaction) =>
             matchesWalletCardId(transaction, walletCard.id) &&
             isPurchaseTransaction(transaction) &&
-            date >= periodStart &&
-            date <= new Date() &&
-            transactionMatchesSpendCapGroup(card, transaction, capGroup)
-          );
-        })
+            isInLocalDateRange(transaction.date, periodStart, now) &&
+            transactionMatchesSpendCapGroup(card, transaction, capGroup),
+        )
         .reduce((sum, transaction) => sum + transaction.amount, 0)
     : 0;
   const capRemaining = Math.max(0, spendCap.amount - cappedSpendUsed);
+  const capLabel = `$${spendCap.amount.toLocaleString("en-US")} per ${spendCap.period}`;
+
+  if (capRemaining <= 0) {
+    rulesApplied.push(`${capLabel} cap already used — earning the base rate`);
+    return { rawRate: defaultRate, rulesApplied };
+  }
+
+  if (amount == null || amount <= 0) {
+    rulesApplied.push(
+      `Bonus rate applies to the first $${capRemaining.toLocaleString("en-US", { maximumFractionDigits: 0 })} left under the ${capLabel} cap`,
+    );
+    return { rawRate: category.rate, rulesApplied };
+  }
+
   const bonusAmount = Math.min(amount, capRemaining);
   const baseAmount = amount - bonusAmount;
-  const defaultRate = getDefaultCategory(card).rate;
   const rawReward = bonusAmount * category.rate + baseAmount * defaultRate;
   const rawRate = rawReward / amount;
 
   rulesApplied.push(
     capRemaining >= amount
-      ? `Within $${spendCap.amount.toLocaleString("en-US")} ${spendCap.period} cap`
+      ? `Within ${capLabel} cap`
       : `Cap split: ${bonusAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })} at bonus rate`,
   );
 
@@ -3252,7 +4106,16 @@ function suggestedFromCard(
   amount: number | null,
 ): SuggestedCard {
   const categoryMatch = findBestCategoryMatch(card, context);
-  const effective = categoryMatch?.category ?? getDefaultCategory(card);
+  // A card with no priced categories cannot be ranked, but it must not take
+  // down the whole suggestion list either.
+  const effective = categoryMatch?.category ??
+    getDefaultCategory(card) ?? {
+      id: -1,
+      cardId: card.id,
+      category: "Other",
+      rate: 0,
+      isDefault: true,
+    };
   const isDefaultRate = !categoryMatch;
   const matchedCategory = getSuggestedCategoryLabel(
     effective,
@@ -3283,6 +4146,7 @@ function suggestedFromCard(
     currency: getCardCurrency(card),
     color: card.color ?? "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
     cardImageUrl: card.cardImageUrl ?? null,
+    annualFee: card.annualFee ?? 0,
     cashbackRate: Number(effectiveCashbackRate.toFixed(4)),
     rewardRate: Number(rawRate.toFixed(4)),
     rewardUnitName: getRewardUnitName(card),
@@ -3300,12 +4164,30 @@ function suggestedFromCard(
   };
 }
 
+/**
+ * Ranks two candidates for a single purchase.
+ *
+ * Cards already in the wallet win ties outright: their annual fee is a sunk
+ * cost, whereas recommending a $795-fee card the user does not hold — over one
+ * they do — is only right if that one purchase justifies the fee, which no
+ * single purchase does. Fee is a tie-breaker among cards not yet held, not a
+ * factor in the earn rate itself.
+ */
 function compareSuggestedCards(a: SuggestedCard, b: SuggestedCard): number {
   const valueDelta = b.cashbackRate - a.cashbackRate;
   if (Math.abs(valueDelta) > 0.0001) return valueDelta;
+
+  const aHeld = a.walletCardId != null;
+  const bHeld = b.walletCardId != null;
+  if (aHeld !== bHeld) return aHeld ? -1 : 1;
+
   const confidenceDelta = (b.confidence ?? 0) - (a.confidence ?? 0);
   if (Math.abs(confidenceDelta) > 0.001) return confidenceDelta;
   if (a.isDefaultRate !== b.isDefaultRate) return a.isDefaultRate ? 1 : -1;
+
+  const feeDelta = (a.annualFee ?? 0) - (b.annualFee ?? 0);
+  if (Math.abs(feeDelta) > 0.001) return feeDelta;
+
   return a.cardName.localeCompare(b.cardName);
 }
 
@@ -3359,7 +4241,11 @@ export const useSuggestCard = () =>
         availableCategories,
       );
       const effectiveAmount = parsedContext.amount ?? amount;
-      const marketScopedCards = getMarketScopedCatalog(cards, parsedContext);
+      const marketScopedCards = getMarketScopedCatalog(
+        cards,
+        parsedContext,
+        walletCards.map((walletCard) => getCardMarket(walletCard.card)),
+      );
 
       const walletSuggestions = walletCards
         .map((walletCard) =>

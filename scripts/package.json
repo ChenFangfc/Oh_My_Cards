@@ -5,10 +5,17 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "cards:check": "tsx ./src/card-data/check-freshness.ts",
+    "cards:watch": "tsx ./src/card-data/watch-newsroom.ts",
+    "cards:apply": "tsx ./src/card-data/apply-updates.ts",
+    "cards:publish": "tsx ./src/card-data/publish-rules.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "cards:matching": "tsx ./src/card-data/check-matching.ts",
+    "cards:choices": "tsx ./src/card-data/check-choices.ts"
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "tsx": "catalog:"
+    "tsx": "catalog:",
+    "@workspace/api-client-react": "workspace:*"
   }
 }

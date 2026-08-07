@@ -31,9 +31,12 @@ CardHeader.displayName = "CardHeader"
 
 const CardTitle = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
+  React.HTMLAttributes<HTMLDivElement> & {
+    /** Render as a heading so screen readers can navigate a page of cards. */
+    as?: "div" | "h2" | "h3" | "h4"
+  }
+>(({ className, as: Component = "div", ...props }, ref) => (
+  <Component
     ref={ref}
     className={cn("font-semibold leading-tight tracking-tight", className)}
     {...props}

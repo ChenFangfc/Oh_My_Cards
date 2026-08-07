@@ -11,6 +11,8 @@ import {
   useGetSpendingStats,
   useListTransactions,
   useListWallet,
+  resolveCashbackCategory,
+  TRANSACTION_CATEGORIES,
 } from "@workspace/api-client-react";
 import type {
   SpendingStatsPeriod,
@@ -44,9 +46,22 @@ import {
   MapPin,
   Plus,
   Receipt,
+  RotateCcw,
   Sparkles,
   Trash2,
+  TriangleAlert,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -89,30 +104,27 @@ type PeriodKey = keyof typeof PERIOD_LABELS;
 
 const PERIOD_ORDER = Object.keys(PERIOD_LABELS) as PeriodKey[];
 
-const COLORS = [
-  "#7DDCD6",
-  "#9CCCF2",
-  "#F6C85F",
-  "#94A3B8",
-  "#34D399",
-  "#60A5FA",
-  "#F59E0B",
-  "#64748B",
+const CATEGORY_COLORS = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--chart-1) / 0.5)",
+  "hsl(var(--chart-2) / 0.5)",
+  "hsl(var(--chart-3) / 0.5)",
 ];
 
-const CATEGORIES = [
-  "Groceries",
-  "Dining",
-  "Travel",
-  "Gas",
-  "Entertainment",
-  "Streaming",
-  "Online Groceries",
-  "Flights",
-  "Hotels",
-  "Rental Cars",
-  "Other",
-];
+const MAX_CATEGORY_SLICES = CATEGORY_COLORS.length;
+const OTHER_CATEGORIES_LABEL = "Other categories";
+const ACTIVITY_PAGE_SIZE = 50;
+
+const SPENT_COLOR = "hsl(var(--chart-2))";
+const CASHBACK_COLOR = "hsl(var(--chart-1))";
+
+// Sourced from the engine so the picker can only offer categories the reward
+// matcher can actually resolve.
+const CATEGORIES = TRANSACTION_CATEGORIES;
 
 const transactionSchema = z
   .object({
@@ -160,12 +172,40 @@ function formatMoney(n: number): string {
   return n.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: n < 100 ? 2 : 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
 }
 
 function formatRate(value: number): string {
   return `${value.toFixed(2)}%`;
+}
+
+/** Cash-equivalent multiplier for point/mile cards, mirroring what the engine stores. */
+function getRewardValueMultiplier(card: {
+  rewardUnitValueCents?: number | null;
+}): number {
+  const valueCents = card.rewardUnitValueCents ?? 1;
+  return valueCents > 0 ? valueCents : 1;
+}
+
+/**
+ * Must go through the engine's matcher, not a string comparison of its own:
+ * catalog rows are worded like "Groceries (US supermarkets, up to $6,000/yr)",
+ * so comparing them to the picker's "Groceries" previews the default rate and
+ * then the engine saves a different number.
+ */
+function getEffectiveRate(walletCard: WalletCard, category: string): number {
+  const matched = resolveCashbackCategory(walletCard.card, category, {
+    walletCard: {
+      id: walletCard.id,
+      cardId: walletCard.cardId,
+      addedAt: walletCard.addedAt,
+      openedAt: walletCard.openedAt ?? null,
+      selectedCategories: walletCard.selectedCategories ?? null,
+    },
+  });
+  return (matched?.rate ?? 0) * getRewardValueMultiplier(walletCard.card);
 }
 
 function toDateInputValue(date = new Date()): string {
@@ -217,13 +257,37 @@ function isTransactionInPeriod(transaction: Transaction, period: PeriodKey): boo
   return !start || date >= start;
 }
 
+/** Narrowest period tab that will display a transaction with this date. */
+function findPeriodContaining(date: Date): PeriodKey {
+  for (const key of PERIOD_ORDER) {
+    const start = getPeriodStart(key);
+    if (!start || date >= start) return key;
+  }
+  return "lifetime";
+}
+
 function buildTrendData(
   transactions: Transaction[],
   period: PeriodKey,
 ): TrendPoint[] {
   const now = new Date();
+  const periodTransactions = transactions.filter(
+    (transaction) =>
+      isPurchaseTransaction(transaction) &&
+      isTransactionInPeriod(transaction, period),
+  );
+  // Buckets have to reach past today, otherwise a future-dated entry counts
+  // toward the summary tiles but has nowhere to plot and vanishes from the chart.
+  // Capped a year out so an imported nonsense date cannot generate endless buckets.
+  const horizon = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
+  const last = periodTransactions.reduce((latest, transaction) => {
+    const date = new Date(transaction.date);
+    return date > latest && date <= horizon ? date : latest;
+  }, now);
+
   const points: TrendPoint[] = [];
   const pointMap = new Map<string, TrendPoint>();
+  const weekStarts: Date[] = [];
   const addPoint = (key: string, label: string) => {
     const point = { key, label, totalSpent: 0, totalCashback: 0 };
     points.push(point);
@@ -232,52 +296,58 @@ function buildTrendData(
 
   if (period === "thisMonth") {
     const start = new Date(now.getFullYear(), now.getMonth(), 1);
-    for (let day = new Date(start); day <= now; day.setDate(day.getDate() + 1)) {
-      addPoint(getDayKey(day), String(day.getDate()));
+    for (let day = new Date(start); day <= last; day.setDate(day.getDate() + 1)) {
+      addPoint(
+        getDayKey(day),
+        day.getMonth() === now.getMonth()
+          ? String(day.getDate())
+          : `${day.getMonth() + 1}/${day.getDate()}`,
+      );
     }
   } else if (period === "thisQuarter") {
     const start = getPeriodStart("thisQuarter", now)!;
     for (
       let weekStart = new Date(start), index = 1;
-      weekStart <= now;
+      weekStart <= last;
       weekStart.setDate(weekStart.getDate() + 7), index += 1
     ) {
+      weekStarts.push(new Date(weekStart));
       addPoint(`w${index}`, `W${index}`);
     }
   } else {
-    const purchaseTransactions = transactions.filter(isPurchaseTransaction);
     const earliest =
-      period === "lifetime" && purchaseTransactions.length > 0
-        ? purchaseTransactions
+      period === "lifetime" && periodTransactions.length > 0
+        ? periodTransactions
             .map((transaction) => new Date(transaction.date))
             .sort((a, b) => a.getTime() - b.getTime())[0]
         : new Date(now.getFullYear(), 0, 1);
     const start = new Date(earliest.getFullYear(), earliest.getMonth(), 1);
     for (
       let month = new Date(start);
-      month <= now;
+      month <= last;
       month.setMonth(month.getMonth() + 1)
     ) {
       addPoint(
         getMonthKey(month),
-        period === "lifetime"
+        period === "lifetime" || month.getFullYear() !== now.getFullYear()
           ? month.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
           : monthLabel(month),
       );
     }
   }
 
-  for (const transaction of transactions) {
-    if (!isPurchaseTransaction(transaction) || !isTransactionInPeriod(transaction, period)) {
-      continue;
-    }
+  for (const transaction of periodTransactions) {
     const date = new Date(transaction.date);
     let key: string;
     if (period === "thisMonth") {
       key = getDayKey(date);
     } else if (period === "thisQuarter") {
-      const start = getPeriodStart("thisQuarter", now)!;
-      const weekIndex = Math.floor((date.getTime() - start.getTime()) / 604_800_000) + 1;
+      // Weeks are generated with calendar arithmetic, so they must be matched the
+      // same way — a fixed 7-day millisecond span drifts across a DST change.
+      let weekIndex = weekStarts.length;
+      while (weekIndex > 1 && date < weekStarts[weekIndex - 1]) {
+        weekIndex -= 1;
+      }
       key = `w${weekIndex}`;
     } else {
       key = getMonthKey(date);
@@ -336,7 +406,15 @@ function invalidateActivityData(queryClient: ReturnType<typeof useQueryClient>) 
   queryClient.invalidateQueries({ queryKey: getGetCashbackByCategoryQueryKey() });
 }
 
-function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
+function ActivityLogDialog({
+  walletCards,
+  period,
+  onPeriodChange,
+}: {
+  walletCards?: WalletCard[];
+  period: PeriodKey;
+  onPeriodChange: (period: PeriodKey) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [locating, setLocating] = useState(false);
   const createTransaction = useCreateTransaction();
@@ -371,16 +449,26 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
     if (isPaymentMode || !walletCardId || !category || !walletCards) return null;
     const walletCard = walletCards.find((card) => card.id === Number(walletCardId));
     if (!walletCard) return null;
-    const exactMatch = walletCard.card.cashbackCategories.find(
-      (cashback) =>
-        cashback.category.toLowerCase() === category.toLowerCase() &&
-        !cashback.isDefault,
-    );
-    const defaultRate = walletCard.card.cashbackCategories.find(
-      (cashback) => cashback.isDefault,
-    );
-    return exactMatch ? exactMatch.rate : (defaultRate?.rate ?? 0);
+    return getEffectiveRate(walletCard, category);
   }, [category, isPaymentMode, walletCardId, walletCards]);
+
+  const bestCardForCategory = useMemo(() => {
+    if (isPaymentMode || !category || !walletCards || walletCards.length === 0) {
+      return null;
+    }
+    let best: { walletCardId: number; label: string; rate: number } | null = null;
+    for (const walletCard of walletCards) {
+      const rate = getEffectiveRate(walletCard, category);
+      if (!best || rate > best.rate) {
+        best = {
+          walletCardId: walletCard.id,
+          label: walletCard.nickname || walletCard.card.name,
+          rate,
+        };
+      }
+    }
+    return best;
+  }, [category, isPaymentMode, walletCards]);
 
   const estimatedCashback =
     !isPaymentMode && selectedCardRate && amount > 0
@@ -442,6 +530,10 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
 
   const onSubmit = (values: TransactionFormValues) => {
     const isPayment = values.transactionType === "payment";
+    const savedDate = new Date(parseDateInput(values.date));
+    const activeStart = getPeriodStart(period);
+    const isVisibleInActivePeriod = !activeStart || savedDate >= activeStart;
+    const containingPeriod = findPeriodContaining(savedDate);
     createTransaction.mutate(
       {
         data: {
@@ -462,7 +554,15 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
       {
         onSuccess: () => {
           invalidateActivityData(queryClient);
-          toast({ title: isPayment ? "Payment recorded" : "Transaction logged" });
+          if (!isVisibleInActivePeriod) {
+            onPeriodChange(containingPeriod);
+          }
+          toast({
+            title: isPayment ? "Payment recorded" : "Transaction logged",
+            description: isVisibleInActivePeriod
+              ? undefined
+              : `Dated ${format(savedDate, "MMM d, yyyy")} — switched the range to ${PERIOD_LABELS[containingPeriod]} so it is visible.`,
+          });
           handleOpenChange(false);
         },
         onError: () => {
@@ -545,7 +645,7 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" max={toDateInputValue()} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -570,11 +670,34 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {walletCards?.map((walletCard) => (
-                          <SelectItem key={walletCard.id} value={String(walletCard.id)}>
-                            {walletCard.nickname || walletCard.card.name}
-                          </SelectItem>
-                        ))}
+                        {walletCards?.map((walletCard) => {
+                          const isBest =
+                            bestCardForCategory?.walletCardId === walletCard.id;
+                          return (
+                            <SelectItem
+                              key={walletCard.id}
+                              value={String(walletCard.id)}
+                            >
+                              <span className="flex items-center gap-2">
+                                {walletCard.nickname || walletCard.card.name}
+                                {!isPaymentMode && category ? (
+                                  <span
+                                    className={`text-xs font-medium ${
+                                      isBest
+                                        ? "text-emerald-700 dark:text-emerald-300"
+                                        : "text-muted-foreground"
+                                    }`}
+                                  >
+                                    {formatRate(
+                                      getEffectiveRate(walletCard, category) * 100,
+                                    )}
+                                    {isBest ? " (best)" : ""}
+                                  </span>
+                                ) : null}
+                              </span>
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -609,8 +732,23 @@ function ActivityLogDialog({ walletCards }: { walletCards?: WalletCard[] }) {
               ) : null}
             </div>
 
+            {bestCardForCategory && category ? (
+              <div className="flex items-start gap-2 rounded-2xl border border-card-border bg-secondary/40 px-4 py-3 text-sm">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-300" />
+                <div className="min-w-0">
+                  <span className="font-medium text-foreground">
+                    Best card for {category}:
+                  </span>{" "}
+                  <span className="text-muted-foreground">
+                    {bestCardForCategory.label} ·{" "}
+                    {formatRate(bestCardForCategory.rate * 100)} back
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
             {estimatedCashback != null && (
-              <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+              <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-100">
                 <span className="font-medium">Estimated reward</span>
                 <span className="font-semibold tabular-nums">
                   +{formatMoney(estimatedCashback)}
@@ -738,13 +876,13 @@ function SummaryTile({
 }) {
   const toneClass =
     tone === "green"
-      ? "bg-emerald-50 text-emerald-900"
+      ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-100"
       : tone === "gold"
-        ? "bg-amber-50 text-amber-950"
+        ? "bg-amber-50 text-amber-950 dark:bg-amber-950/50 dark:text-amber-100"
         : "bg-secondary/55 text-foreground";
 
   return (
-    <div className="rounded-[24px] border border-card-border bg-card px-4 py-4 shadow-[0_8px_24px_rgba(17,24,32,0.05)]">
+    <div className="rounded-[24px] border border-card-border bg-card px-4 py-4 shadow-[var(--app-shadow-card)]">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
         <span className={`flex h-8 w-8 items-center justify-center rounded-2xl ${toneClass}`}>
           {icon}
@@ -759,7 +897,13 @@ function SummaryTile({
   );
 }
 
-function PerCardRows({ period }: { period: SpendingStatsPeriod }) {
+function PerCardRows({
+  period,
+  walletCards,
+}: {
+  period: SpendingStatsPeriod;
+  walletCards?: WalletCard[];
+}) {
   if (period.perCard.length === 0) {
     return (
       <div className="rounded-[22px] border border-dashed border-card-border bg-secondary/25 py-10 text-center text-sm text-muted-foreground">
@@ -768,11 +912,20 @@ function PerCardRows({ period }: { period: SpendingStatsPeriod }) {
     );
   }
 
+  const bestRate = period.perCard.reduce((max, row) => {
+    const rate = row.totalSpent > 0 ? (row.totalCashback / row.totalSpent) * 100 : 0;
+    return rate > max ? rate : max;
+  }, 0);
+
   return (
     <div className="overflow-hidden rounded-[22px] border border-card-border">
       {period.perCard.map((row) => {
         const effectiveRate =
           row.totalSpent > 0 ? (row.totalCashback / row.totalSpent) * 100 : 0;
+        const label =
+          walletCards?.find((walletCard) => walletCard.id === row.walletCardId)
+            ?.nickname || row.cardName;
+        const barWidth = bestRate > 0 ? (effectiveRate / bestRate) * 100 : 0;
         return (
           <div
             key={row.walletCardId}
@@ -780,7 +933,7 @@ function PerCardRows({ period }: { period: SpendingStatsPeriod }) {
           >
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-foreground">
-                {row.cardName}
+                {label}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 {row.transactionCount} purchases
@@ -798,7 +951,7 @@ function PerCardRows({ period }: { period: SpendingStatsPeriod }) {
               <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                 Reward
               </div>
-              <div className="mt-1 text-sm font-semibold tabular-nums text-emerald-700">
+              <div className="mt-1 text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
                 {formatMoney(row.totalCashback)}
               </div>
             </div>
@@ -811,12 +964,13 @@ function PerCardRows({ period }: { period: SpendingStatsPeriod }) {
               </div>
             </div>
             <div className="hidden md:block">
-              <div className="h-2 rounded-full bg-secondary">
+              <div
+                className="h-2 rounded-full bg-secondary"
+                title={`${formatRate(effectiveRate)} effective rate, best in this period is ${formatRate(bestRate)}`}
+              >
                 <div
-                  className="h-2 rounded-full bg-emerald-400"
-                  style={{
-                    width: `${Math.min(100, Math.max(5, effectiveRate * 18))}%`,
-                  }}
+                  className="h-2 rounded-full bg-emerald-500 dark:bg-emerald-400"
+                  style={{ width: `${Math.min(100, barWidth)}%` }}
                 />
               </div>
             </div>
@@ -837,9 +991,12 @@ function LoggedActivityList({
   const queryClient = useQueryClient();
   const deleteTransaction = useDeleteTransaction();
   const { toast } = useToast();
+  const [visibleCount, setVisibleCount] = useState(ACTIVITY_PAGE_SIZE);
 
   const periodTransactions = transactions
     .filter((transaction) => isTransactionInPeriod(transaction, period));
+  const visibleTransactions = periodTransactions.slice(0, visibleCount);
+  const hiddenCount = periodTransactions.length - visibleTransactions.length;
 
   const handleDelete = (id: number) => {
     deleteTransaction.mutate(
@@ -873,7 +1030,7 @@ function LoggedActivityList({
 
   return (
     <div className="max-h-[420px] space-y-1.5 overflow-y-auto pr-1">
-      {periodTransactions.map((transaction) => {
+      {visibleTransactions.map((transaction) => {
         const isPayment = isPaymentTransaction(transaction);
         const title = transaction.merchantName || transaction.description || transaction.category;
         const secondaryParts = [
@@ -917,34 +1074,70 @@ function LoggedActivityList({
                 ) : null}
               </div>
 
-              <div className="shrink-0 text-right">
-                <div
-                  className={`text-base font-semibold tabular-nums ${
-                    isPayment ? "text-sky-800" : "text-foreground"
-                  }`}
-                >
-                  {isPayment ? "-" : ""}{formatMoney(transaction.amount)}
-                </div>
-                {!isPayment && transaction.cashbackEarned > 0 ? (
-                  <div className="text-xs font-semibold tabular-nums text-emerald-700">
-                    +{formatMoney(transaction.cashbackEarned)}
+              <div className="flex shrink-0 items-center gap-1">
+                <div className="text-right">
+                  <div
+                    className={`text-base font-semibold tabular-nums ${
+                      isPayment
+                        ? "text-sky-800 dark:text-sky-300"
+                        : "text-foreground"
+                    }`}
+                  >
+                    {isPayment ? "-" : ""}{formatMoney(transaction.amount)}
                   </div>
-                ) : null}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                  onClick={() => handleDelete(transaction.id)}
-                  disabled={deleteTransaction.isPending}
-                  aria-label="Delete activity"
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
-                </Button>
+                  {!isPayment && transaction.cashbackEarned > 0 ? (
+                    <div className="text-xs font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
+                      +{formatMoney(transaction.cashbackEarned)}
+                    </div>
+                  ) : null}
+                </div>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 text-muted-foreground transition-opacity hover:bg-destructive/10 hover:text-destructive md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                      disabled={deleteTransaction.isPending}
+                      aria-label={`Delete activity: ${title}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete this activity?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        {title} · {formatMoney(transaction.amount)} on{" "}
+                        {format(new Date(transaction.date), "MMM d, yyyy")} will be
+                        permanently removed, along with the rewards it earned. This
+                        cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => handleDelete(transaction.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
           </div>
         );
       })}
+      {hiddenCount > 0 ? (
+        <Button
+          variant="outline"
+          className="w-full rounded-2xl"
+          onClick={() => setVisibleCount((count) => count + ACTIVITY_PAGE_SIZE)}
+        >
+          Show {Math.min(hiddenCount, ACTIVITY_PAGE_SIZE)} more ({hiddenCount} hidden)
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -961,6 +1154,23 @@ function CategorySpendChart({
   walletCards?: WalletCard[];
 }) {
   const totalSpent = data.reduce((sum, item) => sum + item.totalSpent, 0);
+  // Every slice needs its own colour and its own legend row, so the tail beyond
+  // the palette is rolled into a single explicit slice.
+  const slices = useMemo<CategorySpendPoint[]>(() => {
+    if (data.length <= MAX_CATEGORY_SLICES) return data;
+    const head = data.slice(0, MAX_CATEGORY_SLICES - 1);
+    const tail = data.slice(MAX_CATEGORY_SLICES - 1);
+    return [
+      ...head,
+      {
+        category: OTHER_CATEGORIES_LABEL,
+        totalSpent: Number(
+          tail.reduce((sum, item) => sum + item.totalSpent, 0).toFixed(2),
+        ),
+        transactionCount: tail.reduce((sum, item) => sum + item.transactionCount, 0),
+      },
+    ];
+  }, [data]);
 
   return (
     <div className="rounded-[22px] border border-card-border bg-card p-4">
@@ -1008,7 +1218,7 @@ function CategorySpendChart({
                   }}
                 />
                 <Pie
-                  data={data}
+                  data={slices}
                   dataKey="totalSpent"
                   nameKey="category"
                   innerRadius={62}
@@ -1017,8 +1227,8 @@ function CategorySpendChart({
                   stroke="hsl(var(--card))"
                   strokeWidth={3}
                 >
-                  {data.map((_, index) => (
-                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  {slices.map((slice, index) => (
+                    <Cell key={slice.category} fill={CATEGORY_COLORS[index]} />
                   ))}
                 </Pie>
               </PieChart>
@@ -1026,7 +1236,7 @@ function CategorySpendChart({
           </div>
 
           <div className="space-y-2">
-            {data.slice(0, 8).map((item, index) => {
+            {slices.map((item, index) => {
               const share = totalSpent > 0 ? (item.totalSpent / totalSpent) * 100 : 0;
               return (
                 <div
@@ -1037,7 +1247,7 @@ function CategorySpendChart({
                     <div className="flex items-center gap-2">
                       <span
                         className="h-2.5 w-2.5 shrink-0 rounded-full"
-                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                        style={{ backgroundColor: CATEGORY_COLORS[index] }}
                       />
                       <span className="truncate text-sm font-semibold text-foreground">
                         {item.category}
@@ -1063,9 +1273,18 @@ function CategorySpendChart({
 export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
   const [periodKey, setPeriodKey] = useState<PeriodKey>("thisMonth");
   const [categoryWalletCardId, setCategoryWalletCardId] = useState("all");
-  const { data, isLoading } = useGetSpendingStats();
-  const { data: transactions = [] } = useListTransactions();
-  const { data: walletCards } = useListWallet();
+  const {
+    data,
+    isLoading,
+    isError: isStatsError,
+    refetch: refetchStats,
+  } = useGetSpendingStats();
+  const {
+    data: transactions = [],
+    isError: isTransactionsError,
+    refetch: refetchTransactions,
+  } = useListTransactions();
+  const { data: walletCards, refetch: refetchWallet } = useListWallet();
 
   const trendData = useMemo(
     () => buildTrendData(transactions, periodKey),
@@ -1076,11 +1295,39 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
     [categoryWalletCardId, periodKey, transactions],
   );
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <div className="space-y-5">
         <Skeleton className="h-28 w-full rounded-[28px]" />
         <Skeleton className="h-96 w-full rounded-[28px]" />
+      </div>
+    );
+  }
+
+  if (isStatsError || isTransactionsError || !data) {
+    return (
+      <div className="flex min-h-[320px] flex-col items-center justify-center rounded-[30px] border border-card-border bg-card/95 p-8 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+          <TriangleAlert className="h-5 w-5" />
+        </div>
+        <div className="text-lg font-semibold text-foreground">
+          Could not load your activity
+        </div>
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+          Your data is still stored on this device. This usually clears up on a
+          retry — if it does not, check the Data page for a backup to restore.
+        </p>
+        <Button
+          className="mt-5 h-10 rounded-full px-4"
+          onClick={() => {
+            refetchStats();
+            refetchTransactions();
+            refetchWallet();
+          }}
+        >
+          <RotateCcw className="h-4 w-4" />
+          Retry
+        </Button>
       </div>
     );
   }
@@ -1145,7 +1392,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
         <CardHeader className="border-b border-card-border bg-secondary/20 px-5 py-4">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
-              <CardTitle className="flex items-center gap-2 text-base font-semibold">
+              <CardTitle as="h3" className="flex items-center gap-2 text-base font-semibold">
                 <CreditCard className="h-4 w-4" />
                 Cashback by card
               </CardTitle>
@@ -1153,7 +1400,11 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                 {PERIOD_LABELS[periodKey]}
               </div>
             </div>
-            <ActivityLogDialog walletCards={walletCards} />
+            <ActivityLogDialog
+              walletCards={walletCards}
+              period={periodKey}
+              onPeriodChange={setPeriodKey}
+            />
           </div>
         </CardHeader>
         <CardContent className="p-4 md:p-5">
@@ -1165,12 +1416,18 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <span className="h-2 w-2 rounded-full bg-[#9CCCF2]" />
-                    Spent
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: SPENT_COLOR }}
+                    />
+                    Spent (left axis)
                   </span>
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                    <span className="h-2 w-2 rounded-full bg-[#34D399]" />
-                    Cash Back
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: CASHBACK_COLOR }}
+                    />
+                    Cash Back (right axis)
                   </span>
                   <Badge variant="outline" className="rounded-full bg-card px-2.5 py-1">
                     <CalendarDays className="mr-1 h-3.5 w-3.5" />
@@ -1199,7 +1456,13 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       className="text-xs"
                       tickLine={false}
                       axisLine={false}
-                      stroke="#9CCCF2"
+                      stroke={SPENT_COLOR}
+                      label={{
+                        value: "Spent",
+                        angle: -90,
+                        position: "insideLeft",
+                        style: { fontSize: 11, fill: "hsl(var(--muted-foreground))" },
+                      }}
                     />
                     <YAxis
                       yAxisId="cashback"
@@ -1208,8 +1471,14 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       className="text-xs"
                       tickLine={false}
                       axisLine={false}
-                      stroke="#34D399"
-                      width={44}
+                      stroke={CASHBACK_COLOR}
+                      width={56}
+                      label={{
+                        value: "Cash back",
+                        angle: 90,
+                        position: "insideRight",
+                        style: { fontSize: 11, fill: "hsl(var(--muted-foreground))" },
+                      }}
                     />
                     <Tooltip
                       formatter={(value: number) => formatMoney(value)}
@@ -1225,7 +1494,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       type="monotone"
                       dataKey="totalSpent"
                       name="Spent"
-                      stroke="#9CCCF2"
+                      stroke={SPENT_COLOR}
                       strokeWidth={3}
                       dot={false}
                       activeDot={{ r: 5 }}
@@ -1235,8 +1504,9 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       type="monotone"
                       dataKey="totalCashback"
                       name="Cash Back"
-                      stroke="#34D399"
+                      stroke={CASHBACK_COLOR}
                       strokeWidth={3}
+                      strokeDasharray="5 4"
                       dot={false}
                       activeDot={{ r: 5 }}
                     />
@@ -1253,7 +1523,11 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                   </div>
                 </div>
               </div>
-              <LoggedActivityList transactions={transactions} period={periodKey} />
+              <LoggedActivityList
+                key={periodKey}
+                transactions={transactions}
+                period={periodKey}
+              />
             </div>
           </div>
 
@@ -1270,7 +1544,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                 onSelectedWalletCardIdChange={setCategoryWalletCardId}
                 walletCards={walletCards}
               />
-              <PerCardRows period={period} />
+              <PerCardRows period={period} walletCards={walletCards} />
             </div>
           </div>
         </CardContent>

@@ -39,6 +39,31 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (/\/local\/catalog\.[cm]?[jt]sx?$/.test(id)) {
+            return "card-catalog";
+          }
+
+          if (!id.includes("/node_modules/")) return undefined;
+
+          if (/\/node_modules\/(react|react-dom|scheduler)\//.test(id)) {
+            return "vendor-react";
+          }
+
+          if (/\/node_modules\/(recharts|d3-[^/]+|victory-vendor)\//.test(id)) {
+            return "vendor-charts";
+          }
+
+          if (id.includes("/node_modules/@radix-ui/")) {
+            return "vendor-radix";
+          }
+
+          return undefined;
+        },
+      },
+    },
   },
   server: {
     port,

@@ -1,16 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
+import { useTheme } from "next-themes";
 import {
   Activity,
   CreditCard,
   Database,
   Download,
+  Monitor,
+  Moon,
+  Sun,
   Wallet,
   Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppIcon } from "@/components/app-icon";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 
 const NAV_ITEMS = [
@@ -21,8 +32,15 @@ const NAV_ITEMS = [
   { href: "/data", label: "Data", icon: Database },
 ];
 
+const THEME_OPTIONS = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
+] as const;
+
 interface SidebarProps {
   mobile?: boolean;
+  onNavigate?: () => void;
 }
 
 type BeforeInstallPromptEvent = Event & {
@@ -40,15 +58,18 @@ function isStandaloneApp() {
   );
 }
 
-export function Sidebar({ mobile = false }: SidebarProps) {
+export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [installPrompt, setInstallPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [isStandalone, setIsStandalone] = useState(false);
+  const [isThemeReady, setIsThemeReady] = useState(false);
   const pathname = location.split("?")[0];
 
   useEffect(() => {
+    setIsThemeReady(true);
     setIsStandalone(isStandaloneApp());
 
     const handleBeforeInstallPrompt = (event: Event) => {
@@ -92,10 +113,17 @@ export function Sidebar({ mobile = false }: SidebarProps) {
     }
   };
 
+  // `theme` is undefined until next-themes has read storage on the client, so
+  // hold the neutral System option until then rather than flashing the wrong one.
+  const activeTheme = isThemeReady ? (theme ?? "system") : "system";
+  const activeThemeOption =
+    THEME_OPTIONS.find((option) => option.value === activeTheme) ??
+    THEME_OPTIONS[2];
+
   return (
     <aside
       className={cn(
-        "h-screen w-64 flex-shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar",
+        "h-full w-64 flex-shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar",
         mobile ? "flex" : "hidden md:flex",
       )}
     >
@@ -114,8 +142,10 @@ export function Sidebar({ mobile = false }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
+              onClick={onNavigate}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                "flex min-h-11 items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                 isActive
                   ? "bg-primary text-primary-foreground shadow-[var(--app-shadow-soft)]"
                   : "text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
@@ -127,13 +157,38 @@ export function Sidebar({ mobile = false }: SidebarProps) {
           );
         })}
       </nav>
-      <div className="border-t border-sidebar-border p-3">
+      <div className="space-y-2 border-t border-sidebar-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full min-h-11 justify-start gap-2 rounded-xl"
+            >
+              <activeThemeOption.icon className="h-4 w-4" />
+              Theme: {activeThemeOption.label}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuRadioGroup
+              value={activeTheme}
+              onValueChange={setTheme}
+            >
+              {THEME_OPTIONS.map((option) => (
+                <DropdownMenuRadioItem key={option.value} value={option.value}>
+                  <option.icon className="mr-2 h-4 w-4" />
+                  {option.label}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           type="button"
           variant={isStandalone ? "secondary" : "outline"}
           onClick={() => void handleInstall()}
           disabled={isStandalone}
-          className="w-full justify-start gap-2 rounded-xl"
+          className="w-full min-h-11 justify-start gap-2 rounded-xl"
         >
           <Download className="h-4 w-4" />
           {isStandalone ? "Installed" : "Install App"}

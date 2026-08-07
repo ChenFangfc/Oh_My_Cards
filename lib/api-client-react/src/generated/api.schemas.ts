@@ -19,6 +19,43 @@ export interface CashbackCategory {
   isDefault: boolean;
 }
 
+/**
+ * How a bonus category that does not name a fixed kind of spend gets filled in.
+ *
+ * `user-selected` is a category the cardholder picks (Bank of America's choice
+ * category, U.S. Bank Cash+). `automatic-top-spend` is one the issuer applies
+ * to whichever eligible category you spent the most in (Citi Custom Cash), so
+ * it can be derived from logged transactions instead of asked for.
+ * `rotating-calendar` is an issuer-published quarterly calendar (Discover it,
+ * Freedom Flex); it is stored like a selection because those cards require the
+ * cardholder to activate each quarter, and an unactivated quarter earns
+ * nothing extra.
+ */
+export type CardCategoryChoiceMode =
+  | "user-selected"
+  | "automatic-top-spend"
+  | "rotating-calendar";
+
+export type CardCategoryChoiceReset =
+  | "month"
+  | "quarter"
+  | "year"
+  | "anniversary"
+  | "never"
+  | "unknown";
+
+export interface CardCategoryChoice {
+  /** id of the `cashbackCategories` row this choice fills in */
+  categoryId: number;
+  mode: CardCategoryChoiceMode;
+  /** How many options earn the bonus at once */
+  picks: number;
+  /** How often the selection can change */
+  resets: CardCategoryChoiceReset;
+  /** Option labels, each phrased so the category matcher can resolve it */
+  options: string[];
+}
+
 export interface CardBenefit {
   id: number;
   cardId: number;
@@ -65,6 +102,8 @@ export interface CreditCard {
   /** Officially reviewed caveats such as caps, activation requirements, or redemption constraints */
   rewardRuleNotes?: string[] | null;
   cashbackCategories: CashbackCategory[];
+  /** Rules for bonus rows the cardholder picks or the issuer assigns */
+  categoryChoices?: CardCategoryChoice[];
   benefits: CardBenefit[];
   /** Whether this card is in the user's wallet */
   inWallet: boolean;
@@ -87,6 +126,10 @@ export interface WalletCard {
   openedAt?: string | null;
   /** Cashback earned since the most recent anniversary of openedAt (or since addedAt if openedAt is not set) */
   currentYearCashback?: number;
+  /** Chosen options for the card's selectable bonus categories, keyed by category id */
+  selectedCategories?: Record<number, string[]> | null;
+  /** Options each choice category is currently earning on, keyed by category id */
+  activeChoiceCategories?: Record<number, string[]>;
   card: CreditCard;
 }
 
@@ -96,6 +139,8 @@ export interface UpdateWalletCardBody {
   paymentDueDay?: number | null;
   creditLimit?: number | null;
   openedAt?: string | null;
+  /** Chosen options for the card's selectable bonus categories, keyed by category id */
+  selectedCategories?: Record<number, string[]> | null;
 }
 
 export interface AddToWalletBody {
@@ -151,6 +196,10 @@ export interface DashboardSummary {
   totalBenefitValue: number;
   unusedBenefitsCount: number;
   thisMonthCashback: number;
+  /** Currency the totals above are denominated in */
+  currency?: string;
+  /** True when the wallet spans several currencies, so totals exclude some cards */
+  mixedCurrency?: boolean;
 }
 
 export interface CategoryCashback {
@@ -193,6 +242,10 @@ export interface BillingCycle {
   daysUntilDue: number;
   /** Total spend during the most recently closed cycle */
   statementBalance: number;
+  /** Statement balance still unpaid after its due date passed */
+  isOverdue?: boolean;
+  /** Due date of the most recently closed statement, whether or not it was paid */
+  previousDueDate?: string;
   /** Purchases posted during the most recently closed cycle before payments */
   statementSpend?: number;
   /** Payments currently applied to the most recently closed cycle */
@@ -260,6 +313,8 @@ export interface SuggestedCard {
   currency?: string | null;
   color: string;
   cardImageUrl?: string | null;
+  /** Annual fee in the card's own currency, used to break ranking ties */
+  annualFee?: number | null;
   /** Effective cashback / points multiplier as a decimal (e.g. 0.05 for 5%) */
   cashbackRate: number;
   /** The card's category that matched the purchase (e.g. "Dining", "Other" if default) */

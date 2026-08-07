@@ -51,5 +51,8 @@ Thumbs.db
 # Agent runtime state
 .omx/
 
+# Generated at build time by `pnpm --dir scripts cards:publish`
+artifacts/card-organizer/public/card-rules/
+
 # Local design references
 awesome-design-md/

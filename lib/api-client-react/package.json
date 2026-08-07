@@ -11,5 +11,13 @@
   },
   "peerDependencies": {
     "react": ">=18"
+  },
+  "scripts": {
+    "test": "tsx --test src/**/*.test.ts",
+    "typecheck": "tsc -p tsconfig.test.json"
+  },
+  "devDependencies": {
+    "tsx": "catalog:",
+    "@types/node": "catalog:"
   }
 }
