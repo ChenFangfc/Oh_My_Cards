@@ -1,10 +1,110 @@
 {
-  "generatedAt": "2026-08-06T19:51:24.782Z",
-  "rulesetVersion": "2026.08.06.2",
+  "generatedAt": "2026-08-15T07:24:45.038Z",
+  "rulesetVersion": "2026.08.07.1",
   "cardCount": 182,
-  "crawled": 0,
-  "reachable": 0,
+  "crawled": 182,
+  "reachable": 164,
   "findings": [
+    {
+      "kind": "PRODUCT_DISCONTINUED",
+      "severity": "high",
+      "cardId": 7,
+      "cardName": "Citi Custom Cash",
+      "issuer": "Citi",
+      "url": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
+      "detail": "Page contains \"no longer accepting applications\" style language. Confirm and mark the card closed."
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "high",
+      "cardId": 67,
+      "cardName": "US Bank Altitude Reserve",
+      "issuer": "US Bank",
+      "url": "https://www.usbank.com/credit-cards.html",
+      "detail": "The page states a single annual fee and it does not match the catalog.",
+      "catalogValue": "400",
+      "observedValue": "0"
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "high",
+      "cardId": 95,
+      "cardName": "World of Hyatt Business Credit Card",
+      "issuer": "Chase / Hyatt",
+      "url": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt-business",
+      "detail": "Source page returns HTTP 404. The product was probably renamed or retired."
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "high",
+      "cardId": 112,
+      "cardName": "U.S. Bank Shopper Cash Rewards Visa Signature",
+      "issuer": "U.S. Bank",
+      "url": "https://www.usbank.com/credit-cards.html",
+      "detail": "The page states a single annual fee and it does not match the catalog.",
+      "catalogValue": "95",
+      "observedValue": "0"
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "high",
+      "cardId": 115,
+      "cardName": "U.S. Bank Business Leverage Visa Signature",
+      "issuer": "U.S. Bank",
+      "url": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-visa-signature-card.html",
+      "detail": "Source page returns HTTP 404. The product was probably renamed or retired."
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "high",
+      "cardId": 144,
+      "cardName": "TD Cash Credit Card",
+      "issuer": "TD Bank",
+      "url": "https://www.td.com/us/en/personal-banking/credit-cards/cash",
+      "detail": "Source page returns HTTP 404. The product was probably renamed or retired."
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "high",
+      "cardId": 145,
+      "cardName": "TD Clear Visa Platinum",
+      "issuer": "TD Bank",
+      "url": "https://www.td.com/us/en/personal-banking/credit-cards/prequal-option-1/clear",
+      "detail": "The page states a single annual fee and it does not match the catalog.",
+      "catalogValue": "120",
+      "observedValue": "0"
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "high",
+      "cardId": 146,
+      "cardName": "TD Cash Secured Credit Card",
+      "issuer": "TD Bank",
+      "url": "https://www.td.com/us/en/personal-banking/credit-cards/cash-secured",
+      "detail": "Source page returns HTTP 404. The product was probably renamed or retired."
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "high",
+      "cardId": 180,
+      "cardName": "HSBC Revolution Credit Card",
+      "issuer": "HSBC Singapore",
+      "url": "https://www.hsbc.com.sg/credit-cards/products/revolution/",
+      "detail": "The page states a single annual fee and it does not match the catalog.",
+      "catalogValue": "0",
+      "observedValue": "2.5"
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "high",
+      "cardId": 182,
+      "cardName": "Standard Chartered Smart Credit Card",
+      "issuer": "Standard Chartered Singapore",
+      "url": "https://www.sc.com/sg/credit-cards/smart-credit-card/",
+      "detail": "The page states a single annual fee and it does not match the catalog.",
+      "catalogValue": "99.19",
+      "observedValue": "91"
+    },
     {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
@@ -12,6 +112,31 @@
       "cardName": "Citi Custom Cash",
       "issuer": "Citi",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 11,
+      "cardName": "Amex Blue Cash Everyday",
+      "issuer": "American Express",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (7 -> 6)",
+        "cash back (30 -> 31)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 14,
+      "cardName": "Capital One Savor Rewards",
+      "issuer": "Capital One",
+      "url": "https://www.capitalone.com/credit-cards/savor/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "bonus (6 -> 8)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -30,6 +155,105 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 19,
+      "cardName": "Wells Fargo Active Cash",
+      "issuer": "Wells Fargo",
+      "url": "https://creditcards.wellsfargo.com/active-cash-credit-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (6 -> 5)",
+        "cash back (12 -> 11)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 20,
+      "cardName": "Wells Fargo Autograph",
+      "issuer": "Wells Fargo",
+      "url": "https://creditcards.wellsfargo.com/autograph-visa-credit-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (10 -> 14)",
+        "points (43 -> 37)"
+      ]
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "medium",
+      "cardId": 26,
+      "cardName": "PNC Cash Unlimited",
+      "issuer": "PNC Bank",
+      "url": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-unlimited-visa-credit-card.html",
+      "detail": "Request failed after retries: AbortError: This operation was aborted"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 32,
+      "cardName": "Delta SkyMiles Platinum American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-platinum-american-express-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (5 -> 6)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 33,
+      "cardName": "Delta SkyMiles Reserve American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (6 -> 7)",
+        "tsa precheck (4 -> 5)",
+        "foreign transaction (2 -> 1)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 36,
+      "cardName": "Marriott Bonvoy Boundless",
+      "issuer": "Chase / Marriott Bonvoy",
+      "url": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (13 -> 12)",
+        "points (67 -> 59)",
+        "bonus (25 -> 14)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 40,
+      "cardName": "Hilton Honors American Express Surpass",
+      "issuer": "American Express / Hilton",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (3 -> 5)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 41,
+      "cardName": "Hilton Honors American Express Aspire",
+      "issuer": "American Express / Hilton",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (6 -> 5)"
+      ]
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 45,
@@ -38,12 +262,85 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "medium",
+      "cardId": 45,
+      "cardName": "Bilt Mastercard",
+      "issuer": "Wells Fargo / Bilt",
+      "url": "https://newsroom.biltrewards.com/meetbiltcard2.0",
+      "detail": "Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.",
+      "catalogValue": "0",
+      "observedValue": "95, 495"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 45,
+      "cardName": "Bilt Mastercard",
+      "issuer": "Wells Fargo / Bilt",
+      "url": "https://newsroom.biltrewards.com/meetbiltcard2.0",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (1 -> 6)",
+        "statement credit (1 -> 0)",
+        "points (23 -> 17)",
+        "bonus (5 -> 3)",
+        "lounge (1 -> 0)",
+        "foreign transaction (0 -> 3)",
+        "authorized user (0 -> 1)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 54,
+      "cardName": "Marriott Bonvoy Bold",
+      "issuer": "Chase / Marriott",
+      "url": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "points (71 -> 72)",
+        "bonus (21 -> 22)"
+      ]
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 56,
       "cardName": "American Express Business Gold",
       "issuer": "American Express",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 56,
+      "cardName": "American Express Business Gold",
+      "issuer": "American Express",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
+      "detail": "sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.americanexpress.com/en-us/business/shop/error/404/"
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 57,
+      "cardName": "American Express Business Platinum",
+      "issuer": "American Express",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/business-platinum-charge-card/",
+      "detail": "sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.americanexpress.com/en-us/business/shop/error/404/"
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "medium",
+      "cardId": 62,
+      "cardName": "Citi / AAdvantage Executive World Legend Mastercard",
+      "issuer": "Citi / American Airlines",
+      "url": "https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard",
+      "detail": "Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.",
+      "catalogValue": "595",
+      "observedValue": "0, 175"
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -78,12 +375,101 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 70,
+      "cardName": "Discover it Student Cash Back",
+      "issuer": "Discover",
+      "url": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "statement credit (4 -> 3)",
+        "bonus (3 -> 2)"
+      ]
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 71,
+      "cardName": "Discover it Secured",
+      "issuer": "Discover",
+      "url": "https://www.discover.com/credit-cards/secured/",
+      "detail": "sourceUrl redirects to https://www.discover.com/credit-cards/secured-credit-card/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.discover.com/credit-cards/secured-credit-card/"
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 73,
+      "cardName": "Choice Privileges Select Mastercard",
+      "issuer": "Wells Fargo / Choice Hotels",
+      "url": "https://www.wellsfargo.com/credit-cards/choice-select/terms/?FPID=0123CBIXP10000&app_source=WELLS_FARGO_COM",
+      "detail": "sourceUrl redirects to https://www.wellsfargo.com/credit-cards/documents/choice-select-terms/?FPID=0123CBIXP10000&utm_medium=www-redirect&utm_source=credit-cards--choice-select--terms. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.wellsfargo.com/credit-cards/documents/choice-select-terms/?FPID=0123CBIXP10000&utm_medium=www-redirect&utm_source=credit-cards--choice-select--terms"
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "medium",
+      "cardId": 74,
+      "cardName": "PNC Cash Rewards Visa",
+      "issuer": "PNC Bank",
+      "url": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-rewards-visa-credit-card.html",
+      "detail": "Request failed after retries: AbortError: This operation was aborted"
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 77,
       "cardName": "Capital One Walmart Rewards (legacy)",
       "issuer": "Capital One / Walmart",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 77,
+      "cardName": "Capital One Walmart Rewards (legacy)",
+      "issuer": "Capital One / Walmart",
+      "url": "https://www.capitalone.com/credit-cards/quicksilver/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "cash back (0 -> 8)",
+        "bonus (0 -> 4)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 79,
+      "cardName": "RBC Avion Visa Infinite",
+      "issuer": "RBC",
+      "url": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "points (86 -> 87)",
+        "bonus (1 -> 2)"
+      ]
+    },
+    {
+      "kind": "PAGE_GONE",
+      "severity": "medium",
+      "cardId": 82,
+      "cardName": "BMO eclipse Visa Infinite",
+      "issuer": "BMO",
+      "url": "https://www.bmo.com/main/personal/credit-cards/bmo-eclipse-visa-infinite/",
+      "detail": "Request failed after retries: AbortError: This operation was aborted"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 83,
+      "cardName": "CIBC Aventura Visa Infinite",
+      "issuer": "CIBC",
+      "url": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "points (45 -> 82)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -94,12 +480,44 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 88,
+      "cardName": "American Express Green Card",
+      "issuer": "American Express",
+      "url": "https://www.doctorofcredit.com/american-express-removes-green-card-from-website/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "points (1 -> 6)",
+        "miles (1 -> 2)",
+        "bonus (0 -> 33)",
+        "foreign transaction (2 -> 0)"
+      ]
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 95,
       "cardName": "World of Hyatt Business Credit Card",
       "issuer": "Chase / Hyatt",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 108,
+      "cardName": "Wells Fargo Autograph Journey",
+      "issuer": "Wells Fargo",
+      "url": "https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (4 -> 10)",
+        "statement credit (5 -> 6)",
+        "points (36 -> 51)",
+        "cash back (4 -> 3)",
+        "bonus (9 -> 18)",
+        "foreign transaction (2 -> 1)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -110,12 +528,59 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 109,
+      "cardName": "Wells Fargo Attune",
+      "issuer": "Wells Fargo",
+      "url": "https://creditcards.wellsfargo.com/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (57 -> 66)",
+        "points (121 -> 124)",
+        "bonus (68 -> 70)"
+      ]
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 110,
+      "cardName": "Choice Privileges Mastercard",
+      "issuer": "Wells Fargo / Choice Hotels",
+      "url": "https://www.wellsfargo.com/credit-cards/choice/terms/",
+      "detail": "sourceUrl redirects to https://www.wellsfargo.com/credit-cards/documents/choice-terms/?utm_medium=www-redirect&utm_source=credit-cards--choice--terms. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.wellsfargo.com/credit-cards/documents/choice-terms/?utm_medium=www-redirect&utm_source=credit-cards--choice--terms"
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 112,
       "cardName": "U.S. Bank Shopper Cash Rewards Visa Signature",
       "issuer": "U.S. Bank",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "ANNUAL_FEE_MISMATCH",
+      "severity": "medium",
+      "cardId": 120,
+      "cardName": "Wyndham Rewards Earner Card",
+      "issuer": "Barclays / Wyndham Rewards",
+      "url": "https://corporate.wyndhamhotels.com/news-releases/barclays-and-wyndham-cater-to-road-trippers-and-road-warriors-with-new-wyndham-rewards-earner-cards-first-small-business-card/",
+      "detail": "Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.",
+      "catalogValue": "0",
+      "observedValue": "75, 95"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 121,
+      "cardName": "Wyndham Rewards Earner Business Card",
+      "issuer": "Barclays / Wyndham Rewards",
+      "url": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "lounge (3 -> 0)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -126,12 +591,127 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 122,
+      "cardName": "Hawaiian Airlines Business Mastercard",
+      "issuer": "Barclays / Hawaiian Airlines",
+      "url": "https://cards.barclaycardus.com/",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "points (0 -> 2)",
+        "bonus (0 -> 3)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 148,
+      "cardName": "Citi / AAdvantage Business World Elite Mastercard",
+      "issuer": "Citi",
+      "url": "https://www.citi.com/credit-cards/citi-aadvantage-business-credit-card",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (2 -> 5)",
+        "points (8 -> 11)",
+        "miles (28 -> 25)",
+        "cash back (0 -> 1)",
+        "bonus (9 -> 10)",
+        "foreign transaction (3 -> 4)",
+        "authorized user (6 -> 7)"
+      ]
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 152,
+      "cardName": "Delta SkyMiles Gold Business American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-gold-business-credit-card-amex/",
+      "detail": "sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.americanexpress.com/en-us/business/shop/error/404/"
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 153,
+      "cardName": "Delta SkyMiles Platinum Business American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-platinum-business-credit-card-amex/",
+      "detail": "sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.americanexpress.com/en-us/business/shop/error/404/"
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 154,
+      "cardName": "Delta SkyMiles Reserve Business American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-reserve-business-credit-card-amex/",
+      "detail": "sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.americanexpress.com/en-us/business/shop/error/404/"
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 160,
       "cardName": "Bank of America Business Advantage Customized Cash Rewards",
       "issuer": "Bank of America",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 163,
+      "cardName": "Prime Business Card",
+      "issuer": "Amazon / U.S. Bank",
+      "url": "https://www.amazon.com/businesscard",
+      "detail": "sourceUrl redirects to https://www.amazon.com/dp/B0DVBL912R. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.amazon.com/dp/B0DVBL912R"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 163,
+      "cardName": "Prime Business Card",
+      "issuer": "Amazon / U.S. Bank",
+      "url": "https://www.amazon.com/businesscard",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (3 -> 0)",
+        "statement credit (4 -> 0)",
+        "points (2 -> 0)",
+        "cash back (1 -> 0)",
+        "welcome offer (1 -> 0)",
+        "foreign transaction (3 -> 0)"
+      ]
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 164,
+      "cardName": "Amazon Business Card",
+      "issuer": "Amazon / U.S. Bank",
+      "url": "https://www.amazon.com/businesscard",
+      "detail": "sourceUrl redirects to https://www.amazon.com/dp/B0DVBL912R. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.amazon.com/dp/B0DVBL912R"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 164,
+      "cardName": "Amazon Business Card",
+      "issuer": "Amazon / U.S. Bank",
+      "url": "https://www.amazon.com/businesscard",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (3 -> 0)",
+        "statement credit (4 -> 0)",
+        "points (2 -> 0)",
+        "cash back (1 -> 0)",
+        "welcome offer (1 -> 0)",
+        "foreign transaction (3 -> 0)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -148,6 +728,28 @@
       "cardName": "Capital One Spark 1.5X Miles Select",
       "issuer": "Capital One",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 169,
+      "cardName": "BECU Cash Back Visa",
+      "issuer": "BECU",
+      "url": "https://www.becu.org/everyday-banking/credit-card/cash-back-visa",
+      "detail": "sourceUrl redirects to https://www.becu.org/everyday-banking/credit-card/cash-back-credit-card. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.becu.org/everyday-banking/credit-card/cash-back-credit-card"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 169,
+      "cardName": "BECU Cash Back Visa",
+      "issuer": "BECU",
+      "url": "https://www.becu.org/everyday-banking/credit-card/cash-back-visa",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "cash back (57 -> 61)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -174,6 +776,18 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 173,
+      "cardName": "Standard Chartered Cathay Mastercard",
+      "issuer": "Standard Chartered Hong Kong / Cathay",
+      "url": "https://www.sc.com/hk/credit-cards/cathay/?intcid=cardcategory_Jul21-hk-cxam_en",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "miles (138 -> 141)"
+      ]
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 174,
@@ -196,6 +810,18 @@
       "cardName": "Citi Cash Back Card (Hong Kong)",
       "issuer": "Citi Hong Kong",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 176,
+      "cardName": "Citi Cash Back Card (Hong Kong)",
+      "issuer": "Citi Hong Kong",
+      "url": "https://www.citibank.com.hk/english/credit-cards/cash-back-card",
+      "detail": "Page text changed since 2026-08-06 in terms that affect card rules.",
+      "changedTerms": [
+        "cash back (14 -> 13)"
+      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -244,16 +870,123 @@
       "cardName": "Standard Chartered Smart Credit Card",
       "issuer": "Standard Chartered Singapore",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 38,
+      "cardName": "IHG One Rewards Premier",
+      "issuer": "Chase / IHG",
+      "url": "https://www.ihg.com/onerewards/content/us/en/creditcard",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 130,
+      "cardName": "Alliant Cashback Visa Signature",
+      "issuer": "Alliant Credit Union",
+      "url": "https://www.alliantcreditunion.org/credit-cards/visa-signature-card",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 132,
+      "cardName": "Wells Fargo One Key Card",
+      "issuer": "Wells Fargo",
+      "url": "https://newsroom.wf.com/news-releases/news-details/2024/Expedia-Group-Wells-Fargo-and-Mastercard-announce-new-suite-of-One-Key-credit-cards/default.aspx",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 133,
+      "cardName": "Wells Fargo One Key+ Card",
+      "issuer": "Wells Fargo",
+      "url": "https://newsroom.wf.com/news-releases/news-details/2024/Expedia-Group-Wells-Fargo-and-Mastercard-announce-new-suite-of-One-Key-credit-cards/default.aspx",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 141,
+      "cardName": "PenFed Power Cash Rewards Visa Signature",
+      "issuer": "PenFed Credit Union",
+      "url": "https://www.penfed.org/credit-cards/power-cash-rewards-visa",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 142,
+      "cardName": "PenFed Platinum Rewards Visa Signature",
+      "issuer": "PenFed Credit Union",
+      "url": "https://www.penfed.org/credit-cards/platinum-rewards-visa",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 160,
+      "cardName": "Bank of America Business Advantage Customized Cash Rewards",
+      "issuer": "Bank of America",
+      "url": "https://business.bankofamerica.com/en/small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 161,
+      "cardName": "Bank of America Business Advantage Unlimited Cash Rewards",
+      "issuer": "Bank of America",
+      "url": "https://business.bankofamerica.com/en/credit-cards/business-advantage-unlimited-cash-rewards",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 162,
+      "cardName": "Bank of America Business Advantage Travel Rewards",
+      "issuer": "Bank of America",
+      "url": "https://business.bankofamerica.com/en/credit-cards/business-advantage-travel-rewards",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 165,
+      "cardName": "MyLowe's Pro Rewards American Express",
+      "issuer": "Lowe's / Synchrony",
+      "url": "https://www.lowes.com/l/Credit/business-credit-center",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
+    },
+    {
+      "kind": "PAGE_BLOCKED",
+      "severity": "low",
+      "cardId": 168,
+      "cardName": "Atmos Rewards Visa Signature Business",
+      "issuer": "Bank of America / Alaska Airlines",
+      "url": "https://business.bankofamerica.com/en/credit-cards/atmos-rewards",
+      "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
     }
   ],
   "stats": {
     "byKind": {
-      "LOW_CONFIDENCE": 30
+      "PRODUCT_DISCONTINUED": 1,
+      "ANNUAL_FEE_MISMATCH": 8,
+      "PAGE_GONE": 7,
+      "LOW_CONFIDENCE": 30,
+      "CONTENT_CHANGED": 26,
+      "PAGE_REDIRECTED": 11,
+      "PAGE_BLOCKED": 11
     },
     "bySeverity": {
-      "medium": 30
+      "high": 10,
+      "medium": 73,
+      "low": 11
     },
     "stalestReviewDate": "2026-05-17",
-    "medianReviewAgeDays": 79
+    "medianReviewAgeDays": 88
   }
 }
