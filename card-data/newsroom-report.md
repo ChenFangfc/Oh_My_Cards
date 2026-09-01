@@ -1,19 +1,19 @@
 # Card rule change watch
 
-Generated 2026-08-15T07:24:44.562Z · window since 2026-08-07
+Generated 2026-09-01T12:16:29.817Z · window since 2026-08-07
 
 2 feed items mention a catalog card alongside change language.
 
-### US Bank's Mysterious Transferable Points &#124; Frequent Miler on the Air Ep371 &#124; 8-14-26 On today s episode, we ll share a reminder to check your credit c
+### (Update: New terms) Physical Lululemon gift cards no longer online; $75 denominations not allowed in-store When American Express revamped the consumer Platinum 
 
-- feed: Frequent Miler · published Fri, 14 Aug 2026 22:45:37 +0000
-- cards: #67 US Bank Altitude Reserve
-- signals: credit
-- https://frequentmiler.com/us-banks-mysterious-transferable-points-frequent-miler-on-the-air-ep371-8-14-26/
-
-### Elite status via the Air France KLM credit card I m intrigued by the possibility of earning Air France KLM Flying Blue Platinum elite status. Two features of Pl
-
-- feed: Frequent Miler · published Thu, 13 Aug 2026 01:45:35 +0000
+- feed: Frequent Miler · published Mon, 31 Aug 2026 17:46:06 +0000
 - cards: #9 American Express Platinum
-- signals: credit
-- https://frequentmiler.com/elite-status-via-the-air-france-klm-credit-card/
+- signals: revamp, new benefits, no longer, credit
+- https://frequentmiler.com/physical-lululemon-gift-cards-no-longer-online-75-denominations-not-allowed-in-store/
+
+### Sapphire Reserve® Exclusive Tables adds over 30 restaurants, but almost as many removed The Chase Sapphire Reserve® card includes twice-annual $150 credits for 
+
+- feed: Frequent Miler · published Fri, 28 Aug 2026 16:56:01 +0000
+- cards: #2 Chase Sapphire Reserve
+- signals: adds, credit
+- https://frequentmiler.com/sapphire-reserve-exclusive-tables/
