@@ -1,17 +1,17 @@
 # Card data freshness report
 
-Generated 2026-09-01T12:16:30.561Z · ruleset `2026.08.07.1`
+Generated 2026-09-15T12:23:50.208Z · ruleset `2026.08.07.1`
 
 | Metric | Value |
 | --- | --- |
 | Cards in catalog | 182 |
 | Source pages crawled | 182 |
-| Pages reachable (HTTP 200) | 166 |
-| Findings | 253 (11 high / 90 medium / 152 low) |
-| Median review age | 105 days |
+| Pages reachable (HTTP 200) | 167 |
+| Findings | 245 (13 high / 80 medium / 152 low) |
+| Median review age | 119 days |
 | Oldest review date | 2026-05-17 |
 
-> **11 high-severity findings need a human decision before the next release.**
+> **13 high-severity findings need a human decision before the next release.**
 
 Extracted values are *signals, not truth*. Issuer pages list other cards'
 fees in comparison tables and vary offers by region, so every proposed
@@ -23,8 +23,12 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
   - Page contains "no longer accepting applications" style language. Confirm and mark the card closed.
   - https://www.citi.com/credit-cards/citi-custom-cash-credit-card
 
-### Annual fee disagrees with issuer page (8)
+### Annual fee disagrees with issuer page (10)
 
+- **#66 Aeroplan Card** (Chase / Air Canada) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `95` · page: `195`
+  - https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan
 - **#67 US Bank Altitude Reserve** (US Bank) — 🔴 High
   - The page states a single annual fee and it does not match the catalog.
   - catalog: `400` · page: `0`
@@ -33,6 +37,10 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
   - The page states a single annual fee and it does not match the catalog.
   - catalog: `95` · page: `0`
   - https://www.usbank.com/credit-cards.html
+- **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `49` · page: `95`
+  - https://www.navyfederal.org/loans-cards/credit-cards/flagship-visa-signature.html
 - **#145 TD Clear Visa Platinum** (TD Bank) — 🔴 High
   - The page states a single annual fee and it does not match the catalog.
   - catalog: `120` · page: `0`
@@ -58,7 +66,7 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
   - catalog: `0` · page: `75, 95`
   - https://corporate.wyndhamhotels.com/news-releases/barclays-and-wyndham-cater-to-road-trippers-and-road-warriors-with-new-wyndham-rewards-earner-cards-first-small-business-card/
 
-### Source page unreachable (9)
+### Source page unreachable (8)
 
 - **#95 World of Hyatt Business Credit Card** (Chase / Hyatt) — 🔴 High
   - Source page returns HTTP 404. The product was probably renamed or retired.
@@ -84,11 +92,8 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
 - **#82 BMO eclipse Visa Infinite** (BMO) — 🟡 Medium
   - Request failed after retries: AbortError: This operation was aborted
   - https://www.bmo.com/main/personal/credit-cards/bmo-eclipse-visa-infinite/
-- **#181 Citi Cash Back Card (Singapore)** (Citi Singapore) — 🟡 Medium
-  - Request failed after retries: AbortError: This operation was aborted
-  - https://www1.citibank.com.sg/credit-cards/cashback/citi-cash-back-card
 
-### Source page moved (12)
+### Source page moved (13)
 
 - **#56 American Express Business Gold** (American Express) — 🟡 Medium
   - sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.
@@ -100,7 +105,7 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
   - sourceUrl redirects to https://www.citi.com/credit-cards/citi-aadvantage-executive-world-legend-mastercard. Update sourceUrl, and check whether the product changed.
   - https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard
 - **#71 Discover it Secured** (Discover) — 🟡 Medium
-  - sourceUrl redirects to https://www.discover.com/credit-cards/secured-credit-card/?aid=568217&pid=170911&sku=104&iq_id=r23559330&ef_id=y01Puu-@FCUAABE-:20120828225409:s&pageFileId=_iraal1hacckazwpan9jyom6jtm22w9mivgqfbax600&channel=LINK&srccode=ke2z&campaignid=19581364003. Update sourceUrl, and check whether the product changed.
+  - sourceUrl redirects to https://www.discover.com/credit-cards/secured-credit-card/?SCMPGN=va_dcp_fraud&sc=kxpa&srccode=kez5. Update sourceUrl, and check whether the product changed.
   - https://www.discover.com/credit-cards/secured/
 - **#73 Choice Privileges Select Mastercard** (Wells Fargo / Choice Hotels) — 🟡 Medium
   - sourceUrl redirects to https://www.wellsfargo.com/credit-cards/documents/choice-select-terms/?FPID=0123CBIXP10000&utm_medium=www-redirect&utm_source=credit-cards--choice-select--terms. Update sourceUrl, and check whether the product changed.
@@ -108,6 +113,9 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
 - **#110 Choice Privileges Mastercard** (Wells Fargo / Choice Hotels) — 🟡 Medium
   - sourceUrl redirects to https://www.wellsfargo.com/credit-cards/documents/choice-terms/?utm_medium=www-redirect&utm_source=credit-cards--choice--terms. Update sourceUrl, and check whether the product changed.
   - https://www.wellsfargo.com/credit-cards/choice/terms/
+- **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — 🟡 Medium
+  - sourceUrl redirects to https://www.navyfederal.org/loans-cards/credit-cards/flagship-premier-visa-signature.html. Update sourceUrl, and check whether the product changed.
+  - https://www.navyfederal.org/loans-cards/credit-cards/flagship-visa-signature.html
 - **#152 Delta SkyMiles Gold Business American Express** (American Express / Delta) — 🟡 Medium
   - sourceUrl redirects to https://www.americanexpress.com/en-us/business/shop/error/404/. Update sourceUrl, and check whether the product changed.
   - https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-gold-business-credit-card-amex/
@@ -127,172 +135,132 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
   - sourceUrl redirects to https://www.becu.org/everyday-banking/credit-card/cash-back-credit-card. Update sourceUrl, and check whether the product changed.
   - https://www.becu.org/everyday-banking/credit-card/cash-back-visa
 
-### Issuer page changed since last crawl (41)
+### Issuer page changed since last crawl (31)
 
-- **#5 Citi Double Cash** (Citi) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: cash back (26 -> 23), bonus (6 -> 4)
-  - https://www.citi.com/credit-cards/citi-double-cash-credit-card
-- **#11 Amex Blue Cash Everyday** (American Express) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (6 -> 7)
-  - https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/
 - **#12 Capital One Venture X** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (1 -> 2), points (4 -> 2), miles (4 -> 14), bonus (0 -> 2), lounge (23 -> 17), foreign transaction (0 -> 1), authorized user (1 -> 6), priority pass (4 -> 6)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (2 -> 3), lounge (17 -> 18), authorized user (6 -> 4), priority pass (6 -> 4)
   - https://www.capitalone.com/credit-cards/venture-x/
-- **#14 Capital One Savor Rewards** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: foreign transaction (1 -> 2)
-  - https://www.capitalone.com/credit-cards/savor/
-- **#15 Capital One SavorOne** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (2 -> 3), statement credit (0 -> 1), cash back (18 -> 24)
-  - https://www.capitalone.com/credit-cards/savorone/
-- **#16 Capital One Quicksilver** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: statement credit (0 -> 2), cash back (8 -> 11), no longer (0 -> 1), foreign transaction (0 -> 1)
-  - https://www.capitalone.com/credit-cards/quicksilver/
-- **#19 Wells Fargo Active Cash** (Wells Fargo) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (5 -> 6), cash back (11 -> 12)
-  - https://creditcards.wellsfargo.com/active-cash-credit-card/
-- **#20 Wells Fargo Autograph** (Wells Fargo) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (14 -> 10), points (37 -> 43)
-  - https://creditcards.wellsfargo.com/autograph-visa-credit-card/
-- **#31 Delta SkyMiles Gold American Express** (American Express / Delta) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (6 -> 8)
-  - https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-gold-american-express-card/
+- **#13 Capital One Venture Rewards** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: miles (32 -> 30), bonus (7 -> 9)
+  - https://www.capitalone.com/credit-cards/venture/
+- **#17 Discover it Cash Back** (Capital One / Discover) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: authorized user (2 -> 0)
+  - https://www.discover.com/credit-cards/cash-back/it-card/
+- **#18 Discover it Miles** (Capital One / Discover) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: authorized user (2 -> 0)
+  - https://www.discover.com/credit-cards/travel/
+- **#39 Marriott Bonvoy Brilliant American Express** (American Express / Marriott Bonvoy) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: points (24 -> 27)
+  - https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-brilliant/
 - **#40 Hilton Honors American Express Surpass** (American Express / Hilton) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (5 -> 3)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 5)
   - https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/
+- **#41 Hilton Honors American Express Aspire** (American Express / Hilton) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (5 -> 6)
+  - https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/
 - **#42 Wyndham Rewards Earner+ Card** (Barclays / Wyndham Rewards) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (31 -> 46)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: points (46 -> 50), bonus (11 -> 12)
   - https://cards.barclaycardus.com/banking/cards/wyndham-rewards-earner-plus-card/
 - **#43 Apple Card** (Goldman Sachs / Apple) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: no longer (0 -> 2)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: cash back (14 -> 15)
   - https://www.apple.com/apple-card/
-- **#62 Citi / AAdvantage Executive World Legend Mastercard** (Citi / American Airlines) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (11 -> 10), miles (23 -> 20), bonus (14 -> 10), lounge (2 -> 5), foreign transaction (5 -> 2), authorized user (10 -> 9)
-  - https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard
-- **#64 Hawaiian Airlines World Elite Mastercard** (Barclays / Hawaiian Airlines) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (2 -> 4), bonus (3 -> 2)
-  - https://cards.barclaycardus.com/
-- **#65 AAdvantage Aviator Red World Elite** (Barclays / American Airlines) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (2 -> 4), bonus (3 -> 2)
-  - https://cards.barclaycardus.com/
-- **#76 Target Circle Credit Card** (TD Bank / Target) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: bonus (2 -> 0)
-  - https://www.target.com/circlecard/main
-- **#77 Capital One Walmart Rewards (legacy)** (Capital One / Walmart) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: statement credit (0 -> 2), cash back (8 -> 11), no longer (0 -> 1), foreign transaction (0 -> 1)
-  - https://www.capitalone.com/credit-cards/quicksilver/
+- **#58 Marriott Bonvoy Bevy American Express** (American Express / Marriott) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: points (42 -> 44)
+  - https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-bevy/
+- **#66 Aeroplan Card** (Chase / Air Canada) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (12 -> 10), statement credit (12 -> 25), points (70 -> 66), miles (1 -> 2), bonus (28 -> 13), lounge (0 -> 1), foreign transaction (9 -> 7), authorized user (8 -> 6)
+  - https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan
+- **#69 Discover it Chrome** (Discover) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: authorized user (2 -> 0)
+  - https://www.discover.com/credit-cards/cash-back/chrome/
+- **#71 Discover it Secured** (Discover) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: authorized user (2 -> 0)
+  - https://www.discover.com/credit-cards/secured/
 - **#79 RBC Avion Visa Infinite** (RBC) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (87 -> 91)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: points (91 -> 93)
   - https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html
-- **#80 TD Aeroplan Visa Infinite** (TD Canada Trust) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (18 -> 20), bonus (84 -> 81)
-  - https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-card
-- **#83 CIBC Aventura Visa Infinite** (CIBC) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (82 -> 83)
-  - https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html
-- **#98 Capital One VentureOne Rewards** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (3 -> 4), statement credit (0 -> 2), miles (5 -> 12), cash back (2 -> 4), bonus (0 -> 3), foreign transaction (0 -> 1)
-  - https://www.capitalone.com/credit-cards/ventureone/
-- **#109 Wells Fargo Attune** (Wells Fargo) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (66 -> 22), statement credit (5 -> 0), points (124 -> 51), bonus (70 -> 46)
-  - https://creditcards.wellsfargo.com/
-- **#122 Hawaiian Airlines Business Mastercard** (Barclays / Hawaiian Airlines) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (2 -> 4), bonus (3 -> 2)
-  - https://cards.barclaycardus.com/
-- **#127 SoFi Unlimited 2% Credit Card** (SoFi) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (9 -> 8), cash back (1 -> 2), bonus (1 -> 0), lounge (1 -> 0)
-  - https://www.sofi.com/credit-card/unlimited/
-- **#128 SoFi Everyday Cash Rewards Credit Card** (SoFi) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: points (9 -> 8), cash back (4 -> 5), bonus (1 -> 0), lounge (1 -> 0)
-  - https://www.sofi.com/credit-card/everyday-cash/
+- **#88 American Express Green Card** (American Express) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: miles (2 -> 1), bonus (33 -> 34)
+  - https://www.doctorofcredit.com/american-express-removes-green-card-from-website/
+- **#99 Capital One Venture Business** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: statement credit (8 -> 9), miles (31 -> 29)
+  - https://www.capitalone.com/small-business/credit-cards/venture-business/
+- **#100 Capital One Venture X Business** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: statement credit (6 -> 8), miles (22 -> 20), lounge (12 -> 13)
+  - https://www.capitalone.com/small-business/credit-cards/venture-x-business/
+- **#108 Wells Fargo Autograph Journey** (Wells Fargo) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (10 -> 6), points (51 -> 52), cash back (3 -> 4), bonus (18 -> 11), foreign transaction (1 -> 6)
+  - https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/
+- **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 2), statement credit (13 -> 15), points (27 -> 20), cash back (2 -> 1), bonus (2 -> 6), welcome offer (0 -> 1), global entry (13 -> 9), tsa precheck (1 -> 2), foreign transaction (4 -> 2), authorized user (0 -> 1)
+  - https://www.navyfederal.org/loans-cards/credit-cards/flagship-visa-signature.html
+- **#121 Wyndham Rewards Earner Business Card** (Barclays / Wyndham Rewards) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: points (82 -> 80)
+  - https://www.wyndhamrewardscreditcard.com/earner-business-card/
 - **#134 Capital One Spark Cash Plus** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: cash back (19 -> 17), bonus (17 -> 16)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: bonus (16 -> 17), welcome offer (0 -> 1)
   - https://www.capitalone.com/small-business/credit-cards/spark-cash-plus/
-- **#135 Capital One Spark Cash Select for Business** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: bonus (20 -> 19)
-  - https://www.capitalone.com/small-business/credit-cards/spark-cash-select/
-- **#136 Verizon Visa Card** (Verizon / Synchrony) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (4 -> 2), statement credit (8 -> 7), cash back (2 -> 1), foreign transaction (1 -> 0)
-  - https://www.verizon.com/financial-services/verizon-visa-card/
-- **#137 AAA Daily Advantage Visa Signature** (AAA / Comenity Capital Bank) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: statement credit (5 -> 7), cash back (20 -> 29), authorized user (0 -> 2)
-  - https://mwg.aaa.com/credit-card
-- **#138 AAA Travel Advantage Visa Signature** (AAA / Comenity Capital Bank) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: statement credit (5 -> 7), cash back (20 -> 29), authorized user (0 -> 2)
-  - https://mwg.aaa.com/credit-card
-- **#139 FNBO Evergreen Rewards Visa** (FNBO) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (1 -> 0), points (3 -> 0), bonus (2 -> 0)
-  - https://www.fnbo.com/personal-banking/credit-cards/evergreen/
-- **#140 FNBO Getaway** (FNBO) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (1 -> 0), cash back (1 -> 2), foreign transaction (1 -> 0)
-  - https://www.fnbo.com/personal-banking/credit-cards/getaway
+- **#147 TD Business Solutions Credit Card** (TD Bank) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: statement credit (8 -> 9), bonus (31 -> 28)
+  - https://www.td.com/us/en/personal-banking/credit-cards/no-annual-fee
 - **#150 American Express Graphite Business Cash Unlimited** (American Express) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: cash back (42 -> 40), welcome offer (5 -> 3)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: cash back (40 -> 42), welcome offer (3 -> 5)
   - https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/graphite-business-cash-unlimited-card/
 - **#155 Capital One VentureOne Business** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: miles (34 -> 32), bonus (6 -> 5)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: miles (32 -> 30)
   - https://www.capitalone.com/small-business/credit-cards/ventureone-business/
 - **#156 Capital One Spark 2% Cash** (Capital One) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: bonus (11 -> 10)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (2 -> 4)
   - https://www.capitalone.com/small-business/credit-cards/spark-cash/
 - **#163 Prime Business Card** (Amazon / U.S. Bank) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (0 -> 3), statement credit (0 -> 4), points (0 -> 5), cash back (0 -> 1), welcome offer (0 -> 1), foreign transaction (0 -> 3)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 0), statement credit (4 -> 0), points (5 -> 0), cash back (1 -> 0), welcome offer (1 -> 0), foreign transaction (3 -> 0)
   - https://www.amazon.com/businesscard
 - **#164 Amazon Business Card** (Amazon / U.S. Bank) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (0 -> 3), statement credit (0 -> 4), points (0 -> 5), cash back (0 -> 1), welcome offer (0 -> 1), foreign transaction (0 -> 3)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 0), statement credit (4 -> 0), points (5 -> 0), cash back (1 -> 0), welcome offer (1 -> 0), foreign transaction (3 -> 0)
   - https://www.amazon.com/businesscard
+- **#166 Capital One Spark 2X Miles** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: statement credit (7 -> 8)
+  - https://www.capitalone.com/small-business/credit-cards/travel-and-miles/
+- **#167 Capital One Spark 1.5X Miles Select** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: statement credit (7 -> 8)
+  - https://www.capitalone.com/small-business/credit-cards/travel-and-miles/
 - **#169 BECU Cash Back Visa** (BECU) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: annual fee (6 -> 5), statement credit (2 -> 1), points (5 -> 3), cash back (61 -> 48), bonus (8 -> 4)
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: annual fee (5 -> 6), statement credit (1 -> 2), points (3 -> 5), cash back (48 -> 57), bonus (4 -> 8)
   - https://www.becu.org/everyday-banking/credit-card/cash-back-visa
-- **#171 HSBC Red Credit Card** (HSBC Hong Kong) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: welcome offer (1 -> 3)
-  - https://www.hsbc.com.hk/credit-cards/products/red/
-- **#173 Standard Chartered Cathay Mastercard** (Standard Chartered Hong Kong / Cathay) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: miles (141 -> 149)
-  - https://www.sc.com/hk/credit-cards/cathay/?intcid=cardcategory_Jul21-hk-cxam_en
-- **#176 Citi Cash Back Card (Hong Kong)** (Citi Hong Kong) — 🟡 Medium
-  - Page text changed since 2026-08-15 in terms that affect card rules.
-  - changed terms: cash back (13 -> 14)
-  - https://www.citibank.com.hk/english/credit-cards/cash-back-card
+- **#182 Standard Chartered Smart Credit Card** (Standard Chartered Singapore) — 🟡 Medium
+  - Page text changed since 2026-09-01 in terms that affect card rules.
+  - changed terms: lounge (2 -> 3)
+  - https://www.sc.com/sg/credit-cards/smart-credit-card/
 
 ### Never confirmed against an issuer source (30)
 
@@ -384,292 +352,292 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
 ### Past the review budget (145)
 
 - **#2 Chase Sapphire Reserve** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#3 Chase Freedom Unlimited** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#5 Citi Double Cash** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#6 Citi Strata Premier** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#8 American Express Gold Card** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#9 American Express Platinum** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#10 Amex Blue Cash Preferred** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#11 Amex Blue Cash Everyday** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#12 Capital One Venture X** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#13 Capital One Venture Rewards** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#14 Capital One Savor Rewards** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#16 Capital One Quicksilver** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#19 Wells Fargo Active Cash** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#20 Wells Fargo Autograph** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#21 Bank of America Travel Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#22 Bank of America Premium Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#25 US Bank Altitude Connect** (US Bank) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#26 PNC Cash Unlimited** (PNC Bank) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#27 United Explorer Card** (Chase / United Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#28 United Quest Card** (Chase / United Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#29 Southwest Rapid Rewards Plus** (Chase / Southwest Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#30 Southwest Rapid Rewards Priority** (Chase / Southwest Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#31 Delta SkyMiles Gold American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#32 Delta SkyMiles Platinum American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#33 Delta SkyMiles Reserve American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#34 Citi / AAdvantage Platinum Select** (Citi / American Airlines) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#35 Atmos Rewards Ascent Visa Signature** (Bank of America / Alaska Airlines) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#36 Marriott Bonvoy Boundless** (Chase / Marriott Bonvoy) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#37 World of Hyatt Credit Card** (Chase / Hyatt) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#38 IHG One Rewards Premier** (Chase / IHG) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#39 Marriott Bonvoy Brilliant American Express** (American Express / Marriott Bonvoy) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#40 Hilton Honors American Express Surpass** (American Express / Hilton) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#41 Hilton Honors American Express Aspire** (American Express / Hilton) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#43 Apple Card** (Goldman Sachs / Apple) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#46 Robinhood Gold Card** (Robinhood) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#47 Chase Ink Business Preferred** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#48 Chase Ink Business Cash** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#49 Chase Ink Business Unlimited** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#50 Prime Visa** (Chase / Amazon) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#51 United Gateway Card** (Chase / United Airlines) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#52 United Club Infinite Card** (Chase / United Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#53 Southwest Rapid Rewards Premier** (Chase / Southwest Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#54 Marriott Bonvoy Bold** (Chase / Marriott) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#55 IHG One Rewards Traveler** (Chase / IHG) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#57 American Express Business Platinum** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#58 Marriott Bonvoy Bevy American Express** (American Express / Marriott) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#59 Hilton Honors American Express** (American Express / Hilton) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#61 Citi / AAdvantage MileUp** (Citi / American Airlines) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#63 JetBlue Plus Card** (Barclays / JetBlue) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#66 Aeroplan Card** (Chase / Air Canada) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#68 US Bank Altitude Go** (US Bank) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#71 Discover it Secured** (Discover) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#72 Wells Fargo Reflect** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#73 Choice Privileges Select Mastercard** (Wells Fargo / Choice Hotels) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#74 PNC Cash Rewards Visa** (PNC Bank) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#75 TD Double Up Credit Card** (TD Bank) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#76 Target Circle Credit Card** (TD Bank / Target) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#78 PayPal Cashback Mastercard** (Synchrony / PayPal) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#79 RBC Avion Visa Infinite** (RBC) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#80 TD Aeroplan Visa Infinite** (TD Canada Trust) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#81 Scotiabank Passport Visa Infinite** (Scotiabank) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#82 BMO eclipse Visa Infinite** (BMO) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#83 CIBC Aventura Visa Infinite** (CIBC) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#84 American Express Cobalt Card** (American Express Canada) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#86 MBNA Rewards World Elite Mastercard** (MBNA Canada) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#87 National Bank World Elite Mastercard** (National Bank of Canada) — ⚪ Low
-  - Last reviewed 2026-05-17 (107 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (121 days ago); review budget is 90 days.
 - **#89 American Express Blue Business Cash** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#90 American Express Blue Business Plus** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#91 Chase Freedom Rise** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#92 Chase Slate Credit Card** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#93 Chase Ink Business Premier** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#94 United Business Card** (Chase / United Airlines) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#96 Southwest Rapid Rewards Performance Business** (Chase / Southwest Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#97 Southwest Rapid Rewards Premier Business** (Chase / Southwest Airlines) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#98 Capital One VentureOne Rewards** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#99 Capital One Venture Business** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#100 Capital One Venture X Business** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#101 Citi Simplicity Card** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#102 Citi Diamond Preferred Card** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#103 Citi Strata Elite Card** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#104 Bank of America Unlimited Cash Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#105 BankAmericard Credit Card** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#106 Bank of America Premium Rewards Elite** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#108 Wells Fargo Autograph Journey** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#110 Choice Privileges Mastercard** (Wells Fargo / Choice Hotels) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#111 U.S. Bank Smartly Visa Signature** (U.S. Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#114 U.S. Bank Business Triple Cash Rewards** (U.S. Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#116 Navy Federal cashRewards Plus** (Navy Federal Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#117 Navy Federal More Rewards American Express** (Navy Federal Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#119 Navy Federal GO REWARDS** (Navy Federal Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#120 Wyndham Rewards Earner Card** (Barclays / Wyndham Rewards) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#123 Hilton Honors American Express Business** (American Express / Hilton) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#124 Marriott Bonvoy Business American Express** (American Express / Marriott) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#125 Chase Sapphire Reserve for Business** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#126 Fidelity Rewards Visa Signature** (Fidelity / Elan Financial Services) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#127 SoFi Unlimited 2% Credit Card** (SoFi) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#128 SoFi Everyday Cash Rewards Credit Card** (SoFi) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#129 Venmo Visa Signature Credit Card** (Venmo / Synchrony) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#130 Alliant Cashback Visa Signature** (Alliant Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#131 Wells Fargo Signify Business Cash** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#132 Wells Fargo One Key Card** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#133 Wells Fargo One Key+ Card** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#134 Capital One Spark Cash Plus** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#135 Capital One Spark Cash Select for Business** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#136 Verizon Visa Card** (Verizon / Synchrony) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#137 AAA Daily Advantage Visa Signature** (AAA / Comenity Capital Bank) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#138 AAA Travel Advantage Visa Signature** (AAA / Comenity Capital Bank) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#139 FNBO Evergreen Rewards Visa** (FNBO) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#140 FNBO Getaway** (FNBO) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#141 PenFed Power Cash Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#142 PenFed Platinum Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#143 PenFed Pathfinder Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#145 TD Clear Visa Platinum** (TD Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#147 TD Business Solutions Credit Card** (TD Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#149 Bread Cashback American Express** (Bread Financial / Comenity Capital Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#150 American Express Graphite Business Cash Unlimited** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#151 American Express Business Green Rewards** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#152 Delta SkyMiles Gold Business American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#153 Delta SkyMiles Platinum Business American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#154 Delta SkyMiles Reserve Business American Express** (American Express / Delta) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#155 Capital One VentureOne Business** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#156 Capital One Spark 2% Cash** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#157 Capital One Spark 1% Classic** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#158 IHG One Rewards Premier Business** (Chase / IHG) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#159 United Club Business Card** (Chase / United) — ⚪ Low
-  - Last reviewed 2026-05-21 (103 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (117 days ago); review budget is 90 days.
 - **#161 Bank of America Business Advantage Unlimited Cash Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#162 Bank of America Business Advantage Travel Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#163 Prime Business Card** (Amazon / U.S. Bank) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#164 Amazon Business Card** (Amazon / U.S. Bank) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#165 MyLowe's Pro Rewards American Express** (Lowe's / Synchrony) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#168 Atmos Rewards Visa Signature Business** (Bank of America / Alaska Airlines) — ⚪ Low
-  - Last reviewed 2026-05-18 (106 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (120 days ago); review budget is 90 days.
 - **#169 BECU Cash Back Visa** (BECU) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#170 BECU Low Rate Visa** (BECU) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#171 HSBC Red Credit Card** (HSBC Hong Kong) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#173 Standard Chartered Cathay Mastercard** (Standard Chartered Hong Kong / Cathay) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#174 Hang Seng MMPOWER World Mastercard** (Hang Seng Bank) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#175 DBS Black World Mastercard** (DBS Hong Kong) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#176 Citi Cash Back Card (Hong Kong)** (Citi Hong Kong) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#177 DBS Live Fresh Visa** (DBS Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#178 UOB One Card** (UOB Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#179 OCBC 365 Credit Card** (OCBC Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#180 HSBC Revolution Credit Card** (HSBC Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#181 Citi Cash Back Card (Singapore)** (Citi Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
 - **#182 Standard Chartered Smart Credit Card** (Standard Chartered Singapore) — ⚪ Low
-  - Last reviewed 2026-05-19 (105 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (119 days ago); review budget is 90 days.
