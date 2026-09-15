@@ -1,19 +1,26 @@
 # Card rule change watch
 
-Generated 2026-09-01T12:16:29.817Z · window since 2026-08-07
+Generated 2026-09-15T12:23:49.561Z · window since 2026-08-07
 
-2 feed items mention a catalog card alongside change language.
+3 feed items mention a catalog card alongside change language.
 
-### (Update: New terms) Physical Lululemon gift cards no longer online; $75 denominations not allowed in-store When American Express revamped the consumer Platinum 
+### Chase's disappointing Air Canada Aeroplan® Credit Card refresh &#124; Frequent Miler on the Air Ep374 &#124; 9-11-26 In today s episode, listeners weigh in on N
 
-- feed: Frequent Miler · published Mon, 31 Aug 2026 17:46:06 +0000
-- cards: #9 American Express Platinum
-- signals: revamp, new benefits, no longer, credit
-- https://frequentmiler.com/physical-lululemon-gift-cards-no-longer-online-75-denominations-not-allowed-in-store/
+- feed: Frequent Miler · published Fri, 11 Sep 2026 22:45:55 +0000
+- cards: #66 Aeroplan Card
+- signals: refresh, credit
+- https://frequentmiler.com/chases-disappointing-air-canada-aeroplan-credit-card-refresh-frequent-miler-on-the-air-ep374-9-11-26/
 
-### Sapphire Reserve® Exclusive Tables adds over 30 restaurants, but almost as many removed The Chase Sapphire Reserve® card includes twice-annual $150 credits for 
+### Chase Aeroplan Card: New benefits, best-ever welcome offer, higher annual fee (+award discount on partner flights) Update: Based on comments in this post, the 1
 
-- feed: Frequent Miler · published Fri, 28 Aug 2026 16:56:01 +0000
-- cards: #2 Chase Sapphire Reserve
-- signals: adds, credit
-- https://frequentmiler.com/sapphire-reserve-exclusive-tables/
+- feed: Frequent Miler · published Fri, 11 Sep 2026 19:45:31 +0000
+- cards: #66 Aeroplan Card
+- signals: annual fee, new benefits
+- https://frequentmiler.com/chase-aeroplan-card-new-benefits-best-ever-offer-higher-annual-fee/
+
+### Chase Ink Business Cash Review: 100K Bonus, 5x Points, No Annual Fee 
+
+- feed: One Mile at a Time · published Sun, 13 Sep 2026 19:20:51 +0000
+- cards: #48 Chase Ink Business Cash
+- signals: annual fee
+- https://onemileatatime.com/reviews/credit-cards/chase/chase-ink-business-cash/
