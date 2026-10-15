@@ -1,26 +1,26 @@
 # Card rule change watch
 
-Generated 2026-10-01T14:05:33.988Z · window since 2026-08-07
+Generated 2026-10-15T12:22:24.851Z · window since 2026-08-07
 
 3 feed items mention a catalog card alongside change language.
 
-### [Last Day] Chase Sapphire Preferred &#038; INK Business Preferred Will No Longer Transfer 1:1 To Hyatt (4:3 Rate) 
+### Keep an eye on your statement credits when buying Lululemon gift cards Doctor of Credit had a concerning report yesterday that listed multiple data points of pe
 
-- feed: Doctor of Credit · published Wed, 30 Sep 2026 21:00:36 +0000
-- cards: #1 Chase Sapphire Preferred, #47 Chase Ink Business Preferred
-- signals: no longer
-- https://www.doctorofcredit.com/chase-sapphire-preferred-ink-business-preferred-will-no-longer-transfer-11-to-hyatt-43-rate/
+- feed: Frequent Miler · published Wed, 14 Oct 2026 21:45:17 +0000
+- cards: #9 American Express Platinum
+- signals: credit
+- https://frequentmiler.com/keep-an-eye-on-your-statement-credits-when-buying-lululemon-gift-cards/
 
-### The new IHG One Rewards Premier Select credit card is surprisingly compelling Premium hotel credit cards are all the rage at the moment, so much so that even Wy
+### Elite night credits from multiple IHG credit cards do stack When Chase and IHG refreshed the existing suite of IHG credit cards and launched the IHG One Rewards
 
-- feed: Frequent Miler · published Thu, 01 Oct 2026 13:45:27 +0000
+- feed: Frequent Miler · published Tue, 13 Oct 2026 13:45:43 +0000
 - cards: #38 IHG One Rewards Premier
-- signals: credit
-- https://frequentmiler.com/the-new-ihg-one-rewards-premier-select-credit-card-is-surprisingly-compelling/
+- signals: refresh, credit
+- https://frequentmiler.com/elite-night-credits-from-multiple-ihg-credit-cards-do-stack/
 
-### (Last call) Chase slashing Hyatt transfer ratio to 4:3 for Chase Sapphire Preferred® Card and Chase Ink Business Preferred® Credit Card Update 9/29/26: Final re
+### Capital One Venture Business Review: Simple Rewards, Reasonable Annual Fee 
 
-- feed: Frequent Miler · published Tue, 29 Sep 2026 16:45:59 +0000
-- cards: #1 Chase Sapphire Preferred, #47 Chase Ink Business Preferred
-- signals: credit
-- https://frequentmiler.com/chase-slashes-hyatt-transfer-ratio-to-43/
+- feed: One Mile at a Time · published Tue, 13 Oct 2026 15:03:55 +0000
+- cards: #99 Capital One Venture Business
+- signals: annual fee
+- https://onemileatatime.com/reviews/credit-cards/capital-one/capital-one-venture-business/
