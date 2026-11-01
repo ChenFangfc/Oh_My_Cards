@@ -14,6 +14,12 @@ import { BUILTIN_CARDS } from "./catalog";
 import {
   TRANSACTION_CATEGORIES,
   benefitPeriodsForTests,
+  checkForCardRulesUpdate,
+  clearLocalData,
+  getBuiltinRuleSetVersion,
+  getCurrentRuleSetVersion,
+  importLocalDataBackup,
+  resetDownloadedCardRules,
   getBenefitPeriodValue,
   resolveCashbackCategory,
   normalizeRemoteCatalogForTests,
@@ -696,5 +702,155 @@ describe("quick entry", () => {
 
     assert.equal(planQuickEntry("外卖 30", {}, wallet).category, "Food Delivery");
     assert.equal(planQuickEntry("买菜 82.4元", {}, wallet).category, "Groceries");
+  });
+});
+
+describe("untrusted input", () => {
+  const [base] = BUILTIN_CARDS.map(({ inWallet: _inWallet, ...entry }) => entry);
+
+  it("rejects a published card whose names are not text", () => {
+    // Rendering would call issuer.toLowerCase() and crash every page.
+    assert.throws(() => normalizeRemoteCatalogForTests([{ ...base, name: {} }]));
+    assert.throws(() => normalizeRemoteCatalogForTests([{ ...base, issuer: 7 }]));
+    assert.throws(() => normalizeRemoteCatalogForTests([{ ...base, annualFee: "free" }]));
+    assert.throws(() => normalizeRemoteCatalogForTests([{ ...base, dataConfidence: { high: 1 } }]));
+    assert.throws(() => normalizeRemoteCatalogForTests([{ ...base, rewardRuleNotes: [1, 2] }]));
+  });
+
+  it("rejects malformed reward rows and benefits", () => {
+    assert.throws(() =>
+      normalizeRemoteCatalogForTests([
+        { ...base, cashbackCategories: [{ category: 5, rate: 0.03 }] },
+      ]),
+    );
+    assert.throws(() =>
+      normalizeRemoteCatalogForTests([
+        { ...base, cashbackCategories: [{ category: "Dining", rate: "lots" }] },
+      ]),
+    );
+    assert.throws(() =>
+      normalizeRemoteCatalogForTests([{ ...base, benefits: [{ name: { x: 1 } }] }]),
+    );
+  });
+
+  it("drops published links, images and colours that could load or run anything", () => {
+    const [card] = normalizeRemoteCatalogForTests([
+      {
+        ...base,
+        color: "url(https://tracker.example/pixel.png)",
+        cardImageUrl: "javascript:alert(1)",
+        logoUrl: "//tracker.example/logo.png",
+        sourceUrl: "javascript:alert(1)",
+      },
+    ]);
+    assert.equal(card.color, "linear-gradient(135deg, #1e3a5f, #2d6a9f)");
+    assert.equal(card.cardImageUrl, null);
+    assert.equal(card.logoUrl, null);
+    assert.equal((card as { sourceUrl?: unknown }).sourceUrl, null);
+
+    // Real values pass through untouched.
+    const [kept] = normalizeRemoteCatalogForTests([base]);
+    assert.equal(kept.color, base.color);
+    assert.equal(kept.cardImageUrl, base.cardImageUrl);
+    assert.equal(
+      (kept as { sourceUrl?: unknown }).sourceUrl,
+      (base as { sourceUrl?: unknown }).sourceUrl,
+    );
+  });
+
+  it("refuses rule versions that are malformed or dated in the future", async () => {
+    const realFetch = globalThis.fetch;
+    const manifest = (version: string) =>
+      (async () =>
+        new Response(JSON.stringify({ version, url: "./rules.json" }))) as typeof fetch;
+    const inAMonth = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const future = [
+      inAMonth.getUTCFullYear(),
+      String(inAMonth.getUTCMonth() + 1).padStart(2, "0"),
+      String(inAMonth.getUTCDate()).padStart(2, "0"),
+      "1",
+    ].join(".");
+    try {
+      // A far-future version would otherwise outrank every real update.
+      for (const version of ["9999.1.1", "2026.111.01.1", future]) {
+        globalThis.fetch = manifest(version);
+        await assert.rejects(
+          checkForCardRulesUpdate("https://example.test/card-rules/manifest.json"),
+          /invalid version/,
+          version,
+        );
+      }
+      // A well-formed version that is not newer is simply up to date.
+      globalThis.fetch = manifest(getBuiltinRuleSetVersion());
+      const result = await checkForCardRulesUpdate(
+        "https://example.test/card-rules/manifest.json",
+      );
+      assert.equal(result.updated, false);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  it("keeps a pasted wall of digits from stalling the parsers", () => {
+    // Unbounded, these patterns backtracked for seconds on every keystroke.
+    const wall = "1,".repeat(20_000) + "x";
+    const started = performance.now();
+    planQuickEntry(wall);
+    suggestCardForPurchase({ description: wall });
+    assert.ok(performance.now() - started < 1_000, "parsing stays fast");
+  });
+
+  it("imports a backup without letting odd values or extra fields through", () => {
+    const backup = {
+      app: "Oh My Cards",
+      formatVersion: 1,
+      exportedAt: new Date().toISOString(),
+      state: {
+        schemaVersion: 1,
+        ruleSetVersion: { not: "a version" },
+        nextWalletCardId: 2,
+        nextTransactionId: 2,
+        walletCards: [{ id: 1, cardId: base.id }],
+        transactions: [
+          {
+            id: 1,
+            walletCardId: 1,
+            transactionType: "purchase",
+            description: "Dinner",
+            amount: 10,
+            category: "Dining",
+            cashbackEarned: 0,
+            cashbackRate: 0,
+            date: "2026-10-01T00:00:00.000Z",
+            cardName: ["not", "a", "name"],
+            merchantName: { evil: true },
+            locationName: 42,
+            latitude: "north",
+            longitude: 12.5,
+          },
+        ],
+        benefitUsage: [],
+        injected: "<script>",
+      },
+    };
+    try {
+      const { state } = importLocalDataBackup(backup as never);
+      const [transaction] = state.transactions;
+      assert.ok(transaction, "the transaction itself survives");
+      assert.equal(transaction.cardName, undefined);
+      assert.equal(transaction.merchantName, null);
+      assert.equal(transaction.locationName, null);
+      assert.equal(transaction.latitude, null);
+      assert.equal(transaction.longitude, 12.5);
+      assert.equal(typeof state.ruleSetVersion, "string");
+      assert.equal("injected" in state, false);
+    } finally {
+      clearLocalData();
+    }
+  });
+
+  it("can go back to the built-in card rules", () => {
+    resetDownloadedCardRules();
+    assert.equal(getCurrentRuleSetVersion(), getBuiltinRuleSetVersion());
   });
 });

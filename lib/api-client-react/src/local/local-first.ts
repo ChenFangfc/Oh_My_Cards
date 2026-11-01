@@ -38,6 +38,18 @@ const STORAGE_KEY = "oh-my-card:local-state:v1";
 const CATALOG_OVERRIDE_KEY = "oh-my-card:catalog-override:v1";
 /** When the app last asked the rules feed for news, and what it heard. */
 const RULES_STATUS_KEY = "oh-my-card:rules-status:v1";
+/** `2026.11.01.13`: the UTC day the catalog last changed, then a serial. */
+const RULESET_VERSION_PATTERN = /^(\d{4})\.(\d{2})\.(\d{2})\.(\d{1,6})$/;
+/**
+ * Publishing stamps the day's UTC date, so a version far ahead of the device's
+ * clock is bogus — and, since rules only move forward, it would otherwise
+ * block every real update until that date.
+ */
+const MAX_RULESET_VERSION_LEAD_MS = 7 * 24 * 60 * 60 * 1000;
+/** The published feed is about 0.5 MB; anything far larger is not one. */
+const MAX_CARD_RULES_CHARS = 8 * 1024 * 1024;
+/** What a card without (or with an unusable) colour is painted with. */
+const DEFAULT_CARD_COLOR = "linear-gradient(135deg, #1e3a5f, #2d6a9f)";
 const STORAGE_DB_NAME = "oh-my-cards-local-data";
 const STORAGE_DB_VERSION = 1;
 const STORAGE_STORE_NAME = "state";
@@ -59,7 +71,7 @@ export type UiTextTranslator = (text: string, vars?: UiTextVars) => string;
 function fillUiText(text: string, vars?: UiTextVars): string {
   if (!vars) return text;
   return text.replace(/\{(\w+)\}/g, (match, name: string) =>
-    name in vars ? String(vars[name]) : match,
+    Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : match,
   );
 }
 
@@ -321,11 +333,13 @@ function normalizeTransactionRecord(value: Partial<Transaction>): Transaction {
     date: Number.isNaN(date.getTime())
       ? new Date().toISOString()
       : date.toISOString(),
-    cardName: value.cardName,
-    merchantName: value.merchantName ?? null,
-    locationName: value.locationName ?? null,
-    latitude: value.latitude ?? null,
-    longitude: value.longitude ?? null,
+    // Backups are files from anywhere: an object where a name belongs would
+    // crash every page that renders it.
+    cardName: typeof value.cardName === "string" ? value.cardName : undefined,
+    merchantName: typeof value.merchantName === "string" ? value.merchantName : null,
+    locationName: typeof value.locationName === "string" ? value.locationName : null,
+    latitude: toNullableFiniteNumber(value.latitude),
+    longitude: toNullableFiniteNumber(value.longitude),
   };
 }
 
@@ -418,15 +432,22 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
     ) + 1,
   );
 
-  // Card rules are not user data and live under their own key; the legacy copy
-  // is stripped here so it is never parsed again.
-  const { catalogOverride: _legacyOverride, ...rest } = parsed;
+  // Only known fields are kept. Card rules are not user data and live under
+  // their own key, so a legacy copy in here is dropped; anything else in a
+  // backup file would ride along into storage unchecked.
+  const updatedAt =
+    typeof parsed.updatedAt === "string" || parsed.updatedAt === null
+      ? { updatedAt: parsed.updatedAt }
+      : {};
 
   return {
     ...defaultState(),
-    ...rest,
+    ...updatedAt,
     schemaVersion: 1,
-    ruleSetVersion: parsed.ruleSetVersion ?? BUILTIN_RULESET_VERSION,
+    ruleSetVersion:
+      typeof parsed.ruleSetVersion === "string"
+        ? parsed.ruleSetVersion
+        : BUILTIN_RULESET_VERSION,
     nextWalletCardId,
     nextTransactionId,
     walletCards,
@@ -444,10 +465,21 @@ function normalizeCatalogOverride(
   override: LocalState["catalogOverride"],
 ): CatalogOverride | null {
   if (!override?.version || !Array.isArray(override.cards)) return null;
+  // Written by an older build, or tampered with: fall back to built-in rules,
+  // and the next check downloads a good copy.
+  if (!isWellFormedRuleSetVersion(override.version)) return null;
 
   try {
     const cards = normalizeRemoteCatalog(override.cards);
-    return cards.length ? { ...override, cards } : null;
+    return cards.length
+      ? {
+          ...override,
+          cards,
+          notes: typeof override.notes === "string" ? override.notes : undefined,
+          publishedAt:
+            typeof override.publishedAt === "string" ? override.publishedAt : undefined,
+        }
+      : null;
   } catch {
     return null;
   }
@@ -995,6 +1027,62 @@ export function normalizeRemoteCatalogForTests(value: unknown): CreditCard[] {
   return normalizeRemoteCatalog(value);
 }
 
+function isWellFormedRuleSetVersion(version: unknown): version is string {
+  if (typeof version !== "string") return false;
+  const match = RULESET_VERSION_PATTERN.exec(version);
+  if (!match) return false;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+function isRuleSetVersionTooFarAhead(version: string, now = Date.now()): boolean {
+  const [year, month, day] = version.split(".").map(Number);
+  return Date.UTC(year, month - 1, day) - now > MAX_RULESET_VERSION_LEAD_MS;
+}
+
+/** A link or image the feed points at: http(s), or a path on this site. */
+function safeFeedUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const url = value.trim();
+  if (url.startsWith("/") && !url.startsWith("//")) return url;
+  try {
+    const { protocol } = new URL(url);
+    return protocol === "https:" || protocol === "http:" ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Card colours are CSS backgrounds; one that loads a resource is refused. */
+function safeCardColor(value: unknown): string {
+  return typeof value === "string" && !/url\s*\(|expression\s*\(|image-set\s*\(/i.test(value)
+    ? value
+    : DEFAULT_CARD_COLOR;
+}
+
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+/** Card fields shown as text; anything but text (or nothing) is malformed. */
+const OPTIONAL_CARD_TEXT_FIELDS = [
+  "rewardType",
+  "rewardProgram",
+  "rewardUnitName",
+  "rewardValuationDescription",
+  "market",
+  "currency",
+  "lastReviewedAt",
+  "dataConfidence",
+] as const;
+
 function normalizeRemoteCatalog(value: unknown): CreditCard[] {
   const cards = Array.isArray(value)
     ? value
@@ -1015,7 +1103,13 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       lastReviewedAt?: unknown;
       dataConfidence?: unknown;
     };
-    if (!candidate.name || !candidate.issuer || !candidate.network) {
+    // Wrong types are as fatal as missing fields: these strings are lower-cased,
+    // matched and rendered all over the app, so one bad card would crash pages.
+    if (
+      !isNonEmptyString(candidate.name) ||
+      !isNonEmptyString(candidate.issuer) ||
+      !isNonEmptyString(candidate.network)
+    ) {
       throw new Error(`Card at index ${index} is missing required fields.`);
     }
     if (!Array.isArray(candidate.cashbackCategories)) {
@@ -1026,6 +1120,26 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
     }
 
     const cardId = candidate.id ?? index + 1;
+    const annualFee = Number(candidate.annualFee ?? 0);
+    if (!Number.isFinite(annualFee)) {
+      throw new Error(`Card ${candidate.name} has an invalid annual fee.`);
+    }
+    if (candidate.signupBonus != null && typeof candidate.signupBonus !== "string") {
+      throw new Error(`Card ${candidate.name} has an invalid signup bonus.`);
+    }
+    for (const field of OPTIONAL_CARD_TEXT_FIELDS) {
+      const text = (card as Record<string, unknown>)[field];
+      if (text != null && typeof text !== "string") {
+        throw new Error(`Card ${candidate.name} has an invalid ${field}.`);
+      }
+    }
+    const notes = (card as { rewardRuleNotes?: unknown }).rewardRuleNotes;
+    if (
+      notes != null &&
+      !(Array.isArray(notes) && notes.every((note) => typeof note === "string"))
+    ) {
+      throw new Error(`Card ${candidate.name} has invalid reward notes.`);
+    }
 
     // Spread first, then coerce. Rebuilding from a fixed field list silently
     // dropped every field added since it was written — rewardUnitValueCents,
@@ -1038,15 +1152,17 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       name: candidate.name,
       issuer: candidate.issuer,
       network: candidate.network,
-      annualFee: Number(candidate.annualFee ?? 0),
+      annualFee,
       signupBonus: candidate.signupBonus ?? null,
       signupBonusValue:
         candidate.signupBonusValue == null
           ? null
           : Number(candidate.signupBonusValue),
-      color: candidate.color ?? "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
-      logoUrl: candidate.logoUrl ?? null,
-      cardImageUrl: candidate.cardImageUrl ?? null,
+      color: safeCardColor(candidate.color),
+      logoUrl: safeFeedUrl(candidate.logoUrl),
+      cardImageUrl: safeFeedUrl(candidate.cardImageUrl),
+      sourceUrl: safeFeedUrl(metadata.sourceUrl),
+      imageSourceUrl: safeFeedUrl(metadata.imageSourceUrl),
       rewardUnitValueCents:
         candidate.rewardUnitValueCents == null
           ? null
@@ -1054,24 +1170,41 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
       // Rows are spread first for the same reason as the card itself: a field
       // a newer ruleset adds (a benefit's renewal period, say) must survive.
       cashbackCategories: candidate.cashbackCategories.map(
-        (category, catIndex) => ({
-          ...category,
-          id: category.id ?? catIndex + 1,
-          cardId: category.cardId ?? cardId,
-          category: category.category,
-          rate: Number(category.rate),
-          isDefault: Boolean(category.isDefault),
-        }),
+        (category, catIndex) => {
+          if (
+            !isNonEmptyString(category?.category) ||
+            !Number.isFinite(Number(category.rate))
+          ) {
+            throw new Error(`Card ${candidate.name} has a malformed reward row.`);
+          }
+          return {
+            ...category,
+            id: category.id ?? catIndex + 1,
+            cardId: category.cardId ?? cardId,
+            category: category.category,
+            rate: Number(category.rate),
+            isDefault: Boolean(category.isDefault),
+          };
+        },
       ),
-      benefits: candidate.benefits.map((benefit, benefitIndex) => ({
-        ...benefit,
-        id: benefit.id ?? benefitIndex + 1,
-        cardId: benefit.cardId ?? cardId,
-        name: benefit.name,
-        description: benefit.description,
-        annualValue:
-          benefit.annualValue == null ? null : Number(benefit.annualValue),
-      })),
+      benefits: candidate.benefits.map((benefit, benefitIndex) => {
+        if (
+          !isNonEmptyString(benefit?.name) ||
+          (benefit.description != null && typeof benefit.description !== "string")
+        ) {
+          throw new Error(`Card ${candidate.name} has a malformed benefit.`);
+        }
+        const annualValue =
+          benefit.annualValue == null ? null : Number(benefit.annualValue);
+        return {
+          ...benefit,
+          id: benefit.id ?? benefitIndex + 1,
+          cardId: benefit.cardId ?? cardId,
+          name: benefit.name,
+          description: benefit.description,
+          annualValue: annualValue != null && Number.isFinite(annualValue) ? annualValue : null,
+        };
+      }),
       categoryChoices: Array.isArray(candidate.categoryChoices)
         ? candidate.categoryChoices.filter(
             (choice) =>
@@ -1265,9 +1398,18 @@ async function fetchAndInstallCardRules(
   }
 
   const manifest = (await manifestResponse.json()) as CardRulesManifest;
-  if (!manifest.version || !manifest.url) {
+  if (!manifest.version || !manifest.url || typeof manifest.url !== "string") {
     throw uiError("Card rules manifest must include version and url.");
   }
+  if (
+    !isWellFormedRuleSetVersion(manifest.version) ||
+    isRuleSetVersionTooFarAhead(manifest.version)
+  ) {
+    throw uiError("Card rules have an invalid version.");
+  }
+  const notes = typeof manifest.notes === "string" ? manifest.notes : undefined;
+  const publishedAt =
+    typeof manifest.publishedAt === "string" ? manifest.publishedAt : undefined;
 
   const currentVersion = getCurrentRuleSetVersion();
   // Only ever move forward. An older manifest — stale CDN copy, rolled-back
@@ -1299,6 +1441,9 @@ async function fetchAndInstallCardRules(
   }
 
   const body = await rulesResponse.text();
+  if (body.length > MAX_CARD_RULES_CHARS) {
+    throw uiError("Card rules download is too large.");
+  }
   if (manifest.sha256) {
     const digest = await sha256Hex(body);
     if (digest && digest !== manifest.sha256) {
@@ -1327,8 +1472,8 @@ async function fetchAndInstallCardRules(
   const changes = summarizeCardRuleChanges(previousCards, cards);
   writeStoredCatalogOverride({
     version: manifest.version,
-    notes: manifest.notes,
-    publishedAt: manifest.publishedAt,
+    notes,
+    publishedAt,
     cards,
   });
 
@@ -1343,7 +1488,7 @@ async function fetchAndInstallCardRules(
   return {
     updated: true,
     version: manifest.version,
-    notes: manifest.notes,
+    notes,
     changes,
     walletCardsChanged,
   };
@@ -3094,6 +3239,17 @@ export function clearLocalData(): void {
   });
 }
 
+/**
+ * Drops downloaded card rules and goes back to the ones built into the app.
+ * The way out if a published ruleset ever breaks rendering; the next rules
+ * check downloads a fresh copy.
+ */
+export function resetDownloadedCardRules(): void {
+  writeStoredCatalogOverride(null);
+  const state = readState();
+  writeState({ ...state, ruleSetVersion: BUILTIN_RULESET_VERSION });
+}
+
 export const useDeleteTransaction = () =>
   useMutation({
     mutationFn: async ({ id }: { id: number }) => {
@@ -4629,11 +4785,19 @@ function inferPurchaseType(tags: Set<string>): string | null {
   return priority.find((tag) => tags.has(tag)) ?? null;
 }
 
+/**
+ * Longer than any real purchase line. Text is cut to this before parsing: the
+ * amount patterns backtrack quadratically, so a pasted wall of digits would
+ * otherwise freeze the page on every keystroke.
+ */
+const MAX_PURCHASE_TEXT = 500;
+
 function parsePurchaseContext(
-  description: string,
+  fullDescription: string,
   explicitAmount: number | null,
   availableCategories: Set<string>,
 ): ParsedPurchaseContext {
+  const description = fullDescription.slice(0, MAX_PURCHASE_TEXT);
   const text = glossChinesePurchaseText(description).toLowerCase().trim();
   const tags = new Set<string>();
   const matchedTerms: string[] = [];
@@ -5554,6 +5718,7 @@ function takeQuickAmount(input: string): { amount: number | null; rest: string }
   // Chinese runs words and numbers together ("晚饭45", "45块"); spacing them
   // lets the patterns below see the number on its own.
   const text = input
+    .slice(0, MAX_PURCHASE_TEXT)
     .replace(/([\u3400-\u9fff])(?=[0-9])/g, "$1 ")
     .replace(/([0-9])(?=[\u3400-\u9fff])/g, "$1 ");
   const patterns = [

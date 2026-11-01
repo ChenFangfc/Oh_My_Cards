@@ -771,4 +771,13 @@ export const ZH_CN: Record<string, string> = {
   "booking channel": "预订渠道",
   "payment method": "支付方式",
   "merchant or provider": "商家或服务商",
+
+  // Recovery and limits
+  "Something went wrong": "出了点问题",
+  "Your data is still on this device. Reload to try again; if this keeps happening, reset the downloaded card rules.":
+    "你的数据仍保存在这台设备上。可以先刷新重试；如果一直出现，请重置已下载的卡片规则。",
+  "Reset card rules": "重置卡片规则",
+  "Card rules have an invalid version.": "卡片规则的版本号无效。",
+  "Card rules download is too large.": "卡片规则文件过大。",
+  "This file is too large to be an Oh My Cards backup.": "这个文件太大，不是 Oh My Cards 的备份。",
 };

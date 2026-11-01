@@ -91,10 +91,15 @@ export function useLocale(): Locale {
 
 type Vars = Record<string, string | number>;
 
+// Own keys only: text such as a merchant called "toString" must not resolve to
+// Object.prototype. (Object.hasOwn is newer than the macOS 11 WebKit.)
+const hasOwn = (object: object, key: string): boolean =>
+  Object.prototype.hasOwnProperty.call(object, key);
+
 function fill(template: string, vars?: Vars): string {
   if (!vars) return template;
   return template.replace(/\{(\w+)\}/g, (match, name: string) =>
-    name in vars ? String(vars[name]) : match,
+    hasOwn(vars, name) ? String(vars[name]) : match,
   );
 }
 
@@ -105,7 +110,7 @@ export function t(text: string, vars?: Vars): string {
   if (current !== "zh-CN") return fill(text, vars);
   // Templates keep a space around each placeholder so English names read
   // right ("United 是…"); between two Chinese characters it goes.
-  return fill(ZH_CN[text] ?? text, vars).replace(CJK_GAP, "$1");
+  return fill(hasOwn(ZH_CN, text) ? ZH_CN[text] : text, vars).replace(CJK_GAP, "$1");
 }
 
 /** English needs singular and plural; Chinese uses the plural entry for both. */

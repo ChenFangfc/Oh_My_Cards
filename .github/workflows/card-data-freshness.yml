@@ -36,10 +36,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
 
@@ -69,10 +69,20 @@ jobs:
         id: crawl
         if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 7 * * 1'
         continue-on-error: true
+        # Inputs arrive through env and are checked, never pasted into the
+        # script, so a crafted value can't run as shell.
+        env:
+          STALE_DAYS: ${{ github.event.inputs.stale_days || '90' }}
+          ONLY: ${{ github.event.inputs.only }}
         run: |
-          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:check -- \
-            --stale-days=${{ github.event.inputs.stale_days || '90' }} \
-            ${{ github.event.inputs.only && format('--only={0}', github.event.inputs.only) || '' }}
+          case "$STALE_DAYS" in ''|*[!0-9]*) echo "::error::stale_days must be a whole number"; exit 1 ;; esac
+          ARGS=("--stale-days=$STALE_DAYS")
+          ONLY="${ONLY// /}"
+          if [ -n "$ONLY" ]; then
+            case "$ONLY" in *[!0-9,]*) echo "::error::only must be card ids separated by commas"; exit 1 ;; esac
+            ARGS+=("--only=$ONLY")
+          fi
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:check -- "${ARGS[@]}"
 
       - name: Build issue body
         id: body

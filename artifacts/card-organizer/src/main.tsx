@@ -6,6 +6,7 @@ import {
   setUiTextTranslator,
 } from "@workspace/api-client-react";
 import App from "./App";
+import { ErrorBoundary } from "@/components/error-boundary";
 import {
   getAppView,
   installExternalLinkHandler,
@@ -92,7 +93,9 @@ async function bootstrap() {
     const { default: QuickPanelRoot } = await import("./quick/quick-panel");
     createRoot(container).render(
       <Providers>
-        <QuickPanelRoot />
+        <ErrorBoundary>
+          <QuickPanelRoot />
+        </ErrorBoundary>
       </Providers>,
     );
     return;
@@ -100,7 +103,9 @@ async function bootstrap() {
 
   createRoot(container).render(
     <Providers>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </Providers>,
   );
 

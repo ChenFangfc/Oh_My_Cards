@@ -1,7 +1,11 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Default desktop permissions for Oh My Cards.",
+  "description": "Default desktop permissions for Oh My Cards. Opening links is limited to http(s), mailto and tel; opener:default would also allow revealing files in Finder, which the app never does.",
   "windows": ["main"],
-  "permissions": ["core:default", "opener:default"]
+  "permissions": [
+    "core:default",
+    "opener:allow-open-url",
+    "opener:allow-default-urls"
+  ]
 }

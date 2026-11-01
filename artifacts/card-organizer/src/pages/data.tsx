@@ -95,6 +95,16 @@ function readBackupPreview(text: string): PendingImport {
   };
 }
 
+/** Real backups are well under 1 MB; reading a huge file would hang the page. */
+const MAX_BACKUP_BYTES = 20 * 1024 * 1024;
+
+async function readBackupFile(file: File): Promise<PendingImport> {
+  if (file.size > MAX_BACKUP_BYTES) {
+    throw new Error(t("This file is too large to be an Oh My Cards backup."));
+  }
+  return readBackupPreview(await file.text());
+}
+
 /** "3 cards · 120 transactions", or "3 cards and 120 transactions" in a sentence. */
 function formatCounts(
   cards: number | null,
@@ -196,7 +206,7 @@ export default function Data() {
     if (!file) return;
 
     try {
-      setPendingImport(readBackupPreview(await file.text()));
+      setPendingImport(await readBackupFile(file));
     } catch (error) {
       toast({
         variant: "destructive",
@@ -268,7 +278,7 @@ export default function Data() {
         ],
       });
       const file = await handle.getFile();
-      setPendingImport(readBackupPreview(await file.text()));
+      setPendingImport(await readBackupFile(file));
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
       toast({

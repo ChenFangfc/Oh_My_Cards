@@ -122,10 +122,14 @@ To build the same artifacts locally:
 cd artifacts/card-organizer
 TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/oh-my-cards-updater.key)" \
 TAURI_SIGNING_PRIVATE_KEY_PASSWORD="$(cat ~/.tauri/oh-my-cards-updater.password)" \
+RUSTFLAGS="--remap-path-prefix=$HOME=~" \
 PORT=19953 BASE_PATH=/ corepack pnpm exec tauri build \
   --target universal-apple-darwin --bundles app,dmg \
   --config '{"bundle":{"createUpdaterArtifacts":true}}'
 ```
+
+`RUSTFLAGS` keeps your home folder (and so your macOS user name) out of the
+paths Rust compiles into the binary; the `desktop:build` scripts set it too.
 
 The release must be published (not a draft or pre-release) for
 `releases/latest` to point at it.

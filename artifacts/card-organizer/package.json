@@ -10,8 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "tauri": "tauri",
     "desktop:dev": "PORT=19953 BASE_PATH=/ tauri dev",
-    "desktop:build": "PORT=19953 BASE_PATH=/ tauri build --bundles dmg",
-    "desktop:build:universal": "PORT=19953 BASE_PATH=/ tauri build --target universal-apple-darwin --bundles dmg"
+    "desktop:build": "PORT=19953 BASE_PATH=/ RUSTFLAGS=\"--remap-path-prefix=$HOME=~\" tauri build --bundles dmg",
+    "desktop:build:universal": "PORT=19953 BASE_PATH=/ RUSTFLAGS=\"--remap-path-prefix=$HOME=~\" tauri build --target universal-apple-darwin --bundles dmg"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
