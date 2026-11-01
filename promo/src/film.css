@@ -53,37 +53,11 @@ html[lang="zh"] .cap { letter-spacing: 0.01em; font-weight: 600; }
 .card {
   width: 520px;
   height: 328px;
-  border-radius: 24px;
+  border-radius: 23px;
   overflow: hidden;
   box-shadow: 0 34px 70px rgba(24, 32, 42, 0.2), 0 10px 22px rgba(24, 32, 42, 0.12);
-  background: #1d2733;
 }
-/* Drawn, not photographed: the issuers' own art is 250–480 px wide, too small
-   for 4K. Each card carries its reward rule, which is the point of the scene. */
-.vcard { color: #fff; }
-.vcard.light { color: #232a33; }
-.vcard .sheen {
-  position: absolute; inset: 0;
-  background:
-    linear-gradient(115deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 40%),
-    radial-gradient(90% 70% at 88% 115%, rgba(255, 255, 255, 0.16), transparent 62%);
-}
-.vcard.light .sheen {
-  background:
-    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.09) 0 2px, rgba(0, 0, 0, 0.025) 2px 4px),
-    linear-gradient(115deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 42%);
-}
-.vcard .chip { position: absolute; left: 44px; top: 100px; width: 72px; height: 54px; }
-.vcard .nfc { position: absolute; left: 134px; top: 108px; width: 28px; height: 38px; opacity: 0.8; }
-.vcard .num {
-  position: absolute; left: 44px; bottom: 96px;
-  font: 500 24px/1 ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 0.14em; opacity: 0.82;
-}
-.vcard .rule {
-  position: absolute; left: 44px; bottom: 40px; right: 30px;
-  font-size: 38px; font-weight: 700; letter-spacing: -0.015em; line-height: 1; white-space: nowrap;
-}
-html[lang="zh"] .vcard .rule { letter-spacing: 0.01em; font-weight: 650; }
+.card img { width: 100%; height: 100%; display: block; }
 .chip {
   padding: 12px 24px;
   border-radius: 999px;

@@ -14,6 +14,7 @@ LANGS=${LANGS:-"en zh"}
 TSX=../lib/api-client-react/node_modules/.bin/tsx
 
 mkdir -p .cache out ../docs/promo
+python3 scripts/cards.py && node scripts/cards-png.mjs   # the opening's cards, SVG → 2080 px PNG
 "$TSX" scripts/demo-data.mts > .cache/demo-state.json
 for lang in $LANGS; do
   node scripts/capture.mjs --lang "$lang"

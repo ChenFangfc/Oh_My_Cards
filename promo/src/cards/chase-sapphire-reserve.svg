@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 856 540" width="856" height="540">
+<defs>
+  <clipPath id="shape"><rect width="856" height="540" rx="38"/></clipPath>
+  <filter id="brush" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0016 0.55" numOctaves="2" seed="7"/>
+    <feColorMatrix type="saturate" values="0"/>
+    <feComponentTransfer><feFuncA type="linear" slope="0.16"/></feComponentTransfer>
+  </filter>
+  <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#03060d"/><stop offset=".55" stop-color="#0a1630"/><stop offset="1" stop-color="#1c3560"/></linearGradient>
+  <radialGradient id="glow" cx="1" cy="0" r=".62"><stop offset="0" stop-color="#e2c27c" stop-opacity=".75"/><stop offset=".35" stop-color="#8a7a5c" stop-opacity=".28"/><stop offset="1" stop-color="#0a1630" stop-opacity="0"/></radialGradient>
+  <pattern id="lattice" width="22" height="22" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H22M0 0V22" stroke="#e7cf96" stroke-width="1.1" fill="none"/></pattern>
+  <radialGradient id="fade" cx="1" cy="0" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <mask id="latticeMask"><rect width="856" height="540" fill="url(#fade)"/></mask>
+</defs>
+<g clip-path="url(#shape)">
+
+  <rect width="856" height="540" fill="url(#bg)"/>
+  <rect width="856" height="540" fill="url(#glow)"/>
+  <rect width="856" height="540" fill="url(#lattice)" mask="url(#latticeMask)"/>
+  <rect width="856" height="540" filter="url(#brush)" opacity=".5"/>
+  <mask id="chase"><polygon points="111.72,97.48 95.48,113.72 72.52,113.72 56.28,97.48 56.28,74.52 72.52,58.28 95.48,58.28 111.72,74.52" fill="#fff"/><g fill="#000"><rect x="74.4" y="76.4" width="19.2" height="19.2"/><rect x="54" y="74.45" width="20.4" height="3.9000000000000004"/><rect x="91.64999999999999" y="56" width="3.9000000000000004" height="20.4"/><rect x="93.6" y="93.64999999999999" width="20.4" height="3.9000000000000004"/><rect x="72.45" y="95.6" width="3.9000000000000004" height="20.4"/></g></mask>
+  <rect x="54" y="56" width="60" height="60" fill="#f2f4f7" mask="url(#chase)"/>
+  <text x="134" y="98" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="400" font-size="44" letter-spacing="5" fill="#eef2f6">SAPPHIRE</text>
+  <text x="136" y="132" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="500" font-size="22" letter-spacing="6" fill="#c9d1db">RESERVE</text>
+  <g transform="translate(118 232)">
+  <defs><linearGradient id="chip118232" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1f2f4"/><stop offset=".55" stop-color="#c3c7cd"/><stop offset="1" stop-color="#9ba1a9"/></linearGradient></defs>
+  <rect width="86" height="66" rx="13" fill="url(#chip118232)" stroke="#80868e" stroke-width="1.6"/>
+  <path d="M29 0v19q0 4 4 4h20q4 0 4-4V0M29 66V47q0-4 4-4h20q4 0 4 4v19M0 23h25M0 43h25M61 23h25M61 43h25M25 23v20M61 23v20M33 23v20M53 23v20" fill="none" stroke="#80868e" stroke-width="1.8"/>
+</g>
+</g>
+</svg>

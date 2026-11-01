@@ -96,14 +96,16 @@
 
   /* ── assets ────────────────────────────────────────────────────────── */
   const REPO = "../../";
-  // The opening's cards, left to right once fanned; the middle one is the
-  // answer. Drawn as vectors so they stay sharp at 4K.
+  // The opening's cards — the demo wallet — left to right once fanned; the
+  // middle one is the answer. SVG redrawings of the real designs
+  // (scripts/cards.py), rasterised at 2080 px: the issuers' own art is too
+  // small for 4K.
   const CARDS = [
-    { bg: "linear-gradient(135deg,#eef0f3 0%,#c9ced6 32%,#f6f7f8 52%,#aab1bc 100%)", light: true, num: "4821" },
-    { bg: "radial-gradient(130% 120% at 15% 10%,#3a6fc4 0%,#16387a 45%,#0a1838 100%)", num: "0937" },
-    { bg: "linear-gradient(135deg,#22c3d4 0%,#0f93c4 45%,#0a5ea6 100%)", num: "2290" },
-    { bg: "linear-gradient(135deg,#7a67dc 0%,#4f41b8 50%,#2c2774 100%)", num: "6614" },
-    { bg: "linear-gradient(135deg,#ef5a5f 0%,#c7303a 55%,#8a1b27 100%)", num: "3058" },
+    "amex-platinum",
+    "chase-sapphire-reserve",
+    "citi-custom-cash",
+    "amex-gold",
+    "capital-one-venture-x",
   ];
   const CAP = `captures/${LANG}/`;
 
@@ -155,15 +157,12 @@
   const desktop = h("div", "full", stage); desktop.id = "desktop";
 
   // Scene 1: the cards.
-  const cards = CARDS.map((spec, i) => {
-    const c = h("div", "card vcard abs" + (spec.light ? " light" : ""));
-    c.style.zIndex = [1, 2, 10, 4, 5][i];
-    c.style.background = spec.bg;
-    c.innerHTML = `<div class="sheen"></div>
-      <svg class="chip" viewBox="0 0 72 54"><defs><linearGradient id="chip${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4df92"/><stop offset=".5" stop-color="#d6ae57"/><stop offset="1" stop-color="#a87e2f"/></linearGradient></defs><rect x="1" y="1" width="70" height="52" rx="10" fill="url(#chip${i})" stroke="rgba(0,0,0,.22)"/><path d="M24 1v52M48 1v52M1 18h23M48 18h23M1 36h23M48 36h23M24 27h24" stroke="rgba(90,62,12,.42)" stroke-width="2" fill="none"/></svg>
-      <svg class="nfc" viewBox="0 0 28 38"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 13a9 9 0 0 1 0 12"/><path d="M11 8a16 16 0 0 1 0 22"/><path d="M18 3a23 23 0 0 1 0 32"/></g></svg>
-      <div class="num">•••• ${spec.num}</div>
-      <div class="rule">${S.rules[i]}</div>`;
+  const cards = CARDS.map((name, i) => {
+    const c = h("div", "card abs");
+    // Stacked like a hand: the middle card on top, each side card above
+    // its outer neighbour, so every card shows its own outer edge.
+    c.style.zIndex = [1, 2, 10, 4, 3][i];
+    img(`cards/${name}.png`, null, c);
     return c;
   });
   const chip = h("div", "chip abs", stage, S.chip);

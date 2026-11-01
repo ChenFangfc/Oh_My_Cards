@@ -28,6 +28,7 @@ it plays in sync.
 | timing, camera, rings | `src/film.js` — the timeline is one `seek(t)` |
 | colours, type | `src/film.css` |
 | the demo wallet | `scripts/demo-data.mts` |
+| the cards in the opening | `scripts/cards.py` |
 | what is typed, which pages are shot | `scripts/capture.mjs` |
 | the music | `scripts/music.py` — `PLAN` is the chord and density per bar |
 
@@ -46,8 +47,11 @@ npm install                      # playwright-core
 `out/stills/` for checking by eye (`--dsf 1` for 1080p, faster).
 
 The app is captured at 3× so the film can zoom in 1.5× and still render 4K
-without upscaling. The opening's cards are drawn as vectors: the issuers' own
-art is only 250–480 px wide.
+without upscaling. The opening's five cards (Amex Platinum, Chase Sapphire
+Reserve, Citi Custom Cash, Amex Gold, Capital One Venture X — also the demo
+wallet) are SVG redrawings of the real designs in `scripts/cards.py`,
+rasterised at 2080 px by `scripts/cards-png.mjs`: the issuers' own art is only
+250–480 px wide.
 
 Requirements: Node 18+, Google Chrome (`CHROME=` to point elsewhere), ffmpeg
 with libx264, `img2webp` (libwebp), Python 3 with numpy and scipy.

@@ -2,8 +2,8 @@
 //
 //   tsx scripts/demo-data.mts > .cache/demo-state.json
 //
-// Five common US cards and two months of everyday purchases, dated relative
-// to today. Each purchase goes on whichever card the app itself ranks first
+// Five popular US cards — the ones the film opens on — and two months of
+// everyday purchases, dated relative to today. Each purchase goes on whichever card the app itself ranks first
 // for it, and is priced by the same reward engine, so every number on screen
 // is one the app really computes.
 const store = new Map<string, string>();
@@ -35,16 +35,16 @@ let state: any = {
   nextWalletCardId: 6,
   nextTransactionId: 1,
   walletCards: [
-    // Chase Sapphire Preferred: payment due in 3 days, fee posts in 11.
-    { id: 1, cardId: 1, addedAt: at(-700), statementClosingDay: dayOfMonth(-25), paymentDueDay: dayOfMonth(3), creditLimit: 15000, openedAt: opened(11, 2) },
+    // Chase Sapphire Reserve: payment due in 3 days, annual fee posts in 11.
+    { id: 1, cardId: 2, addedAt: at(-700), statementClosingDay: dayOfMonth(-25), paymentDueDay: dayOfMonth(3), creditLimit: 30000, openedAt: opened(11, 2) },
     // American Express Platinum
     { id: 2, cardId: 9, addedAt: at(-1000), statementClosingDay: dayOfMonth(-4), paymentDueDay: dayOfMonth(21), openedAt: opened(140, 3) },
+    // American Express Gold Card
+    { id: 3, cardId: 8, addedAt: at(-500), statementClosingDay: dayOfMonth(-16), paymentDueDay: dayOfMonth(9), openedAt: opened(60, 1) },
     // Citi Custom Cash: 5x on the month's top category.
-    { id: 3, cardId: 7, addedAt: at(-300), statementClosingDay: dayOfMonth(-12), paymentDueDay: dayOfMonth(14), creditLimit: 9000, openedAt: opened(200, 1) },
-    // Bank of America Customized Cash Rewards, 3% category set to gas.
-    { id: 4, cardId: 23, addedAt: at(-500), statementClosingDay: dayOfMonth(-16), paymentDueDay: dayOfMonth(9), creditLimit: 8000, openedAt: opened(60, 1), selectedCategories: { 77: ["Gas and EV charging stations"] } },
-    // Chase Freedom Unlimited
-    { id: 5, cardId: 3, addedAt: at(-900), statementClosingDay: dayOfMonth(-8), paymentDueDay: dayOfMonth(18), creditLimit: 12000, openedAt: opened(90, 4) },
+    { id: 4, cardId: 7, addedAt: at(-300), statementClosingDay: dayOfMonth(-12), paymentDueDay: dayOfMonth(14), creditLimit: 9000, openedAt: opened(200, 1) },
+    // Capital One Venture X
+    { id: 5, cardId: 12, addedAt: at(-900), statementClosingDay: dayOfMonth(-8), paymentDueDay: dayOfMonth(18), creditLimit: 20000, openedAt: opened(90, 2) },
   ],
   transactions: [] as any[],
   benefitUsage: [] as any[],
@@ -62,25 +62,29 @@ save();
 
 // [days ago (negative), category, amount, merchant, description]
 const purchases: Array<[number, string, number, string, string]> = [
-  [-54, "Groceries", 128.4, "Whole Foods", "Groceries"],
-  [-52, "Gas", 52.1, "Shell", "Fill-up"],
-  [-50, "Dining", 34.5, "Tartine", "Lunch"],
+  // Each month dining outspends groceries, so dining is Citi Custom Cash's
+  // top (5x) category and groceries go to the Gold card at 4x; a flight
+  // booked through Amex Travel earns the Platinum's 5x.
+  [-54, "Dining", 146.2, "Nopa", "Dinner"],
+  [-52, "Groceries", 72.4, "Whole Foods", "Groceries"],
+  [-50, "Gas", 52.1, "Shell", "Fill-up"],
   [-47, "Streaming", 15.49, "Netflix", "Subscription"],
   [-45, "Flights", 612, "United Airlines", "Flight to Seattle"],
-  [-44, "Dining", 86.4, "Nopa", "Dinner"],
-  [-41, "Groceries", 64.3, "Trader Joe's", "Groceries"],
+  [-44, "Dining", 34.5, "Tartine", "Lunch"],
+  [-41, "Groceries", 54.3, "Trader Joe's", "Groceries"],
+  [-40, "Flights", 420, "Amex Travel", "Flight to Denver"],
   [-39, "Drugstores", 23.8, "CVS", "Pharmacy"],
   [-37, "Online Retail", 74.99, "Amazon", "Online order"],
   [-36, "Rideshare", 18.6, "Uber", "Ride home"],
   [-34, "Hotels", 389, "Hilton", "Hotel stay"],
-  [-33, "Dining", 72.4, "Zuni Cafe", "Dinner"],
-  [-31, "Gas", 58.3, "Chevron", "Fill-up"],
-  [-29, "Groceries", 146.75, "Safeway", "Groceries"],
+  [-31, "Dining", 132.4, "Zuni Cafe", "Dinner"],
+  [-30, "Gas", 58.3, "Chevron", "Fill-up"],
+  [-29, "Groceries", 96.75, "Safeway", "Groceries"],
   [-27, "Dining", 6.45, "Starbucks", "Coffee"],
   [-24, "Entertainment", 32, "AMC Theatres", "Movie night"],
   [-22, "Dining", 41.2, "Dumpling Home", "Dinner"],
   [-20, "Gas", 49.8, "Shell", "Fill-up"],
-  [-18, "Groceries", 96.1, "Whole Foods", "Groceries"],
+  [-18, "Groceries", 64.1, "Whole Foods", "Groceries"],
   [-17, "Streaming", 11.99, "Spotify", "Subscription"],
   [-15, "Dining", 58.7, "Burma Superstar", "Dinner"],
   [-13, "Rideshare", 22.4, "Lyft", "Ride"],
@@ -152,11 +156,14 @@ const used = (walletCardId: number, benefitId: number, ...offsets: number[]) => 
 state = {
   ...state,
   benefitUsage: [
-    used(2, 873, -29, 0), // Uber Cash, October and November
-    used(2, 282, -27), // Digital Entertainment, October
-    used(2, 283, -19), // Resy, this quarter
-    used(2, 872, -200), // Airline fee credit, this year
-    used(1, 269, -150), // Sapphire hotel credit, this cardmember year
+    used(2, 873, -29, 0), // Platinum: Uber Cash, October and November
+    used(2, 282, -27), // Platinum: Digital Entertainment, October
+    used(2, 283, -19), // Platinum: Resy, this quarter
+    used(2, 872, -200), // Platinum: airline fee credit, this year
+    used(3, 277, -28), // Gold: Uber Cash, October
+    used(3, 278, -24), // Gold: dining credit, October
+    used(1, 273, -150), // Reserve: annual travel credit, this cardmember year
+    used(5, 39, -60), // Venture X: travel credit, this cardmember year
   ],
 };
 save();
