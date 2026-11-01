@@ -663,7 +663,7 @@ function QuickPanel() {
 
   return (
     <div className="flex h-full flex-col text-foreground">
-      <header className="flex items-center gap-2 px-4 pb-2.5 pt-3">
+      <header className="flex items-center gap-2 px-4 pb-1.5 pt-3">
         <AppIcon className="h-5 w-5 rounded-[5px]" />
         <span className="text-[13px] font-semibold">Oh My Cards</span>
         {stats && (walletCards?.length ?? 0) > 0 ? (
@@ -686,7 +686,9 @@ function QuickPanel() {
         ) : null}
       </header>
 
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pb-3">
+      {/* pt-1 gives the input's focus ring room: overflow-y-auto clips
+          anything drawn outside this box. */}
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pb-3 pt-1">
         {walletCards ? (
           <QuickLog inputRef={inputRef} walletCount={walletCards.length} />
         ) : null}
