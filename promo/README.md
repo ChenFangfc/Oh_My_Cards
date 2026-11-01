@@ -47,9 +47,9 @@ npm install                      # playwright-core
 `out/stills/` for checking by eye (`--dsf 1` for 1080p, faster).
 
 The app is captured at 3× so the film can zoom in 1.5× and still render 4K
-without upscaling. The opening's five cards (Amex Platinum, Chase Sapphire
-Reserve, Citi Custom Cash, Amex Gold, Capital One Venture X — also the demo
-wallet) are SVG redrawings of the real designs in `scripts/cards.py`,
+without upscaling. The opening's five cards (Chase Freedom Unlimited, Chase
+Sapphire Reserve, Amex Gold, Amex Platinum, Capital One Venture X — also the
+demo wallet) are SVG redrawings of the real designs in `scripts/cards.py`,
 rasterised at 2080 px by `scripts/cards-png.mjs`: the issuers' own art is only
 250–480 px wide.
 

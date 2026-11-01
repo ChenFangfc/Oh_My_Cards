@@ -2,10 +2,11 @@
 //
 //   tsx scripts/demo-data.mts > .cache/demo-state.json
 //
-// Five popular US cards — the ones the film opens on — and two months of
-// everyday purchases, dated relative to today. Each purchase goes on whichever card the app itself ranks first
-// for it, and is priced by the same reward engine, so every number on screen
-// is one the app really computes.
+// Five popular US cards — Chase, Amex and Capital One, the ones the film
+// opens on — and two months of everyday purchases, dated relative to today.
+// Each purchase goes on whichever card the app itself ranks first for it, and
+// is priced by the same reward engine, so every number on screen is one the
+// app really computes.
 const store = new Map<string, string>();
 (globalThis as any).window = {
   localStorage: {
@@ -41,8 +42,8 @@ let state: any = {
     { id: 2, cardId: 9, addedAt: at(-1000), statementClosingDay: dayOfMonth(-4), paymentDueDay: dayOfMonth(21), openedAt: opened(140, 3) },
     // American Express Gold Card
     { id: 3, cardId: 8, addedAt: at(-500), statementClosingDay: dayOfMonth(-16), paymentDueDay: dayOfMonth(9), openedAt: opened(60, 1) },
-    // Citi Custom Cash: 5x on the month's top category.
-    { id: 4, cardId: 7, addedAt: at(-300), statementClosingDay: dayOfMonth(-12), paymentDueDay: dayOfMonth(14), creditLimit: 9000, openedAt: opened(200, 1) },
+    // Chase Freedom Unlimited
+    { id: 4, cardId: 3, addedAt: at(-900), statementClosingDay: dayOfMonth(-12), paymentDueDay: dayOfMonth(14), creditLimit: 12000, openedAt: opened(200, 4) },
     // Capital One Venture X
     { id: 5, cardId: 12, addedAt: at(-900), statementClosingDay: dayOfMonth(-8), paymentDueDay: dayOfMonth(18), creditLimit: 20000, openedAt: opened(90, 2) },
   ],
@@ -62,9 +63,8 @@ save();
 
 // [days ago (negative), category, amount, merchant, description]
 const purchases: Array<[number, string, number, string, string]> = [
-  // Each month dining outspends groceries, so dining is Citi Custom Cash's
-  // top (5x) category and groceries go to the Gold card at 4x; a flight
-  // booked through Amex Travel earns the Platinum's 5x.
+  // Each lands on whichever card the app ranks first for it: groceries on
+  // the Gold card, dining and travel on the Reserve, the rest spread out.
   [-54, "Dining", 146.2, "Nopa", "Dinner"],
   [-52, "Groceries", 72.4, "Whole Foods", "Groceries"],
   [-50, "Gas", 52.1, "Shell", "Fill-up"],

@@ -97,14 +97,15 @@
   /* ── assets ────────────────────────────────────────────────────────── */
   const REPO = "../../";
   // The opening's cards — the demo wallet — left to right once fanned; the
-  // middle one is the answer. SVG redrawings of the real designs
-  // (scripts/cards.py), rasterised at 2080 px: the issuers' own art is too
-  // small for 4K.
+  // middle one, Amex Gold, is the answer. Chase goes left and Capital One
+  // right, the sides where their logos stay in view. SVG redrawings of the
+  // real designs (scripts/cards.py), rasterised at 2080 px: the issuers' own
+  // art is too small for 4K.
   const CARDS = [
-    "amex-platinum",
+    "chase-freedom-unlimited",
     "chase-sapphire-reserve",
-    "citi-custom-cash",
     "amex-gold",
+    "amex-platinum",
     "capital-one-venture-x",
   ];
   const CAP = `captures/${LANG}/`;
@@ -188,7 +189,7 @@
   const panelFrames = [];
   let panelLogged = null;
   const pring = h("div", "ring abs");
-  const plus = h("div", "plus abs", stage, S.plus);
+  const plus = h("div", "plus abs", stage, "");
 
   // Scenes 3–5: the app window.
   const K = 0.88;
@@ -286,6 +287,8 @@
       panelFrames.push(img(`${CAP}panel-${String(i).padStart(2, "0")}.png`, null, panel));
     }
     panelLogged = img(CAP + "panel-logged.png", null, panel);
+    // What the best card earned, as the app showed it.
+    plus.textContent = B.panel.plus || S.plus;
   }
 
   /* ── scene helpers ─────────────────────────────────────────────────── */
@@ -338,7 +341,7 @@
   const panelBox = (b) => ({ x: PX + b.x * PS, y: PY + b.y * PS, w: b.w * PS, h: b.h * PS });
 
   /* ── the timeline ──────────────────────────────────────────────────── */
-  const TYPE0 = 7.25, TYPE1 = 8.55;
+  const TYPE0 = 7.2, TYPE1 = 8.65;
 
   function seek(t) {
     t = clamp(t, 0, DURATION);

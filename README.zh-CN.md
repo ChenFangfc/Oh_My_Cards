@@ -26,7 +26,7 @@
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screenshots/menubar.zh.webp" alt="菜单栏面板为一笔消费排序卡片"><br><b>菜单栏快速记账</b> · 写一句“在 Nopa 吃晚饭 45”，回车就记好。任何应用里按 <kbd>⌃⌥⌘Space</kbd> 呼出。</td>
+<td width="50%"><img src="docs/screenshots/menubar.zh.webp" alt="菜单栏面板为一笔消费排序卡片"><br><b>菜单栏快速记账</b> · 写一句“在 Whole Foods 买菜 86”，回车就记好。任何应用里按 <kbd>⌃⌥⌘Space</kbd> 呼出。</td>
 <td width="50%"><img src="docs/screenshots/suggest.zh.webp" alt="智能推荐为一张机票排序"><br><b>智能推荐</b> · 任何消费都能给钱包里的卡排个序，还会列出你还没办、但更划算的卡。</td>
 </tr>
 <tr>

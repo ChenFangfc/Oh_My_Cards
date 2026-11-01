@@ -21,8 +21,8 @@ const state = fs.readFileSync(path.join(ROOT, ".cache/demo-state.json"), "utf8")
 
 // What gets typed, per language.
 const SCRIPT = {
-  en: { quick: "45 dinner at nopa", suggest: "United flight to Tokyo booked direct", quarter: "This Quarter" },
-  zh: { quick: "在 Nopa 吃晚饭 45", suggest: "直接在 United 官网订去东京的机票", quarter: "本季度" },
+  en: { quick: "86 groceries at whole foods", suggest: "United flight to Tokyo booked direct", quarter: "This Quarter" },
+  zh: { quick: "在 Whole Foods 买菜 86", suggest: "直接在 United 官网订去东京的机票", quarter: "本季度" },
 };
 
 // The box (CSS px) and corner radius of an element, so a ring drawn around
@@ -80,6 +80,8 @@ async function capture(browser, lang) {
       input: await boxOf(input),
       best: await boxOf(page.locator("[role=radio][aria-checked=true]")),
       log: await boxOf(page.locator("button", { hasText: /Log \$|记 \$/ })),
+      // What the best card earns on this purchase, e.g. "+$3.44".
+      plus: ((await page.locator("[role=radio][aria-checked=true]").innerText()).match(/\+\S*\d/) || [""])[0],
     };
     await page.keyboard.press("Enter");
     await page.waitForTimeout(500);

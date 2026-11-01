@@ -26,7 +26,7 @@ A free credit card organizer for anyone carrying more than one card. Type a purc
 
 <table>
 <tr>
-<td width="50%"><img src="docs/screenshots/menubar.en.webp" alt="The menu bar panel ranking cards for a typed purchase"><br><b>Menu bar quick log</b> · type “45 dinner at nopa”, press Enter, done. <kbd>⌃⌥⌘Space</kbd> from any app.</td>
+<td width="50%"><img src="docs/screenshots/menubar.en.webp" alt="The menu bar panel ranking cards for a typed purchase"><br><b>Menu bar quick log</b> · type “86 groceries at whole foods”, press Enter, done. <kbd>⌃⌥⌘Space</kbd> from any app.</td>
 <td width="50%"><img src="docs/screenshots/suggest.en.webp" alt="Smart Suggest ranking the wallet for a flight"><br><b>Smart Suggest</b> · ranks your wallet for any purchase, and shows the better cards you don't have.</td>
 </tr>
 <tr>

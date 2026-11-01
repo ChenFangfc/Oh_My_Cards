@@ -3,7 +3,7 @@ window.STR = {
   en: {
     a: "Five cards in your wallet.",
     b: "Which one [[pays you most]]?",
-    chip: "5× on dinner",
+    chip: "4× on groceries",
     c: "Type what you bought.",
     d: "It picks the card\nthat [[pays the most]].",
     e: "Check before you pay.",
@@ -17,12 +17,12 @@ window.STR = {
     name: "Oh My Cards",
     sub: "Free · macOS & web · English & Chinese",
     url: "github.com/ChenFangfc/Oh_My_Cards",
-    plus: "+$2.25",
+    plus: "+$3.44",
   },
   zh: {
     a: "钱包里有五张卡。",
     b: "这一笔，刷[[哪张最划算]]？",
-    chip: "餐饮 5 倍",
+    chip: "超市 4 倍",
     c: "写下买了什么，",
     d: "[[自动选出\n回报最高的卡。]]",
     e: "付款之前，先问一句。",
@@ -36,6 +36,6 @@ window.STR = {
     name: "Oh My Cards",
     sub: "免费 · macOS 与网页版 · 中文 / English",
     url: "github.com/ChenFangfc/Oh_My_Cards",
-    plus: "+$2.25",
+    plus: "+$3.44",
   },
 };

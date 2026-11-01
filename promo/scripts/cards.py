@@ -3,8 +3,8 @@
     python3 scripts/cards.py        # writes src/cards/*.svg; render.mjs --cards rasterises them
 
 The issuers' own card art is 250–480 px wide, too small for a 4K film, so
-these are vector redrawings of the real designs: Amex Platinum and Gold,
-Chase Sapphire Reserve, Citi Custom Cash and Capital One Venture X.
+these are vector redrawings of the real designs: Chase Freedom Unlimited,
+Amex Platinum and Gold, Chase Sapphire Reserve and Capital One Venture X.
 856 × 540 units (the card's 85.6 × 54 mm, ×10).
 """
 import math
@@ -163,27 +163,28 @@ def sapphire_reserve():
     return card(body, defs)
 
 
-def custom_cash():
-    rings = "".join(
-        f'<circle cx="640" cy="470" r="{r}" fill="none" stroke="#bfe9ff" stroke-opacity="{o}" stroke-width="{w}"/>'
-        for r, o, w in [(110, .22, 18), (175, .16, 10), (240, .2, 22), (310, .12, 8), (380, .16, 18), (455, .1, 10), (530, .12, 16), (610, .08, 8)]
-    )
-    defs = '''<radialGradient id="bg" cx=".72" cy=".86" r=".95"><stop offset="0" stop-color="#5fd0f6"/><stop offset=".35" stop-color="#1f95e2"/><stop offset=".75" stop-color="#1167cc"/><stop offset="1" stop-color="#0b4fae"/></radialGradient>
-  <linearGradient id="arc" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".25" stop-color="#fff"/><stop offset=".75" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>'''
+def freedom_unlimited():
+    defs = '''<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0b1442"/><stop offset=".5" stop-color="#17287a"/><stop offset="1" stop-color="#0a1038"/></linearGradient>
+  <radialGradient id="glowA" cx=".35" cy=".45" r=".6"><stop offset="0" stop-color="#2f62d8" stop-opacity=".55"/><stop offset="1" stop-color="#2f62d8" stop-opacity="0"/></radialGradient>
+  <linearGradient id="streak" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5fd4ff" stop-opacity="0"/><stop offset=".35" stop-color="#46c8f0"/><stop offset=".75" stop-color="#7cf0d8"/><stop offset="1" stop-color="#7cf0d8" stop-opacity="0"/></linearGradient>
+  <linearGradient id="soft" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6aa3ff" stop-opacity="0"/><stop offset=".5" stop-color="#6aa3ff" stop-opacity=".55"/><stop offset="1" stop-color="#6aa3ff" stop-opacity="0"/></linearGradient>
+  <filter id="blur" x="-10%" y="-50%" width="120%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>'''
     body = f'''
   <rect width="{W}" height="{H}" fill="url(#bg)"/>
-  {rings}
-  <path d="M410 188 C460 120 600 116 650 186" fill="none" stroke="url(#arc)" stroke-width="15" stroke-linecap="round"/>
-  <text x="52" y="100" font-family="{SANS}" font-weight="600" font-size="62" letter-spacing="-1" fill="#fff">citi</text>
-  <path d="M86 58 C102 40 128 40 146 58" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
-  {contactless(70, 210, "#fff", 0.95)}
-  {chip(116, 196)}
-  <text x="410" y="262" font-family="{SANS}" font-weight="500" font-size="44" letter-spacing="4" fill="#fff">CUSTOM</text>
-  <text x="592" y="302" font-family="{SANS}" font-weight="500" font-size="44" letter-spacing="4" fill="#fff">CASH</text>
-  <text x="56" y="486" font-family="{SANS}" font-weight="500" font-size="34" letter-spacing="1.5" fill="#fff">ALEX MORGAN</text>
-  <g opacity=".92"><circle cx="694" cy="440" r="44" fill="#e9eef3" fill-opacity=".85"/><circle cx="752" cy="440" r="44" fill="#c9d2dc" fill-opacity=".85"/>
-  <path d="M723 406 a44 44 0 0 1 0 68 a44 44 0 0 1 0 -68z" fill="#aab6c3"/></g>
-  <text x="723" y="512" text-anchor="middle" font-family="{SANS}" font-weight="500" font-size="17" fill="#eaf2f9">mastercard</text>'''
+  <rect width="{W}" height="{H}" fill="url(#glowA)"/>
+  <g filter="url(#blur)" opacity=".85">
+    <path d="M-40 250 C180 170 420 200 900 120" fill="none" stroke="url(#soft)" stroke-width="46"/>
+    <path d="M-40 330 C220 260 520 300 900 210" fill="none" stroke="url(#soft)" stroke-width="30"/>
+  </g>
+  <path d="M-20 420 C220 380 520 360 900 250" fill="none" stroke="url(#streak)" stroke-width="5" filter="url(#blur)" opacity=".9"/>
+  <path d="M-20 420 C220 380 520 360 900 250" fill="none" stroke="url(#streak)" stroke-width="2.4"/>
+  {chase_logo(86, 84, 34, "#ffffff")}
+  <text x="146" y="104" font-family="Avenir Next, {SANS}" font-style="italic" font-weight="700" font-size="66" letter-spacing="-1" fill="#fff">freedom</text>
+  <text x="170" y="138" font-family="{SANS}" font-weight="600" font-size="25" letter-spacing="3.5" fill="#9bd63a">UNLIMITED</text>
+  {chip(96, 196)}
+  {contactless(758, 222, "#fff", 1.05)}
+  <text x="76" y="470" font-family="{SANS}" font-weight="500" font-size="34" letter-spacing="3" fill="#dfe6f2">ALEX MORGAN</text>
+  <text x="792" y="482" text-anchor="end" font-family="{SANS}" font-style="italic" font-weight="900" font-size="64" letter-spacing="-1" fill="#fff">VISA</text>'''
     return card(body, defs)
 
 
@@ -205,10 +206,10 @@ def venture_x():
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     files = {
+        "chase-freedom-unlimited.svg": freedom_unlimited(),
         "amex-platinum.svg": amex("ALEX MORGAN", "platinum", "1005"),
-        "chase-sapphire-reserve.svg": sapphire_reserve(),
-        "citi-custom-cash.svg": custom_cash(),
         "amex-gold.svg": amex("ALEX MORGAN", "gold", "3007"),
+        "chase-sapphire-reserve.svg": sapphire_reserve(),
         "capital-one-venture-x.svg": venture_x(),
     }
     for name, svg in files.items():
