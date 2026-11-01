@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "hello": "tsx ./src/hello.ts",
     "cards:check": "tsx ./src/card-data/check-freshness.ts",
     "cards:watch": "tsx ./src/card-data/watch-newsroom.ts",
     "cards:apply": "tsx ./src/card-data/apply-updates.ts",
