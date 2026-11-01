@@ -7,7 +7,9 @@
  * matches headlines against the 182 card names and their issuers, and reports
  * hits since the last run.
  *
- * It is cheap enough to run daily, unlike the full crawl.
+ * It is cheap enough to run daily, unlike the full crawl — and it has to be:
+ * a feed only carries its latest 10–20 posts, so a slower cadence misses
+ * announcements outright.
  *
  *   pnpm --dir scripts cards:watch
  *   pnpm --dir scripts cards:watch -- --since=2026-05-21
@@ -39,6 +41,11 @@ const FEEDS: Feed[] = [
   { name: "Doctor of Credit", url: "https://www.doctorofcredit.com/feed/", issuers: [] },
   { name: "Frequent Miler", url: "https://frequentmiler.com/feed/", issuers: [] },
   { name: "One Mile at a Time", url: "https://onemileatatime.com/feed/", issuers: [] },
+  { name: "Upgraded Points", url: "https://upgradedpoints.com/feed/", issuers: [] },
+  { name: "The Points Guy", url: "https://thepointsguy.com/feed/", issuers: [] },
+  // The US blogs rarely cover the catalog's Canadian and Singapore cards.
+  { name: "Prince of Travel", url: "https://princeoftravel.com/feed/", issuers: [] },
+  { name: "The MileLion", url: "https://milelion.com/feed/", issuers: [] },
 ];
 
 /** Words that turn a card mention into a rules change worth reviewing. */

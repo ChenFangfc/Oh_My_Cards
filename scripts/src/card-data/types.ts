@@ -14,12 +14,29 @@ export interface CashbackCategory {
   isDefault: boolean;
 }
 
+/**
+ * How often a benefit's allowance renews. Absent means once per cardmember
+ * (anniversary) year, which is how every benefit was tracked before this
+ * field existed.
+ */
+export type CardBenefitPeriod =
+  | "monthly"
+  | "quarterly"
+  | "semiannual"
+  | "calendar-year"
+  | "cardmember-year"
+  | "multi-year"
+  | "one-time";
+
 export interface CardBenefit {
   id: number;
   cardId: number;
   name: string;
   description: string;
   annualValue: number | null;
+  period?: CardBenefitPeriod;
+  /** For `multi-year` benefits such as a Global Entry credit: years between renewals. */
+  periodYears?: number;
 }
 
 export type CardCategoryChoiceMode =
@@ -111,7 +128,15 @@ export type FindingKind =
   | "MISSING_SOURCE_URL"
   | "MISSING_CARD_IMAGE"
   | "STALE_REVIEW"
-  | "LOW_CONFIDENCE";
+  | "LOW_CONFIDENCE"
+  /** Structural catalog problem from `cards:lint`; publishing would ship it. */
+  | "CATALOG_ERROR"
+  /** A rotating-category calendar lacks (or has a placeholder for) this quarter. */
+  | "STALE_CALENDAR"
+  /** A credit that renews monthly/quarterly/semi-annually is tracked yearly. */
+  | "MISSING_BENEFIT_PERIOD"
+  /** A spend cap written in a form the engine cannot enforce. */
+  | "UNPARSED_CAP";
 
 export type Severity = "high" | "medium" | "low";
 

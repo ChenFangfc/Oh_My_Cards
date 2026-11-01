@@ -56,13 +56,38 @@ export interface CardCategoryChoice {
   options: string[];
 }
 
+/**
+ * How often a benefit's allowance renews. Absent means once per cardmember
+ * (anniversary) year.
+ */
+export type CardBenefitPeriod =
+  | "monthly"
+  | "quarterly"
+  | "semiannual"
+  | "calendar-year"
+  | "cardmember-year"
+  | "multi-year"
+  | "one-time";
+
 export interface CardBenefit {
   id: number;
   cardId: number;
   name: string;
   description: string;
-  /** Estimated dollar value of this benefit per year */
+  /** Estimated dollar value of this benefit per year (amortized for multi-year credits) */
   annualValue?: number | null;
+  period?: CardBenefitPeriod | null;
+  /** Years between renewals, for `multi-year` benefits such as a Global Entry credit */
+  periodYears?: number | null;
+}
+
+/** Where a benefit stands in its current renewal period. */
+export interface BenefitPeriodState {
+  period: CardBenefitPeriod;
+  /** Value of one period's allowance, e.g. 25 for a $300/yr credit paid monthly */
+  periodValue?: number | null;
+  /** When the current period's allowance renews; null when it never does */
+  resetsAt?: string | null;
 }
 
 export type CreditCardNetwork =
@@ -130,6 +155,12 @@ export interface WalletCard {
   selectedCategories?: Record<number, string[]> | null;
   /** Options each choice category is currently earning on, keyed by category id */
   activeChoiceCategories?: Record<number, string[]>;
+  /** Benefits already used in their current renewal period */
+  usedBenefitIds?: number[];
+  /** Benefit value captured since the start of the current cardmember year */
+  currentYearBenefitValue?: number;
+  /** Renewal state for each of the card's benefits, keyed by benefit id */
+  benefitPeriods?: Record<number, BenefitPeriodState>;
   card: CreditCard;
 }
 
@@ -177,12 +208,13 @@ export interface CreateTransactionBody {
   longitude?: number | null;
 }
 
-export interface BenefitUsage {
+export interface BenefitUsage extends BenefitPeriodState {
   benefitId: number;
   walletCardId: number;
   name: string;
   description: string;
   annualValue?: number | null;
+  /** Used in the current renewal period */
   used: boolean;
   usedAt?: string | null;
 }
@@ -216,13 +248,15 @@ export interface BestCardForCategory {
   cashbackRate: number;
 }
 
-export interface UnusedBenefit {
+export interface UnusedBenefit extends BenefitPeriodState {
   benefitId: number;
   walletCardId: number;
   cardName: string;
   name: string;
   description: string;
   annualValue?: number | null;
+  /** Currency the benefit's value is denominated in */
+  currency?: string | null;
 }
 
 export interface BillingCycle {

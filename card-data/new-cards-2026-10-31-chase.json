@@ -1,0 +1,141 @@
+[
+  {
+    "id": 0,
+    "name": "IHG One Rewards Premier Select Credit Card",
+    "issuer": "Chase / IHG",
+    "network": "Mastercard",
+    "annualFee": 350,
+    "signupBonus": null,
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #3d5a6c, #1c2f3a)",
+    "logoUrl": "https://logo.clearbit.com/chase.com",
+    "cardImageUrl": null,
+    "rewardType": "points",
+    "rewardProgram": "IHG One Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 0.5,
+    "rewardValuationDescription": "IHG One Rewards value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+      "Launched 2026-10-01 (https://media.chase.com/news/ihg-premier-select-card-portfolio-updates) as the top tier of the IHG One Rewards card portfolio; the 6x travel category includes rideshare and transit and excludes IHG hotel stays, which earn 12x."
+    ],
+    "cashbackCategories": [
+      { "id": 0, "cardId": 0, "category": "IHG Hotels", "rate": 0.12, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Dining", "rate": 0.06, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Travel (including rideshare and transit)", "rate": 0.06, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Other", "rate": 0.03, "isDefault": true }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Anniversary Free Night",
+        "description": "A Free Night after each card anniversary at an IHG hotel with a redemption cap of 60,000 points; points can be added for pricier nights.",
+        "annualValue": 300,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Food and Beverage Rewards",
+        "description": "A $75 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $300 a year).",
+        "annualValue": 300,
+        "period": "quarterly"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Airline Statement Credit",
+        "description": "$200 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "$50 United TravelBank Cash",
+        "description": "After registering the card with a MileagePlus account: $25 in United TravelBank cash for January-June and another $25 for July-December, up to $50 each calendar year.",
+        "annualValue": 50,
+        "period": "semiannual"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 a year) while an Instacart+ member (3 months complimentary, then $99/year); ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Automatic Platinum Elite Status",
+        "description": "Automatic IHG One Rewards Platinum Elite status while the card is open; Diamond Elite after $25,000 in purchases in a calendar year.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "20 Elite Night Credits",
+        "description": "20 Elite Night Credits at account opening and each January, plus 2 more for every $5,000 spent and 5 more after $15,000 in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "4th Night Free",
+        "description": "When you redeem points for a consecutive four-night IHG stay, the fourth night is free.",
+        "annualValue": 150
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Second Anniversary Free Night After $40,000 Annual Spend",
+        "description": "An additional Free Night (60,000-point redemption cap) after $40,000 in purchases each calendar year.",
+        "annualValue": 300,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "20,000 Bonus Points After $15,000 Annual Spend",
+        "description": "20,000 bonus points after $15,000 in purchases each calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees on purchases made outside the United States.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier-select",
+    "imageSourceUrl": "https://creditcards.chase.com/content/dam/jpmc-marketplace/card-art/ihg_premier_select_card.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  }
+]

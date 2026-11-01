@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Compass } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 export default function NotFound() {
   return (
@@ -12,19 +13,15 @@ export default function NotFound() {
           </div>
           <div>
             <h2 className="text-xl font-bold tracking-tight text-foreground">
-              We couldn't find that page
-            </h2>
+              {t("We couldn't find that page")}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              The link may be out of date. Your wallet, cards, and activity are
-              all still here.
-            </p>
+              {t("The link may be out of date. Your wallet, cards, and activity are all still here.")}</p>
           </div>
           <Link
             href="/wallet"
             className="inline-flex h-11 items-center justify-center whitespace-nowrap rounded-lg bg-primary px-5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Back to My Wallet
-          </Link>
+            {t("Back to My Wallet")}</Link>
         </CardContent>
       </Card>
     </div>

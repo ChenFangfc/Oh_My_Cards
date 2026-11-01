@@ -1,5 +1,31 @@
 # Pending card-data corrections
 
+> **Status (2026-10-31): processed.** Every still-valid item in the queue below
+> was re-checked against the issuer page and applied, together with changes
+> announced since August, through `patch-2026-10-31-chase.json`,
+> `patch-2026-10-31-amex.json`, `patch-2026-10-31-citi-capone.json`,
+> `patch-2026-10-31-us-other.json` and `patch-2026-10-31-intl.json`. Items that
+> no longer held were dropped (reasons are in each patch's `_why` notes). New
+> products went in via `new-cards-2026-10-31-*.json`. Keep this file as the
+> record of the August verification pass; start the next queue from
+> `freshness-report.md`.
+
+## Scheduled follow-ups (from the 2026-10-31 review)
+
+- **On/after 2027-01-01:** remove the "(through 12/31/2026)" rows on IHG #38,
+  #55 and #158; set Aeroplan #66 dining and groceries to 2x; drop the Sapphire
+  Reserve for Business (#125) select-hotels credit and raise its The Edit
+  credit to $1,000; Bilt hotel credits change for accounts from this date.
+- **On/after 2027-01-24:** Citi AAdvantage Platinum Select (#34) and
+  AAdvantage Business (#148) refresh (fee, earn rates, credits).
+- **Applied ahead of its date:** Rogers Red (#85) 5% on Rogers purchases takes
+  effect 2026-11-18.
+- **Still unverified:** BMO eclipse (#82, bmo.com blocked automated access);
+  OCBC 365 (#179) rests on secondary sources; Discover's Q4 2026 calendar was
+  read from secondary sources while Discover's page was down.
+- **Every quarter:** update the Chase Freedom Flex and Discover rotating
+  calendars (`cards:lint` flags a missing current quarter).
+
 Generated 2026-08-06 from a 159-agent verification pass over all 182 cards.
 Each item was proposed by a research agent and then independently re-confirmed
 against the issuer page by a second agent.

@@ -1,0 +1,195 @@
+name: Release Desktop App
+
+# Builds the macOS app as a universal (Apple silicon + Intel) DMG and attaches
+# it to a GitHub Release. Push a tag like v1.2.0 — matching the "version" in
+# artifacts/card-organizer/src-tauri/tauri.conf.json — or run it by hand.
+#
+# With the TAURI_SIGNING_PRIVATE_KEY secret set, the release also carries a
+# signed update bundle and latest.json, which installed copies read from
+# releases/latest/download/latest.json to update themselves. No server needed.
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-desktop-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # A release published by hand (DMG, update bundle and latest.json built
+  # locally with the same key) needs no second build.
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      skip: ${{ steps.release.outputs.skip }}
+    steps:
+      - id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]] && \
+             gh release view "$GITHUB_REF_NAME" -R "$GITHUB_REPOSITORY" --json assets -q '.assets[].name' 2>/dev/null | grep -qx 'Oh-My-Cards.dmg'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$GITHUB_REF_NAME already has Oh-My-Cards.dmg; nothing to build."
+          fi
+
+  macos:
+    needs: check
+    if: needs.check.outputs.skip != 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install Rust (both macOS architectures)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - name: Cache Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: artifacts/card-organizer/src-tauri -> target
+
+      - name: Install dependencies
+        env:
+          npm_config_user_agent: pnpm/ci
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm install --frozen-lockfile
+
+      - name: Build workspace client types
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm exec tsc --build lib/api-client-react/tsconfig.json
+
+      - name: Typecheck and test
+        run: |
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir artifacts/card-organizer typecheck
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir lib/api-client-react test
+          COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:lint
+
+      # Developer ID signing and notarization happen only when the secrets
+      # exist. Without them the app is ad-hoc signed (tauri.conf.json sets
+      # signingIdentity "-"), which runs on Apple silicon but asks the user to
+      # approve it once in System Settings → Privacy & Security.
+      - name: Configure Apple signing (optional)
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ] && [ -n "$APPLE_SIGNING_IDENTITY" ]; then
+            {
+              echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+              echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+              echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+            } >> "$GITHUB_ENV"
+            echo "Signing with a Developer ID certificate."
+          else
+            echo "No signing certificate configured; building ad-hoc signed."
+          fi
+          if [ -n "$APPLE_ID" ] && [ -n "$APPLE_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            {
+              echo "APPLE_ID=$APPLE_ID"
+              echo "APPLE_PASSWORD=$APPLE_PASSWORD"
+              echo "APPLE_TEAM_ID=$APPLE_TEAM_ID"
+            } >> "$GITHUB_ENV"
+            echo "Notarization enabled."
+          fi
+
+      # The update bundle is signed with the key whose public half is in
+      # tauri.conf.json (plugins.updater.pubkey). Installed apps refuse any
+      # update that does not verify against it.
+      - name: Build universal app and DMG
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            UPDATER_CONFIG='{"bundle":{"createUpdaterArtifacts":true}}'
+          else
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY is not set, so installed apps will not be offered this release automatically."
+            UPDATER_CONFIG='{}'
+          fi
+          cd artifacts/card-organizer
+          PORT=19953 BASE_PATH=/ COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm exec tauri build \
+            --target universal-apple-darwin --bundles app,dmg --config "$UPDATER_CONFIG"
+
+      - name: Collect artifacts
+        run: |
+          BUNDLE=artifacts/card-organizer/src-tauri/target/universal-apple-darwin/release/bundle
+          VERSION=$(node -p "require('./artifacts/card-organizer/src-tauri/tauri.conf.json').version")
+          # One name for every release, so
+          # releases/latest/download/Oh-My-Cards.dmg is always the newest.
+          DMG="Oh-My-Cards.dmg"
+          mkdir -p dist
+          cp "$(ls "$BUNDLE"/dmg/*.dmg | head -1)" "dist/$DMG"
+          (cd dist && shasum -a 256 "$DMG" | tee "$DMG.sha256")
+
+          TARBALL=$(ls "$BUNDLE"/macos/*.app.tar.gz 2>/dev/null | head -1 || true)
+          if [ -n "$TARBALL" ] && [ -f "$TARBALL.sig" ]; then
+            cp "$TARBALL" dist/Oh-My-Cards_universal.app.tar.gz
+            cp "$TARBALL.sig" dist/Oh-My-Cards_universal.app.tar.gz.sig
+            # The feed the installed apps poll. One universal bundle serves
+            # both architectures.
+            node -e '
+              const fs = require("fs");
+              const [version, tag] = process.argv.slice(1);
+              const platform = {
+                signature: fs.readFileSync("dist/Oh-My-Cards_universal.app.tar.gz.sig", "utf8").trim(),
+                url: `https://github.com/${process.env.GITHUB_REPOSITORY}/releases/download/${tag}/Oh-My-Cards_universal.app.tar.gz`,
+              };
+              fs.writeFileSync("dist/latest.json", JSON.stringify({
+                version,
+                notes: `Oh My Cards ${version}`,
+                pub_date: new Date().toISOString(),
+                platforms: {
+                  "darwin-aarch64": platform,
+                  "darwin-x86_64": platform,
+                  "darwin-aarch64-app": platform,
+                  "darwin-x86_64-app": platform,
+                },
+              }, null, 2));
+            ' "$VERSION" "$GITHUB_REF_NAME"
+            cat dist/latest.json
+          fi
+          ls -la dist
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oh-my-cards-macos
+          path: dist/*
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body: |
+            Download the `.dmg`, open it, and drag **Oh My Cards** into Applications.
+
+            First launch: macOS may say it can't verify the developer. Open
+            **System Settings → Privacy & Security**, scroll down, and click
+            **Open Anyway** next to Oh My Cards (only needed once).
+
+            Already installed? The app updates itself (Settings → Updates), and
+            every update is checked against the signing key built into the app.
+
+            Your wallet stays on your Mac. The app only downloads public card
+            rules and its own updates.

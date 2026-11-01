@@ -3,7 +3,10 @@ import { BUILTIN_CARDS, BUILTIN_RULESET_VERSION } from "./catalog";
 import { CreditCardNetwork } from "../generated/api.schemas";
 import type {
   AddToWalletBody,
+  BenefitPeriodState,
   BenefitUsage,
+  CardBenefit,
+  CardBenefitPeriod,
   CardCategoryChoice,
   CardCategoryChoiceReset,
   CashbackCategory,
@@ -27,12 +30,58 @@ import type {
 } from "../generated/api.schemas";
 
 const STORAGE_KEY = "oh-my-card:local-state:v1";
+/**
+ * Published card rules live under their own key. They used to sit inside the
+ * user's state, which put a ~450 KB catalog through JSON.parse and full
+ * normalization on every single read — several times per render.
+ */
+const CATALOG_OVERRIDE_KEY = "oh-my-card:catalog-override:v1";
+/** When the app last asked the rules feed for news, and what it heard. */
+const RULES_STATUS_KEY = "oh-my-card:rules-status:v1";
 const STORAGE_DB_NAME = "oh-my-cards-local-data";
 const STORAGE_DB_VERSION = 1;
 const STORAGE_STORE_NAME = "state";
 const STORAGE_RECORD_KEY = "primary";
 const BACKUP_APP_NAME = "Oh My Cards";
 const BACKUP_FORMAT_VERSION = 1;
+/**
+ * Highest rules-payload schema this build understands. A feed published for a
+ * newer app (one whose rules carry semantics this build would misread) is
+ * skipped rather than applied half-understood.
+ */
+export const SUPPORTED_RULES_SCHEMA = 2;
+
+// ---- UI text -------------------------------------------------------------------
+
+export type UiTextVars = Record<string, string | number>;
+export type UiTextTranslator = (text: string, vars?: UiTextVars) => string;
+
+function fillUiText(text: string, vars?: UiTextVars): string {
+  if (!vars) return text;
+  return text.replace(/\{(\w+)\}/g, (match, name: string) =>
+    name in vars ? String(vars[name]) : match,
+  );
+}
+
+let uiTextTranslator: UiTextTranslator = fillUiText;
+
+/**
+ * Sentences built here (recommendation notes, errors shown in toasts) are
+ * English templates with {placeholders}. The app hands over its translator so
+ * they follow the UI language; card rules themselves stay as published.
+ */
+export function setUiTextTranslator(translator: UiTextTranslator | null): void {
+  uiTextTranslator = translator ?? fillUiText;
+}
+
+function uiText(text: string, vars?: UiTextVars): string {
+  return uiTextTranslator(text, vars);
+}
+
+/** An Error whose message follows the UI language. */
+function uiError(text: string, vars?: UiTextVars): Error {
+  return new Error(uiText(text, vars));
+}
 
 export interface LocalWalletCard {
   id: number;
@@ -53,24 +102,40 @@ export interface LocalWalletCard {
 export interface LocalBenefitUsage {
   walletCardId: number;
   benefitId: number;
+  /** Mirrors the most recent use; kept so older builds can still read a backup. */
   used: boolean;
   usedAt?: string | null;
+  /**
+   * Every time the benefit was marked used. A monthly credit is used up to
+   * twelve times a year, so a single flag cannot say how much of it was
+   * captured — this log is what the current period and the annual-fee
+   * progress are both read from.
+   */
+  history?: string[] | null;
+}
+
+export interface CatalogOverride {
+  version: string;
+  cards: CreditCard[];
+  notes?: string;
+  publishedAt?: string;
 }
 
 export interface LocalState {
   schemaVersion: 1;
   ruleSetVersion: string;
-  catalogOverride?: {
-    version: string;
-    cards: CreditCard[];
-    notes?: string;
-    publishedAt?: string;
-  } | null;
+  /**
+   * Legacy location of downloaded card rules. Read once to migrate them to
+   * their own storage key; never written any more.
+   */
+  catalogOverride?: CatalogOverride | null;
   nextWalletCardId: number;
   nextTransactionId: number;
   walletCards: LocalWalletCard[];
   transactions: Transaction[];
   benefitUsage: LocalBenefitUsage[];
+  /** Stamped on every write; decides which storage backend is newer at boot. */
+  updatedAt?: string | null;
 }
 
 export interface LocalDataBackup {
@@ -271,12 +336,39 @@ function normalizeBenefitUsageRecord(
   const benefitId = toFiniteNumber(value.benefitId, -1);
   if (walletCardId <= 0 || benefitId <= 0) return null;
 
+  const usedAt = toTrimmedString(value.usedAt) || null;
+  const history = normalizeBenefitHistory(value.history);
+
+  // Records written before the usage log existed carry only the flag. A use
+  // without a date was counted as "used this year", so it is dated now — the
+  // closest reading that keeps today's screen unchanged.
+  if (!history.length && value.used) {
+    history.push(usedAt && isValidDateString(usedAt) ? usedAt : new Date().toISOString());
+  }
+
+  const latest = history[history.length - 1] ?? null;
   return {
     walletCardId,
     benefitId,
-    used: Boolean(value.used),
-    usedAt: toTrimmedString(value.usedAt) || null,
+    used: history.length > 0,
+    usedAt: latest,
+    history,
   };
+}
+
+const MAX_BENEFIT_HISTORY = 120;
+
+function isValidDateString(value: string): boolean {
+  return !Number.isNaN(new Date(value).getTime());
+}
+
+function normalizeBenefitHistory(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const dates = value
+    .map((entry) => toTrimmedString(entry))
+    .filter((entry) => entry && isValidDateString(entry))
+    .map((entry) => new Date(entry).toISOString());
+  return [...new Set(dates)].sort().slice(-MAX_BENEFIT_HISTORY);
 }
 
 function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
@@ -326,9 +418,13 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
     ) + 1,
   );
 
+  // Card rules are not user data and live under their own key; the legacy copy
+  // is stripped here so it is never parsed again.
+  const { catalogOverride: _legacyOverride, ...rest } = parsed;
+
   return {
     ...defaultState(),
-    ...parsed,
+    ...rest,
     schemaVersion: 1,
     ruleSetVersion: parsed.ruleSetVersion ?? BUILTIN_RULESET_VERSION,
     nextWalletCardId,
@@ -336,7 +432,6 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
     walletCards,
     transactions,
     benefitUsage,
-    catalogOverride: normalizeCatalogOverride(parsed.catalogOverride),
   };
 }
 
@@ -347,7 +442,7 @@ function normalizeLocalState(parsed: Partial<LocalState>): LocalState {
  */
 function normalizeCatalogOverride(
   override: LocalState["catalogOverride"],
-): LocalState["catalogOverride"] {
+): CatalogOverride | null {
   if (!override?.version || !Array.isArray(override.cards)) return null;
 
   try {
@@ -401,6 +496,7 @@ async function readIndexedDbState(): Promise<LocalState | null> {
         resolve(null);
         return;
       }
+      if (value.catalogOverride) adoptLegacyCatalogOverride(value.catalogOverride);
       resolve(normalizeLocalState(value));
     };
   });
@@ -438,19 +534,121 @@ function queueIndexedDbWrite(state: LocalState): void {
   });
 }
 
+/**
+ * The last raw string read from (or written to) localStorage, and what it
+ * normalized to. Every query hook reads state synchronously, often several
+ * times per render, so re-parsing an unchanged string each time was pure
+ * waste. Keying the cache on the stored text itself keeps it honest across
+ * tabs: another tab's write changes the text, which misses the cache.
+ */
+let cachedStateRaw: string | null = null;
+let cachedState: LocalState | null = null;
+
 function readLocalStorageState(): LocalState | null {
   if (!canUseLocalStorage()) return null;
 
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
+    if (raw === cachedStateRaw && cachedState) return cachedState;
 
     const parsed = JSON.parse(raw) as Partial<LocalState>;
     if (parsed.schemaVersion !== 1) return null;
-    return normalizeLocalState(parsed);
+
+    const state = normalizeLocalState(parsed);
+    let storedRaw = raw;
+    if (parsed.catalogOverride) {
+      // One-time move of downloaded rules out of the user's state.
+      adoptLegacyCatalogOverride(parsed.catalogOverride);
+      storedRaw = JSON.stringify(state);
+      try {
+        window.localStorage.setItem(STORAGE_KEY, storedRaw);
+      } catch {
+        storedRaw = raw;
+      }
+    }
+
+    cachedStateRaw = storedRaw;
+    cachedState = state;
+    return state;
   } catch {
     return null;
   }
+}
+
+let catalogOverrideLoaded = false;
+let catalogOverrideValue: CatalogOverride | null = null;
+let catalogOverrideListenerAttached = false;
+
+function attachCatalogOverrideListener(): void {
+  if (catalogOverrideListenerAttached || typeof window === "undefined") return;
+  catalogOverrideListenerAttached = true;
+  // Another tab may download newer rules; drop the in-memory copy so this tab
+  // picks them up on its next read instead of pricing with stale ones.
+  window.addEventListener("storage", (event) => {
+    if (event.key === CATALOG_OVERRIDE_KEY || event.key === null) {
+      catalogOverrideLoaded = false;
+    }
+  });
+}
+
+function readStoredCatalogOverride(): CatalogOverride | null {
+  if (catalogOverrideLoaded) return catalogOverrideValue;
+  attachCatalogOverrideListener();
+
+  if (canUseLocalStorage()) {
+    try {
+      const raw = window.localStorage.getItem(CATALOG_OVERRIDE_KEY);
+      catalogOverrideValue = raw
+        ? normalizeCatalogOverride(JSON.parse(raw) as CatalogOverride)
+        : null;
+    } catch {
+      catalogOverrideValue = null;
+    }
+  }
+  // Without localStorage the override only ever lives in memory, so whatever
+  // this session downloaded stays in effect until it closes.
+  catalogOverrideLoaded = true;
+  return catalogOverrideValue;
+}
+
+function writeStoredCatalogOverride(override: CatalogOverride | null): void {
+  catalogOverrideValue = override;
+  catalogOverrideLoaded = true;
+  if (!canUseLocalStorage()) return;
+
+  try {
+    if (override) {
+      window.localStorage.setItem(CATALOG_OVERRIDE_KEY, JSON.stringify(override));
+    } else {
+      window.localStorage.removeItem(CATALOG_OVERRIDE_KEY);
+    }
+  } catch {
+    // Quota: the rules stay in memory for this session and are re-downloaded
+    // on the next launch. Built-in rules remain the floor either way.
+  }
+}
+
+/**
+ * Drops this window's read caches. The desktop app runs two webviews (the
+ * main window and the menu bar panel) over one storage; when the other one
+ * writes, this one must not keep serving what it read before.
+ */
+export function refreshLocalCaches(): void {
+  cachedStateRaw = null;
+  cachedState = null;
+  catalogOverrideLoaded = false;
+}
+
+function adoptLegacyCatalogOverride(legacy: unknown): void {
+  const override = normalizeCatalogOverride(legacy as LocalState["catalogOverride"]);
+  if (!override) return;
+
+  const current = readStoredCatalogOverride();
+  if (current && compareRuleSetVersions(current.version, override.version) >= 0) {
+    return;
+  }
+  writeStoredCatalogOverride(override);
 }
 
 /**
@@ -474,28 +672,45 @@ export function getPersistenceFailure(): string | null {
   return persistenceFailure;
 }
 
+/**
+ * Set when the latest write could not reach localStorage (usually quota).
+ * localStorage then still holds an older state, and reading it would quietly
+ * undo the change the user just made, so this session reads its own last
+ * write until a localStorage write succeeds again.
+ */
+let localStorageStale = false;
+
 function readState(): LocalState {
+  if (localStorageStale && lastWrittenState) return lastWrittenState;
   return readLocalStorageState() ?? lastWrittenState ?? defaultState();
 }
 
 function writeState(state: LocalState): void {
-  const normalized = normalizeLocalState(state);
+  const normalized = {
+    ...normalizeLocalState(state),
+    updatedAt: new Date().toISOString(),
+  };
   lastWrittenState = normalized;
 
   let storedSomewhere = false;
 
   if (canUseLocalStorage()) {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      const raw = JSON.stringify(normalized);
+      window.localStorage.setItem(STORAGE_KEY, raw);
+      cachedStateRaw = raw;
+      cachedState = normalized;
+      localStorageStale = false;
       storedSomewhere = true;
       persistenceFailure = null;
     } catch (error) {
       // Quota is the common case. IndexedDB has a far larger budget, so the
       // write below may still succeed — do not bail out here.
+      localStorageStale = true;
       persistenceFailure =
         error instanceof Error && error.name === "QuotaExceededError"
-          ? "Browser storage is full. Export a backup and remove old transactions."
-          : "This browser blocked local storage. Data will not survive a reload.";
+          ? uiText("Browser storage is full. Export a backup and remove old transactions.")
+          : uiText("This browser blocked local storage. Data will not survive a reload.");
     }
   }
 
@@ -505,8 +720,9 @@ function writeState(state: LocalState): void {
   }
 
   if (!storedSomewhere) {
-    persistenceFailure =
-      "No browser storage is available. Data will be lost when this tab closes.";
+    persistenceFailure = uiText(
+      "No browser storage is available. Data will be lost when this tab closes.",
+    );
   }
 }
 
@@ -530,21 +746,28 @@ async function requestPersistentBrowserStorage(): Promise<void> {
 export async function initializeLocalDataStore(): Promise<void> {
   try {
     const localStorageState = readLocalStorageState();
-    if (localStorageState) {
-      lastWrittenState = localStorageState;
-    } else {
-      const indexedDbState = await withTimeout(readIndexedDbState(), 3_000);
-      if (indexedDbState) {
-        lastWrittenState = indexedDbState;
-        try {
-          window.localStorage?.setItem(
-            STORAGE_KEY,
-            JSON.stringify(indexedDbState),
-          );
-        } catch {
-          // Mirroring back is an optimisation, not a requirement.
-        }
+    const indexedDbState = await withTimeout(readIndexedDbState(), 3_000);
+
+    // Both backends are written on every change, but a localStorage write can
+    // fail on quota while IndexedDB succeeds. Whichever saw the latest write
+    // wins, so a full localStorage cannot roll the wallet back on reload.
+    const indexedDbIsNewer =
+      indexedDbState !== null &&
+      (localStorageState === null ||
+        (indexedDbState.updatedAt ?? "") > (localStorageState.updatedAt ?? ""));
+
+    if (indexedDbIsNewer && indexedDbState) {
+      lastWrittenState = indexedDbState;
+      try {
+        const raw = JSON.stringify(indexedDbState);
+        window.localStorage?.setItem(STORAGE_KEY, raw);
+        cachedStateRaw = raw;
+        cachedState = indexedDbState;
+      } catch {
+        localStorageStale = true;
       }
+    } else if (localStorageState) {
+      lastWrittenState = localStorageState;
     }
 
     await withTimeout(requestPersistentBrowserStorage(), 3_000);
@@ -588,7 +811,7 @@ export function importLocalDataBackup(
     try {
       backup = JSON.parse(input) as LocalDataBackup;
     } catch {
-      throw new Error("Backup file is not valid JSON.");
+      throw uiError("Backup file is not valid JSON.");
     }
   } else {
     backup = input;
@@ -598,10 +821,10 @@ export function importLocalDataBackup(
     backup.app !== BACKUP_APP_NAME ||
     backup.formatVersion !== BACKUP_FORMAT_VERSION
   ) {
-    throw new Error("Backup file is not compatible with Oh My Cards.");
+    throw uiError("Backup file is not compatible with Oh My Cards.");
   }
   if (!backup.state || backup.state.schemaVersion !== 1) {
-    throw new Error("Backup file is missing a valid local state.");
+    throw uiError("Backup file is missing a valid local state.");
   }
 
   const state = normalizeLocalState(backup.state);
@@ -623,7 +846,7 @@ export function getLocalDataStorageSummary(): LocalDataStorageSummary {
     transactionCount: state.transactions.length,
     benefitUsageCount: state.benefitUsage.length,
     usedBenefitCount: state.benefitUsage.filter((usage) => usage.used).length,
-    hasCatalogOverride: Boolean(getCatalogOverride(state)),
+    hasCatalogOverride: Boolean(getCatalogOverride()),
   };
 }
 
@@ -643,21 +866,41 @@ function compareRuleSetVersions(left: string, right: string): number {
   return 0;
 }
 
-function getCatalogOverride(
-  state = readState(),
-): LocalState["catalogOverride"] {
-  const override = state.catalogOverride;
+/** Downloaded rules, but only while they are newer than the ones built in. */
+function getCatalogOverride(): CatalogOverride | null {
+  const override = readStoredCatalogOverride();
   if (!override?.cards?.length) return null;
   return compareRuleSetVersions(override.version, BUILTIN_RULESET_VERSION) >= 0
     ? override
     : null;
 }
 
+function activeCatalogCards(): CreditCard[] {
+  return getCatalogOverride()?.cards ?? (BUILTIN_CARDS as unknown as CreditCard[]);
+}
+
+/**
+ * id → card for the active catalog. Rebuilt only when the catalog array itself
+ * changes; looking a card up used to copy all 182 cards first.
+ */
+let catalogIndex: { source: CreditCard[]; byId: Map<number, CreditCard> } | null =
+  null;
+
+function getCatalogIndex(): Map<number, CreditCard> {
+  const cards = activeCatalogCards();
+  if (!catalogIndex || catalogIndex.source !== cards) {
+    catalogIndex = {
+      source: cards,
+      byId: new Map(cards.map((card) => [card.id, card])),
+    };
+  }
+  return catalogIndex.byId;
+}
+
 function getCatalog(): CreditCard[] {
   const state = readState();
   const walletCardIds = new Set(state.walletCards.map((w) => w.cardId));
-  const catalog = getCatalogOverride(state)?.cards ?? BUILTIN_CARDS;
-  return catalog.map((card) => ({
+  return activeCatalogCards().map((card) => ({
     ...card,
     inWallet: walletCardIds.has(card.id),
   }));
@@ -670,16 +913,81 @@ export interface CardRulesManifest {
   publishedAt?: string;
   /** sha256 of the rules payload, as published by `cards:publish`. */
   sha256?: string;
+  /** Rules payload schema; absent means 1. See SUPPORTED_RULES_SCHEMA. */
+  schema?: number;
+}
+
+/** What changed between two rulesets, in terms a cardholder cares about. */
+export interface CardRulesChangeSummary {
+  added: string[];
+  removed: string[];
+  /** One line per changed card, e.g. "Amex Gold: annual fee $325 → $350". */
+  changed: Array<{ cardId: number; name: string; details: string[] }>;
 }
 
 export interface CardRulesUpdateResult {
   updated: boolean;
   version: string;
   notes?: string;
+  changes?: CardRulesChangeSummary;
+  /** Names of wallet cards whose rules changed in this update. */
+  walletCardsChanged?: string[];
+}
+
+export interface CardRulesStatus {
+  /** Last time the feed was asked, successful or not. */
+  lastCheckedAt: string | null;
+  lastOutcome: "updated" | "up-to-date" | "error" | "skipped" | null;
+  lastError: string | null;
+  /** The most recent update that was actually applied. */
+  lastUpdate: {
+    version: string;
+    appliedAt: string;
+    notes?: string;
+    changes?: CardRulesChangeSummary;
+  } | null;
+}
+
+const EMPTY_RULES_STATUS: CardRulesStatus = {
+  lastCheckedAt: null,
+  lastOutcome: null,
+  lastError: null,
+  lastUpdate: null,
+};
+
+let rulesStatusMemory: CardRulesStatus = EMPTY_RULES_STATUS;
+
+export function getCardRulesStatus(): CardRulesStatus {
+  if (!canUseLocalStorage()) return rulesStatusMemory;
+  try {
+    const raw = window.localStorage.getItem(RULES_STATUS_KEY);
+    if (!raw) return rulesStatusMemory;
+    const parsed = JSON.parse(raw) as Partial<CardRulesStatus>;
+    return { ...EMPTY_RULES_STATUS, ...parsed };
+  } catch {
+    return rulesStatusMemory;
+  }
+}
+
+function writeCardRulesStatus(patch: Partial<CardRulesStatus>): CardRulesStatus {
+  const next = { ...getCardRulesStatus(), ...patch };
+  rulesStatusMemory = next;
+  if (canUseLocalStorage()) {
+    try {
+      window.localStorage.setItem(RULES_STATUS_KEY, JSON.stringify(next));
+    } catch {
+      // Status is informational only.
+    }
+  }
+  return next;
 }
 
 export function getCurrentRuleSetVersion(): string {
   return getCatalogOverride()?.version ?? BUILTIN_RULESET_VERSION;
+}
+
+export function getBuiltinRuleSetVersion(): string {
+  return BUILTIN_RULESET_VERSION;
 }
 
 /** Exposed for tests: this is the one place a published ruleset can lose data. */
@@ -743,8 +1051,11 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
         candidate.rewardUnitValueCents == null
           ? null
           : Number(candidate.rewardUnitValueCents),
+      // Rows are spread first for the same reason as the card itself: a field
+      // a newer ruleset adds (a benefit's renewal period, say) must survive.
       cashbackCategories: candidate.cashbackCategories.map(
         (category, catIndex) => ({
+          ...category,
           id: category.id ?? catIndex + 1,
           cardId: category.cardId ?? cardId,
           category: category.category,
@@ -753,6 +1064,7 @@ function normalizeRemoteCatalog(value: unknown): CreditCard[] {
         }),
       ),
       benefits: candidate.benefits.map((benefit, benefitIndex) => ({
+        ...benefit,
         id: benefit.id ?? benefitIndex + 1,
         cardId: benefit.cardId ?? cardId,
         name: benefit.name,
@@ -784,19 +1096,177 @@ async function sha256Hex(value: string): Promise<string | null> {
     .join("");
 }
 
-export async function checkForCardRulesUpdate(
+function formatRuleMoney(card: CreditCard, amount: number): string {
+  const currency = getCardCurrency(card) ?? "USD";
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    }).format(amount);
+  } catch {
+    return String(amount);
+  }
+}
+
+function formatRulePercent(rate: number): string {
+  return `${Number((rate * 100).toFixed(2))}%`;
+}
+
+/**
+ * Describes how `next` differs from `previous`, limited to what changes a
+ * cardholder's numbers: fees, earn rates, benefits and availability.
+ */
+export function summarizeCardRuleChanges(
+  previous: CreditCard[],
+  next: CreditCard[],
+): CardRulesChangeSummary {
+  const before = new Map(previous.map((card) => [card.id, card]));
+  const after = new Map(next.map((card) => [card.id, card]));
+  const summary: CardRulesChangeSummary = { added: [], removed: [], changed: [] };
+
+  for (const card of next) {
+    const old = before.get(card.id);
+    if (!old) {
+      summary.added.push(card.name);
+      continue;
+    }
+
+    const details: string[] = [];
+    if (old.name !== card.name) {
+      details.push(uiText("renamed from {name}", { name: old.name }));
+    }
+    if (old.annualFee !== card.annualFee) {
+      details.push(
+        uiText("annual fee {from} → {to}", {
+          from: formatRuleMoney(old, old.annualFee),
+          to: formatRuleMoney(card, card.annualFee),
+        }),
+      );
+    }
+
+    const oldRates = new Map(old.cashbackCategories.map((row) => [row.category, row.rate]));
+    const newRates = new Map(card.cashbackCategories.map((row) => [row.category, row.rate]));
+    for (const [label, rate] of newRates) {
+      const oldRate = oldRates.get(label);
+      if (oldRate === undefined) {
+        details.push(
+          uiText("new: {rate} {category}", {
+            rate: formatRulePercent(rate),
+            category: label,
+          }),
+        );
+      }
+      else if (oldRate !== rate) {
+        details.push(`${label} ${formatRulePercent(oldRate)} → ${formatRulePercent(rate)}`);
+      }
+    }
+    for (const label of oldRates.keys()) {
+      if (!newRates.has(label)) {
+        details.push(uiText("removed: {category}", { category: label }));
+      }
+    }
+
+    const oldBenefits = new Map(old.benefits.map((benefit) => [benefit.name, benefit]));
+    const newBenefitNames = new Set(card.benefits.map((benefit) => benefit.name));
+    for (const benefit of card.benefits) {
+      const previousBenefit = oldBenefits.get(benefit.name);
+      if (!previousBenefit) details.push(`new benefit: ${benefit.name}`);
+      else if ((previousBenefit.annualValue ?? 0) !== (benefit.annualValue ?? 0)) {
+        details.push(`${benefit.name} value changed`);
+      }
+    }
+    for (const name of oldBenefits.keys()) {
+      if (!newBenefitNames.has(name)) details.push(`benefit removed: ${name}`);
+    }
+
+    const oldAvailability = (old as CreditCardMetadata).availability ?? "open";
+    const newAvailability = (card as CreditCardMetadata).availability ?? "open";
+    if (oldAvailability !== newAvailability) {
+      details.push(
+        newAvailability === "open"
+          ? "open to new applicants again"
+          : newAvailability === "discontinued"
+            ? "no longer offered"
+            : "closed to new applicants",
+      );
+    }
+
+    if (details.length) summary.changed.push({ cardId: card.id, name: card.name, details });
+  }
+
+  for (const card of previous) {
+    if (!after.has(card.id)) summary.removed.push(card.name);
+  }
+
+  return summary;
+}
+
+let rulesCheckInFlight: Promise<CardRulesUpdateResult> | null = null;
+
+/**
+ * Asks the rules feed for a newer ruleset and installs it.
+ *
+ * Concurrent calls share one request: the app checks on launch, on focus and
+ * on a timer, and two overlapping downloads would race to write the same key.
+ */
+export function checkForCardRulesUpdate(
+  manifestUrl: string,
+): Promise<CardRulesUpdateResult> {
+  if (!rulesCheckInFlight) {
+    rulesCheckInFlight = runCardRulesUpdate(manifestUrl).finally(() => {
+      rulesCheckInFlight = null;
+    });
+  }
+  return rulesCheckInFlight;
+}
+
+async function runCardRulesUpdate(
+  manifestUrl: string,
+): Promise<CardRulesUpdateResult> {
+  const checkedAt = new Date().toISOString();
+
+  try {
+    const result = await fetchAndInstallCardRules(manifestUrl);
+    writeCardRulesStatus({
+      lastCheckedAt: checkedAt,
+      lastOutcome: result.updated ? "updated" : "up-to-date",
+      lastError: null,
+      ...(result.updated
+        ? {
+            lastUpdate: {
+              version: result.version,
+              appliedAt: checkedAt,
+              notes: result.notes,
+              changes: result.changes,
+            },
+          }
+        : {}),
+    });
+    return result;
+  } catch (error) {
+    writeCardRulesStatus({
+      lastCheckedAt: checkedAt,
+      lastOutcome: "error",
+      lastError: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+async function fetchAndInstallCardRules(
   manifestUrl: string,
 ): Promise<CardRulesUpdateResult> {
   const manifestResponse = await fetch(manifestUrl, { cache: "no-store" });
   if (!manifestResponse.ok) {
-    throw new Error(
-      `Could not fetch card rules manifest: ${manifestResponse.status}`,
-    );
+    throw uiError("Could not fetch card rules manifest: {status}", {
+      status: manifestResponse.status,
+    });
   }
 
   const manifest = (await manifestResponse.json()) as CardRulesManifest;
   if (!manifest.version || !manifest.url) {
-    throw new Error("Card rules manifest must include version and url.");
+    throw uiError("Card rules manifest must include version and url.");
   }
 
   const currentVersion = getCurrentRuleSetVersion();
@@ -804,6 +1274,11 @@ export async function checkForCardRulesUpdate(
   // deploy — must not downgrade rules the app already has.
   if (compareRuleSetVersions(manifest.version, currentVersion) <= 0) {
     return { updated: false, version: currentVersion };
+  }
+  if ((manifest.schema ?? 1) > SUPPORTED_RULES_SCHEMA) {
+    throw uiError(
+      "Newer card rules need a newer version of the app. Update Oh My Cards to get them.",
+    );
   }
 
   const pageUrl =
@@ -813,46 +1288,69 @@ export async function checkForCardRulesUpdate(
   // The payload replaces every reward rule in the app, so it has to come from
   // the same origin as the manifest that vouched for it.
   if (rulesUrl.origin !== manifestOrigin) {
-    throw new Error("Card rules must be served from the manifest's origin.");
+    throw uiError("Card rules must be served from the manifest's origin.");
   }
 
   const rulesResponse = await fetch(rulesUrl.toString(), { cache: "no-store" });
   if (!rulesResponse.ok) {
-    throw new Error(`Could not fetch card rules: ${rulesResponse.status}`);
+    throw uiError("Could not fetch card rules: {status}", {
+      status: rulesResponse.status,
+    });
   }
 
   const body = await rulesResponse.text();
   if (manifest.sha256) {
     const digest = await sha256Hex(body);
     if (digest && digest !== manifest.sha256) {
-      throw new Error("Card rules failed their integrity check.");
+      throw uiError("Card rules failed their integrity check.");
     }
   }
 
-  const cards = normalizeRemoteCatalog(JSON.parse(body));
-  if (!cards.length) throw new Error("Card rules contained no cards.");
+  const payload = JSON.parse(body) as { version?: unknown; schema?: unknown };
+  if (typeof payload.version === "string" && payload.version !== manifest.version) {
+    throw uiError("Card rules payload does not match its manifest version.");
+  }
+  if (Number(payload.schema ?? 1) > SUPPORTED_RULES_SCHEMA) {
+    throw uiError(
+      "Newer card rules need a newer version of the app. Update Oh My Cards to get them.",
+    );
+  }
+
+  const cards = normalizeRemoteCatalog(payload);
+  if (!cards.length) throw uiError("Card rules contained no cards.");
+  // A truncated or half-published feed would silently drop cards people hold.
+  if (cards.length < Math.floor(activeCatalogCards().length * 0.8)) {
+    throw uiError("Card rules look incomplete; keeping the current rules.");
+  }
+
+  const previousCards = activeCatalogCards();
+  const changes = summarizeCardRuleChanges(previousCards, cards);
+  writeStoredCatalogOverride({
+    version: manifest.version,
+    notes: manifest.notes,
+    publishedAt: manifest.publishedAt,
+    cards,
+  });
 
   const state = readState();
-  writeState({
-    ...state,
-    ruleSetVersion: manifest.version,
-    catalogOverride: {
-      version: manifest.version,
-      notes: manifest.notes,
-      publishedAt: manifest.publishedAt,
-      cards,
-    },
-  });
+  writeState({ ...state, ruleSetVersion: manifest.version });
+
+  const heldCardIds = new Set(state.walletCards.map((walletCard) => walletCard.cardId));
+  const walletCardsChanged = changes.changed
+    .filter((change) => heldCardIds.has(change.cardId))
+    .map((change) => change.name);
 
   return {
     updated: true,
     version: manifest.version,
     notes: manifest.notes,
+    changes,
+    walletCardsChanged,
   };
 }
 
 function getCard(cardId: number): CreditCard | undefined {
-  return getCatalog().find((card) => card.id === cardId);
+  return getCatalogIndex().get(cardId);
 }
 
 function sortByDateDesc(transactions: Transaction[]): Transaction[] {
@@ -1045,12 +1543,203 @@ function travelSubjectsOverlap(
  * matched almost nothing and silently paid the default rate instead. Matching
  * on derived tags is what makes those categories reachable.
  */
+/**
+ * Logged categories too broad to say what was bought; for these the merchant
+ * is the better signal ("Other" at "Hilton Garden Inn" is a hotel stay).
+ */
+const GENERIC_TRANSACTION_CATEGORIES = new Set(["travel", "other"]);
+
+/**
+ * Chinese purchase words, glossed into the English the matchers read, so
+ * "星巴克咖啡 45" and "Costco 加油" find the same cards as their English
+ * versions. Glosses are appended for matching only; what the user typed is
+ * what gets saved.
+ */
+const CHINESE_PURCHASE_GLOSSES: Array<[string, string]> = [
+  // Dining
+  ["外卖", "food delivery"],
+  ["送餐", "food delivery"],
+  ["餐厅", "restaurant"],
+  ["饭店", "restaurant"],
+  ["餐馆", "restaurant"],
+  ["吃饭", "dining"],
+  ["聚餐", "dining"],
+  ["下馆子", "dining"],
+  ["早午餐", "brunch"],
+  ["早餐", "breakfast"],
+  ["早饭", "breakfast"],
+  ["午餐", "lunch"],
+  ["午饭", "lunch"],
+  ["晚餐", "dinner"],
+  ["晚饭", "dinner"],
+  ["夜宵", "dining"],
+  ["宵夜", "dining"],
+  ["火锅", "restaurant"],
+  ["烧烤", "restaurant"],
+  ["奶茶", "coffee"],
+  ["咖啡", "coffee"],
+  ["星巴克", "starbucks"],
+  ["麦当劳", "mcdonald"],
+  ["肯德基", "kfc"],
+  ["汉堡", "burger"],
+  ["披萨", "pizza"],
+  ["寿司", "sushi"],
+  ["拉面", "ramen"],
+  // Groceries and warehouse clubs
+  ["超市", "supermarket"],
+  ["买菜", "groceries"],
+  ["菜市场", "groceries"],
+  ["杂货", "groceries"],
+  ["生鲜", "groceries"],
+  ["好市多", "costco"],
+  ["开市客", "costco"],
+  ["仓储会员店", "warehouse club"],
+  ["沃尔玛", "walmart"],
+  ["全食", "whole foods"],
+  ["亚马逊", "amazon"],
+  // Gas and charging
+  ["加油站", "gas"],
+  ["加油", "gas"],
+  ["油费", "gas"],
+  ["汽油", "gasoline"],
+  ["充电桩", "ev charging"],
+  ["充电", "ev charging"],
+  // Travel
+  ["机票", "flight"],
+  ["航班", "flight"],
+  ["飞机", "flight"],
+  ["美联航", "united airlines"],
+  ["联合航空", "united airlines"],
+  ["达美", "delta airlines"],
+  ["美国航空", "american airlines"],
+  ["美航", "american airlines"],
+  ["西南航空", "southwest airlines"],
+  ["阿拉斯加航空", "alaska airlines"],
+  ["国泰", "cathay"],
+  ["酒店", "hotel"],
+  ["宾馆", "hotel"],
+  ["旅馆", "hotel"],
+  ["民宿", "airbnb"],
+  ["住宿", "lodging"],
+  ["万豪", "marriott"],
+  ["希尔顿", "hilton"],
+  ["凯悦", "hyatt"],
+  ["洲际", "ihg"],
+  ["租车", "rental car"],
+  ["官网", "booked direct"],
+  ["直接订", "booked direct"],
+  ["直订", "booked direct"],
+  ["旅行", "travel"],
+  ["旅游", "travel"],
+  ["度假", "vacation"],
+  // Getting around
+  ["打车", "rideshare"],
+  ["网约车", "rideshare"],
+  ["优步", "uber"],
+  ["出租车", "taxi"],
+  ["地铁", "transit"],
+  ["公交", "transit"],
+  ["火车", "train ticket"],
+  ["通勤", "commute"],
+  // Bills and subscriptions
+  ["流媒体", "streaming"],
+  ["网飞", "netflix"],
+  ["视频会员", "streaming"],
+  ["话费", "phone bill"],
+  ["手机费", "phone bill"],
+  ["网费", "internet"],
+  ["宽带", "internet"],
+  ["水电", "utilities"],
+  ["电费", "electric bill"],
+  ["水费", "utility bill"],
+  ["燃气费", "utility bill"],
+  ["房租", "rent"],
+  ["租金", "rent"],
+  // Everything else
+  ["药店", "pharmacy"],
+  ["药房", "pharmacy"],
+  ["买药", "pharmacy"],
+  ["家装", "home improvement"],
+  ["装修", "home improvement"],
+  ["五金", "home improvement"],
+  ["办公用品", "office supplies"],
+  ["文具", "office supplies"],
+  ["快递", "shipping"],
+  ["健身房", "gym"],
+  ["健身", "fitness"],
+  ["瑜伽", "yoga"],
+  ["网购", "online shopping"],
+  ["网上", "online order"],
+  ["线上", "online order"],
+  ["苹果支付", "apple pay"],
+  ["苹果店", "apple store"],
+  ["香港", "hong kong"],
+  ["新加坡", "singapore"],
+  ["加拿大", "canada"],
+  ["日本", "japan"],
+  ["东京", "tokyo"],
+  ["欧洲", "europe"],
+  ["国外", "overseas"],
+  ["海外", "overseas"],
+  ["境外", "overseas"],
+];
+
+const HAS_CJK = /[\u3400-\u9fff]/;
+
+function glossChinesePurchaseText(text: string): string {
+  if (!HAS_CJK.test(text)) return text;
+  const glosses = new Set<string>();
+  for (const [term, gloss] of CHINESE_PURCHASE_GLOSSES) {
+    if (text.includes(term)) glosses.add(gloss);
+  }
+  return glosses.size ? `${text} ${[...glosses].join(" ")}` : text;
+}
+
+/** Tags read from a merchant name or note, minus brand words used as words. */
+function getPurchaseTextTags(text: string): string[] {
+  let cleaned = glossChinesePurchaseText(text).toLowerCase();
+  // "Shipping to the United States" is not United Airlines.
+  for (const entry of AMBIGUOUS_TERMS) {
+    cleaned = cleaned.replace(new RegExp(entry.notWhen.source, "g"), " ");
+  }
+  return getCategoryTags(cleaned);
+}
+
+/**
+ * What a logged transaction says about itself: its category, plus the
+ * merchant and note the user typed. The merchant contributes brand and channel
+ * tags — "Flights" at "United Airlines" can reach a United bonus, "Rideshare"
+ * at "Lyft" a Lyft bonus — which the bare category never could. It only adds
+ * *what was bought* when the category itself is generic.
+ */
+function getTransactionTags(label: string, purchaseText?: string | null): string[] {
+  const tags = new Set(getCategoryTags(label));
+  const text = purchaseText?.trim();
+  if (!text) return [...tags];
+
+  const fromText = partitionTags(getPurchaseTextTags(text));
+  for (const tag of fromText.narrowing) tags.add(tag);
+  if (GENERIC_TRANSACTION_CATEGORIES.has(label.trim().toLowerCase())) {
+    for (const tag of fromText.subjects) tags.add(tag);
+  }
+  return [...tags];
+}
+
+function transactionPurchaseText(
+  transaction: Pick<Transaction, "merchantName" | "description" | "category">,
+): string {
+  return [transaction.merchantName, transaction.description]
+    .filter((part): part is string => Boolean(part) && part !== transaction.category)
+    .join(" ");
+}
+
 function categoryCovers(
   categoryLabel: string,
   transactionLabel: string,
+  purchaseText?: string | null,
 ): boolean {
   const category = partitionTags(getCategoryTags(categoryLabel));
-  const transaction = partitionTags(getCategoryTags(transactionLabel));
+  const transaction = partitionTags(getTransactionTags(transactionLabel, purchaseText));
 
   if (!category.subjects.size || !transaction.subjects.size) return false;
 
@@ -1102,6 +1791,8 @@ export interface CategoryChoiceContext {
   onDate?: Date;
   /** The purchase being priced, which counts toward an automatic choice. */
   pending?: { category: string; amount: number };
+  /** Merchant and note of the purchase, for merchant-specific bonuses. */
+  purchaseText?: string | null;
 }
 
 function choicePeriodStart(
@@ -1188,6 +1879,18 @@ export function resolveCashbackCategory(
   return getCashbackCategory(card, category, context);
 }
 
+/**
+ * A non-default row that covers every purchase — "Business Purchases (up to
+ * $50,000/yr)" on Amex Blue Business — is a capped base rate. Its label names
+ * no kind of spend, so the subject matcher could never select it and those
+ * cards were priced at the post-cap 1% on everything.
+ */
+function isCatchAllBonusRow(row: CashbackCategory): boolean {
+  if (row.isDefault) return false;
+  const tags = getCategoryTags(row.category);
+  return tags.includes("default") && partitionTags(tags).subjects.size === 0;
+}
+
 function getCashbackCategory(
   card: CreditCard,
   category: string,
@@ -1207,10 +1910,15 @@ function getCashbackCategory(
    */
   const rowApplies = (row: CashbackCategory): boolean => {
     const choice = choicesByCategoryId.get(row.id);
-    if (!choice) return categoryCovers(row.category, label);
+    if (!choice) {
+      return (
+        isCatchAllBonusRow(row) ||
+        categoryCovers(row.category, label, context.purchaseText)
+      );
+    }
 
     return getActiveChoiceOptions(choice, context).some((option) =>
-      categoryCovers(option, label),
+      categoryCovers(option, label, context.purchaseText),
     );
   };
 
@@ -1220,9 +1928,16 @@ function getCashbackCategory(
       !c.isDefault &&
       !choicesByCategoryId.has(c.id),
   );
-  if (exact) return exact;
+  // The verbatim row wins outright unless the merchant names a brand or
+  // channel, which may unlock something better ("Travel" at "Chase Travel").
+  const merchantNarrows =
+    Boolean(context.purchaseText?.trim()) &&
+    partitionTags(getPurchaseTextTags(context.purchaseText!)).narrowing.size > 0;
+  if (exact && !merchantNarrows) return exact;
 
-  const transactionSubjects = partitionTags(getCategoryTags(label)).subjects;
+  const transactionSubjects = partitionTags(
+    getTransactionTags(label, context.purchaseText),
+  ).subjects;
 
   const candidates = card.cashbackCategories
     .filter((c) => !c.isDefault && rowApplies(c))
@@ -1240,14 +1955,25 @@ function getCashbackCategory(
         a.category.category.localeCompare(b.category.category),
     );
 
+  const fallbackRate = fallback?.rate ?? 0;
   const best = candidates[0]?.category;
   if (!best) return fallback;
+  if (!fallback || best.rate > fallbackRate) return best;
 
-  // A "bonus" that pays no better than the default is not a bonus, and
-  // treating it as one would wrongly subject the spend to that row's cap.
-  if (fallback && best.rate <= fallback.rate) return fallback;
+  // Some rows are exceptions that earn *less* than the base rate — Bilt
+  // Palladium pays 2x everywhere but 1x on rent. Those must win over the
+  // fallback, or rent would be credited at 2x. The most specific one applies.
+  const reduced = candidates
+    .filter((candidate) => candidate.category.rate < fallbackRate)
+    .sort(
+      (a, b) =>
+        b.overlap - a.overlap || a.category.rate - b.category.rate,
+    )[0]?.category;
+  if (reduced) return reduced;
 
-  return best;
+  // A "bonus" that pays exactly the default is not a bonus, and treating it as
+  // one would wrongly subject the spend to that row's cap.
+  return fallback;
 }
 
 function getCashbackRate(cardId: number, category: string): number {
@@ -1341,7 +2067,10 @@ function transactionMatchesSpendCapGroup(
   capGroup: string,
   context: CategoryChoiceContext = {},
 ): boolean {
-  const category = getCashbackCategory(card, transaction.category, context);
+  const category = getCashbackCategory(card, transaction.category, {
+    ...context,
+    purchaseText: transactionPurchaseText(transaction),
+  });
   const cap = category ? parseSpendCap(category.category) : null;
   if (!category || !cap) return false;
   return normalizeCapGroup(category.category, cap) === capGroup;
@@ -1378,6 +2107,11 @@ function calculateCashback(
     state,
     onDate: transactionDate,
     pending: { category: data.category, amount: data.amount },
+    purchaseText: transactionPurchaseText({
+      merchantName: data.merchantName ?? null,
+      description: data.description,
+      category: data.category,
+    }),
   };
   const matchedCategory = getCashbackCategory(
     card,
@@ -1521,34 +2255,42 @@ function buildWalletCard(
     activeChoiceCategories[choice.categoryId] = active;
   }
 
+  const now = new Date();
+  const usageByBenefitId = new Map(
+    state.benefitUsage
+      .filter((usage) => usage.walletCardId === walletCard.id)
+      .map((usage) => [usage.benefitId, usage]),
+  );
+  const usedBenefitIds: number[] = [];
+  const benefitPeriods: Record<number, BenefitPeriodState> = {};
+  let currentYearBenefitValue = 0;
+  for (const benefit of card.benefits) {
+    const usage = usageByBenefitId.get(benefit.id);
+    benefitPeriods[benefit.id] = getBenefitPeriodState(benefit, walletCard, now);
+    if (usage && isBenefitUsedInCurrentPeriod(usage, benefit, walletCard, now)) {
+      usedBenefitIds.push(benefit.id);
+    }
+    if (usage) {
+      currentYearBenefitValue += getBenefitValueCaptured(
+        usage,
+        benefit,
+        walletCard,
+        currentYearStart,
+        now,
+      );
+    }
+  }
+
   return {
     ...walletCard,
     totalCashbackEarned,
     currentYearCashback,
     activeChoiceCategories,
+    usedBenefitIds,
+    currentYearBenefitValue: Number(currentYearBenefitValue.toFixed(2)),
+    benefitPeriods,
     card: { ...card, inWallet: true },
   };
-}
-
-/**
- * Wallet cards denominated in the currency most of the wallet uses.
- *
- * Benefit values cannot be summed across currencies, so the dashboard totals
- * and the benefit lists must both narrow to the same population or the count
- * on the tile will not match the list behind it.
- */
-function inDominantCurrency(walletCards: WalletCard[]): WalletCard[] {
-  const counts = new Map<string, number>();
-  for (const walletCard of walletCards) {
-    const currency = getCardCurrency(walletCard.card) ?? "USD";
-    counts.set(currency, (counts.get(currency) ?? 0) + 1);
-  }
-
-  const dominant =
-    [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "USD";
-  return walletCards.filter(
-    (walletCard) => (getCardCurrency(walletCard.card) ?? "USD") === dominant,
-  );
 }
 
 function listWalletCards(state = readState()): WalletCard[] {
@@ -1587,23 +2329,197 @@ function ensureBenefitUsageRows(
     : state.benefitUsage;
 }
 
-/**
- * Whether a benefit counts as used *in the current benefit year*.
- *
- * Card benefits are annual allowances that reset on the account anniversary.
- * Treating the stored `used` flag as permanent made every credit vanish from
- * the unused list the first time it was claimed and never come back.
- */
-function isBenefitUsedThisYear(
-  usage: LocalBenefitUsage,
-  walletCard: LocalWalletCard | undefined,
-): boolean {
-  if (!usage.used) return false;
-  if (!walletCard) return usage.used;
-  if (!usage.usedAt) return true;
+const BENEFIT_PERIODS: readonly CardBenefitPeriod[] = [
+  "monthly",
+  "quarterly",
+  "semiannual",
+  "calendar-year",
+  "cardmember-year",
+  "multi-year",
+  "one-time",
+];
 
-  return isOnOrAfterLocalDate(usage.usedAt, cycleStartForAnnualFee(walletCard));
+type BenefitRenewal = Pick<CardBenefit, "annualValue" | "period" | "periodYears">;
+
+export function getBenefitPeriod(benefit: BenefitRenewal): CardBenefitPeriod {
+  const period = benefit.period;
+  return period && BENEFIT_PERIODS.includes(period) ? period : "cardmember-year";
 }
+
+function getBenefitPeriodYears(benefit: BenefitRenewal): number {
+  const years = Number(benefit.periodYears);
+  return Number.isFinite(years) && years > 0 ? years : 4;
+}
+
+/**
+ * Value of a single period's allowance. `annualValue` is per year, so a
+ * monthly credit is a twelfth of it, and a credit renewed every four years
+ * (stored amortized) is worth four years' share on the one occasion it pays.
+ */
+export function getBenefitPeriodValue(benefit: BenefitRenewal): number | null {
+  const annual = benefit.annualValue;
+  if (!annual || annual <= 0) return null;
+
+  switch (getBenefitPeriod(benefit)) {
+    case "monthly":
+      return Number((annual / 12).toFixed(2));
+    case "quarterly":
+      return Number((annual / 4).toFixed(2));
+    case "semiannual":
+      return Number((annual / 2).toFixed(2));
+    case "multi-year":
+      return Number((annual * getBenefitPeriodYears(benefit)).toFixed(2));
+    default:
+      return annual;
+  }
+}
+
+function addMonths(date: Date, months: number): Date {
+  return new Date(date.getFullYear(), date.getMonth() + months, 1);
+}
+
+/**
+ * The renewal window that contains `onDate`, as [start, end). `end` is null
+ * for an allowance that never renews. Multi-year windows hang off the last
+ * use, since that is when the clock starts for a Global Entry style credit.
+ */
+function getBenefitWindow(
+  benefit: BenefitRenewal,
+  walletCard: LocalWalletCard | undefined,
+  onDate: Date,
+  history: string[] = [],
+): { start: Date; end: Date | null } {
+  const year = onDate.getFullYear();
+  const month = onDate.getMonth();
+
+  switch (getBenefitPeriod(benefit)) {
+    case "monthly": {
+      const start = new Date(year, month, 1);
+      return { start, end: addMonths(start, 1) };
+    }
+    case "quarterly": {
+      const start = getQuarterStart(onDate);
+      return { start, end: addMonths(start, 3) };
+    }
+    case "semiannual": {
+      const start = new Date(year, month < 6 ? 0 : 6, 1);
+      return { start, end: addMonths(start, 6) };
+    }
+    case "calendar-year":
+      return { start: new Date(year, 0, 1), end: new Date(year + 1, 0, 1) };
+    case "one-time":
+      return { start: new Date(0), end: null };
+    case "multi-year": {
+      const years = getBenefitPeriodYears(benefit);
+      const spanMs = years * 365.25 * 86_400_000;
+      const lastUse = history
+        .map((entry) => new Date(entry))
+        .filter((date) => date.getTime() <= onDate.getTime())
+        .sort((a, b) => b.getTime() - a.getTime())[0];
+      if (lastUse && onDate.getTime() - lastUse.getTime() < spanMs) {
+        return { start: lastUse, end: new Date(lastUse.getTime() + spanMs) };
+      }
+      return { start: new Date(onDate.getTime() - spanMs), end: null };
+    }
+    case "cardmember-year":
+    default: {
+      if (!walletCard) {
+        return { start: new Date(year, 0, 1), end: new Date(year + 1, 0, 1) };
+      }
+      const start = cycleStartForAnnualFee(walletCard, onDate);
+      const anchor = parseCalendarDate(walletCard.openedAt ?? walletCard.addedAt);
+      const end = Number.isNaN(anchor.getTime())
+        ? new Date(start.getFullYear() + 1, start.getMonth(), start.getDate())
+        : dateOnDayOfMonth(start.getFullYear() + 1, anchor.getMonth(), anchor.getDate());
+      return { start, end };
+    }
+  }
+}
+
+function usageHistory(usage: LocalBenefitUsage): string[] {
+  if (usage.history?.length) return usage.history;
+  // Normalization fills history from the legacy flag; this covers a record
+  // built in memory without passing through it.
+  return usage.used ? [usage.usedAt ?? new Date().toISOString()] : [];
+}
+
+function isWithinWindow(dateInput: string, window: { start: Date; end: Date | null }): boolean {
+  const time = new Date(dateInput).getTime();
+  if (Number.isNaN(time)) return false;
+  return time >= window.start.getTime() && (window.end === null || time < window.end.getTime());
+}
+
+/**
+ * Whether a benefit has been used in its *current* renewal period.
+ *
+ * A monthly credit used in March is unused again on April 1; an anniversary-
+ * year credit resets on the account anniversary. Treating the stored flag as
+ * permanent made every credit vanish from the unused list after its first use.
+ */
+function isBenefitUsedInCurrentPeriod(
+  usage: LocalBenefitUsage,
+  benefit: BenefitRenewal,
+  walletCard: LocalWalletCard | undefined,
+  onDate = new Date(),
+): boolean {
+  const history = usageHistory(usage);
+  if (!history.length) return false;
+  const window = getBenefitWindow(benefit, walletCard, onDate, history);
+  return history.some((entry) => isWithinWindow(entry, window));
+}
+
+function getBenefitPeriodState(
+  benefit: BenefitRenewal,
+  walletCard: LocalWalletCard | undefined,
+  onDate = new Date(),
+  usage?: LocalBenefitUsage,
+): BenefitPeriodState {
+  const window = getBenefitWindow(
+    benefit,
+    walletCard,
+    onDate,
+    usage ? usageHistory(usage) : [],
+  );
+  return {
+    period: getBenefitPeriod(benefit),
+    periodValue: getBenefitPeriodValue(benefit),
+    resetsAt: window.end ? window.end.toISOString() : null,
+  };
+}
+
+/**
+ * How much of a benefit was actually captured between two dates: one period's
+ * allowance for every distinct period with a recorded use. This is what lets
+ * a $25/month credit count as $200 toward the annual fee after eight months,
+ * not $300 after one click.
+ */
+function getBenefitValueCaptured(
+  usage: LocalBenefitUsage,
+  benefit: BenefitRenewal,
+  walletCard: LocalWalletCard | undefined,
+  since: Date,
+  until: Date,
+): number {
+  const perPeriod = getBenefitPeriodValue(benefit);
+  if (!perPeriod) return 0;
+
+  const periodStarts = new Set<number>();
+  for (const entry of usageHistory(usage)) {
+    const date = new Date(entry);
+    if (Number.isNaN(date.getTime())) continue;
+    if (date < startOfLocalDay(since) || date > until) continue;
+    const window = getBenefitWindow(benefit, walletCard, date, [entry]);
+    periodStarts.add(window.start.getTime());
+  }
+  return periodStarts.size * perPeriod;
+}
+
+/** Exposed for tests: renewal windows are where a credit can be double-counted. */
+export const benefitPeriodsForTests = {
+  isUsedInCurrentPeriod: isBenefitUsedInCurrentPeriod,
+  valueCaptured: getBenefitValueCaptured,
+  normalizeUsage: normalizeBenefitUsageRecord,
+};
 
 function buildBenefitUsage(
   usage: LocalBenefitUsage,
@@ -1613,7 +2529,9 @@ function buildBenefitUsage(
   const benefit = getCard(walletCard?.cardId ?? -1)?.benefits.find(
     (b) => b.id === usage.benefitId,
   );
-  const used = isBenefitUsedThisYear(usage, walletCard);
+  const renewal: BenefitRenewal = benefit ?? { annualValue: null };
+  const now = new Date();
+  const used = isBenefitUsedInCurrentPeriod(usage, renewal, walletCard, now);
 
   return {
     benefitId: usage.benefitId,
@@ -1623,6 +2541,7 @@ function buildBenefitUsage(
     annualValue: benefit?.annualValue ?? null,
     used,
     usedAt: used ? (usage.usedAt ?? null) : null,
+    ...getBenefitPeriodState(renewal, walletCard, now, usage),
   };
 }
 
@@ -1667,7 +2586,7 @@ export function useGetCard(id: number) {
     queryKey: queryKeys.card(id),
     queryFn: async () => {
       const card = getCard(id);
-      if (!card) throw new Error("Card not found");
+      if (!card) throw uiError("Card not found");
       return card;
     },
   });
@@ -1684,9 +2603,9 @@ export const useAddToWallet = () =>
   useMutation({
     mutationFn: async ({ data }: { data: AddToWalletBody }) => {
       const state = readState();
-      if (!getCard(data.cardId)) throw new Error("Card not found");
+      if (!getCard(data.cardId)) throw uiError("Card not found");
       if (state.walletCards.some((w) => w.cardId === data.cardId)) {
-        throw new Error("Card already in wallet");
+        throw uiError("Card already in wallet");
       }
 
       const walletCard: LocalWalletCard = {
@@ -1721,7 +2640,7 @@ export const useUpdateWalletCard = () =>
     }) => {
       const state = readState();
       const existing = state.walletCards.find((w) => w.id === id);
-      if (!existing) throw new Error("Wallet card not found");
+      if (!existing) throw uiError("Wallet card not found");
 
       const next: LocalWalletCard = {
         ...existing,
@@ -1793,7 +2712,7 @@ export const useRemoveFromWallet = () =>
     mutationFn: async ({ id }: { id: number }) => {
       const state = readState();
       if (!state.walletCards.some((w) => w.id === id)) {
-        throw new Error("Wallet card not found");
+        throw uiError("Wallet card not found");
       }
 
       writeState({
@@ -1909,6 +2828,7 @@ function recalculateCardCashback(
         amount: transaction.amount,
         category: transaction.category,
         description: transaction.description,
+        merchantName: transaction.merchantName ?? null,
       },
       new Date(transaction.date),
     );
@@ -1932,20 +2852,20 @@ export const useCreateTransaction = () =>
       const state = readState();
       const walletCardId = toFiniteNumber(data.walletCardId, -1);
       const amount = toFiniteNumber(data.amount);
-      if (amount <= 0) throw new Error("Amount must be greater than zero");
+      if (amount <= 0) throw uiError("Amount must be greater than zero");
 
       const walletCard = state.walletCards.find((w) => w.id === walletCardId);
-      if (!walletCard) throw new Error("Wallet card not found");
+      if (!walletCard) throw uiError("Wallet card not found");
 
       const card = getCard(walletCard.cardId);
-      if (!card) throw new Error("Card not found");
+      if (!card) throw uiError("Card not found");
 
       const transactionType = data.transactionType ?? "purchase";
       const category =
         transactionType === "payment" ? "Payment" : data.category;
       const transactionDate = new Date(data.date ?? new Date().toISOString());
       if (Number.isNaN(transactionDate.getTime())) {
-        throw new Error("Transaction date is not a valid date");
+        throw uiError("Transaction date is not a valid date");
       }
 
       const transaction: Transaction = {
@@ -1982,12 +2902,204 @@ export const useCreateTransaction = () =>
     },
   });
 
+/**
+ * What logging this purchase would earn, priced exactly as the engine will
+ * price it: spend caps already consumed this period, automatic top-spend
+ * choices, and the card's point valuation. The log form previews with this so
+ * the number it shows is the number that gets saved.
+ */
+export function estimateTransactionReward(input: {
+  walletCardId: number;
+  category: string;
+  amount: number;
+  date?: string;
+  merchantName?: string | null;
+  description?: string | null;
+  /** The transaction being edited, which must not count against its own cap. */
+  excludeTransactionId?: number;
+}): { cashbackEarned: number; cashbackRate: number } | null {
+  const stored = readState();
+  const state =
+    input.excludeTransactionId == null
+      ? stored
+      : {
+          ...stored,
+          transactions: stored.transactions.filter(
+            (transaction) => transaction.id !== input.excludeTransactionId,
+          ),
+        };
+  const walletCard = state.walletCards.find((w) => w.id === input.walletCardId);
+  if (!walletCard) return null;
+  const card = getCard(walletCard.cardId);
+  if (!card) return null;
+
+  const date = input.date ? new Date(input.date) : new Date();
+  if (Number.isNaN(date.getTime())) return null;
+
+  return calculateCashback(
+    state,
+    walletCard,
+    card,
+    {
+      walletCardId: walletCard.id,
+      amount: input.amount,
+      category: input.category,
+      description: input.description?.trim() || input.category,
+      merchantName: input.merchantName ?? null,
+    },
+    date,
+  );
+}
+
+export const useUpdateTransaction = () =>
+  useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: number;
+      data: Partial<CreateTransactionBody>;
+    }) => {
+      const state = readState();
+      const existing = state.transactions.find((t) => t.id === id);
+      if (!existing) throw uiError("Transaction not found");
+
+      const walletCardId =
+        data.walletCardId != null
+          ? toFiniteNumber(data.walletCardId, -1)
+          : existing.walletCardId;
+      const walletCard = state.walletCards.find((w) => w.id === walletCardId);
+      if (!walletCard) throw uiError("Wallet card not found");
+      const card = getCard(walletCard.cardId);
+
+      const amount =
+        data.amount != null ? toFiniteNumber(data.amount) : existing.amount;
+      if (amount <= 0) throw uiError("Amount must be greater than zero");
+
+      const transactionType =
+        data.transactionType ?? existing.transactionType ?? "purchase";
+      const category =
+        transactionType === "payment"
+          ? "Payment"
+          : toTrimmedString(data.category) ||
+            (existing.category === "Payment" ? "Other" : existing.category);
+      const date = data.date ? new Date(data.date) : new Date(existing.date);
+      if (Number.isNaN(date.getTime())) {
+        throw uiError("Transaction date is not a valid date");
+      }
+      const isPayment = transactionType === "payment";
+
+      const updated: Transaction = {
+        ...existing,
+        walletCardId,
+        transactionType,
+        amount,
+        category,
+        date: date.toISOString(),
+        description: toTrimmedString(data.description) || existing.description,
+        cardName: card?.name ?? existing.cardName,
+        merchantName: isPayment
+          ? null
+          : "merchantName" in data
+            ? (data.merchantName ?? null)
+            : (existing.merchantName ?? null),
+        locationName: isPayment
+          ? null
+          : "locationName" in data
+            ? (data.locationName ?? null)
+            : (existing.locationName ?? null),
+        latitude: isPayment
+          ? null
+          : "latitude" in data
+            ? (data.latitude ?? null)
+            : (existing.latitude ?? null),
+        longitude: isPayment
+          ? null
+          : "longitude" in data
+            ? (data.longitude ?? null)
+            : (existing.longitude ?? null),
+      };
+
+      // Moving a purchase between cards or dates changes cap consumption on
+      // both sides, so both histories are replayed.
+      let nextState = recalculateCardCashback(
+        {
+          ...state,
+          transactions: state.transactions.map((t) => (t.id === id ? updated : t)),
+        },
+        walletCardId,
+      );
+      if (existing.walletCardId !== walletCardId) {
+        nextState = recalculateCardCashback(nextState, existing.walletCardId);
+      }
+      writeState(nextState);
+
+      return nextState.transactions.find((t) => t.id === id) ?? updated;
+    },
+  });
+
+function csvCell(value: unknown): string {
+  const text = value == null ? "" : String(value);
+  // Leading =, +, - or @ makes spreadsheets evaluate the cell as a formula.
+  const safe = /^[=+\-@]/.test(text) ? `'${text}` : text;
+  return /[",\n\r]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
+}
+
+/** Every logged transaction as CSV, newest first, for spreadsheets or taxes. */
+export function serializeTransactionsCsv(): string {
+  const state = readState();
+  const walletById = new Map(state.walletCards.map((w) => [w.id, w]));
+  const header = [
+    "Date",
+    "Card",
+    "Type",
+    "Category",
+    "Merchant",
+    "Description",
+    "Amount",
+    "Currency",
+    "Reward Value",
+    "Effective Rate",
+    "Location",
+  ];
+  const rows = sortByDateDesc(state.transactions).map((transaction) => {
+    const walletCard = walletById.get(transaction.walletCardId);
+    const card = walletCard ? getCard(walletCard.cardId) : undefined;
+    const isPayment = isPaymentTransaction(transaction);
+    return [
+      transaction.date.slice(0, 10),
+      walletCard?.nickname || card?.name || transaction.cardName || "",
+      isPayment ? "Payment" : "Purchase",
+      transaction.category,
+      transaction.merchantName ?? "",
+      transaction.description,
+      transaction.amount.toFixed(2),
+      (card && getCardCurrency(card)) ?? "USD",
+      isPayment ? "" : transaction.cashbackEarned.toFixed(2),
+      isPayment ? "" : `${(transaction.cashbackRate * 100).toFixed(2)}%`,
+      transaction.locationName ?? "",
+    ];
+  });
+  return `${[header, ...rows].map((row) => row.map(csvCell).join(",")).join("\r\n")}\r\n`;
+}
+
+/**
+ * Removes every wallet card, transaction and benefit record from this device.
+ * Downloaded card rules are kept: they are public data, not the user's.
+ */
+export function clearLocalData(): void {
+  writeState({
+    ...defaultState(),
+    ruleSetVersion: getCurrentRuleSetVersion(),
+  });
+}
+
 export const useDeleteTransaction = () =>
   useMutation({
     mutationFn: async ({ id }: { id: number }) => {
       const state = readState();
       const removed = state.transactions.find((t) => t.id === id);
-      if (!removed) throw new Error("Transaction not found");
+      if (!removed) throw uiError("Transaction not found");
 
       writeState(
         recalculateCardCashback(
@@ -2029,17 +3141,45 @@ function markBenefit(
     ...state,
     benefitUsage: ensureBenefitUsageRows(state, walletCardId),
   };
-  const updatedAt = used ? new Date().toISOString() : null;
-  const nextUsages = withRows.benefitUsage.map((usage) =>
-    usage.walletCardId === walletCardId && usage.benefitId === benefitId
-      ? { ...usage, used, usedAt: updatedAt }
-      : usage,
+  const walletCard = state.walletCards.find((w) => w.id === walletCardId);
+  const benefit = getCard(walletCard?.cardId ?? -1)?.benefits.find(
+    (entry) => entry.id === benefitId,
   );
+  const renewal: BenefitRenewal = benefit ?? { annualValue: null };
+  const now = new Date();
+
+  const nextUsages = withRows.benefitUsage.map((usage) => {
+    if (usage.walletCardId !== walletCardId || usage.benefitId !== benefitId) {
+      return usage;
+    }
+
+    const history = usageHistory(usage);
+    const window = getBenefitWindow(renewal, walletCard, now, history);
+    let nextHistory: string[];
+    if (used) {
+      // One use per period: a second click in the same month is a no-op
+      // rather than a second $25 toward the annual fee.
+      nextHistory = history.some((entry) => isWithinWindow(entry, window))
+        ? history
+        : [...history, now.toISOString()];
+    } else {
+      // "Mark unused" undoes this period only; earlier months stay captured.
+      nextHistory = history.filter((entry) => !isWithinWindow(entry, window));
+    }
+
+    const latest = nextHistory[nextHistory.length - 1] ?? null;
+    return {
+      ...usage,
+      used: nextHistory.length > 0,
+      usedAt: latest,
+      history: nextHistory,
+    };
+  });
   const found = nextUsages.some(
     (usage) =>
       usage.walletCardId === walletCardId && usage.benefitId === benefitId,
   );
-  if (!found) throw new Error("Benefit usage not found");
+  if (!found) throw uiError("Benefit usage not found");
 
   const nextState = { ...withRows, benefitUsage: nextUsages };
   writeState(nextState);
@@ -2112,24 +3252,17 @@ export function useGetDashboardSummary() {
         )
         .reduce((sum, transaction) => sum + transaction.cashbackEarned, 0);
 
+      // Values only add up within one currency, but a count does not care:
+      // counting every card keeps the tile in step with the benefit lists,
+      // which list every card's benefits.
       let totalBenefitValue = 0;
       let unusedBenefitsCount = 0;
-      for (const walletCard of inCurrency) {
-        const localCard = state.walletCards.find(
-          (card) => card.id === walletCard.id,
-        );
-        const usedBenefitIds = new Set(
-          state.benefitUsage
-            .filter(
-              (usage) =>
-                usage.walletCardId === walletCard.id &&
-                isBenefitUsedThisYear(usage, localCard),
-            )
-            .map((usage) => usage.benefitId),
-        );
+      for (const walletCard of walletCards) {
+        const usedBenefitIds = new Set(walletCard.usedBenefitIds ?? []);
+        const counted = countedWalletCardIds.has(walletCard.id);
         for (const benefit of walletCard.card.benefits) {
           if (!benefit.annualValue) continue;
-          totalBenefitValue += benefit.annualValue;
+          if (counted) totalBenefitValue += benefit.annualValue;
           if (!usedBenefitIds.has(benefit.id)) unusedBenefitsCount += 1;
         }
       }
@@ -2553,86 +3686,67 @@ export function useGetSpendingStats() {
   });
 }
 
+function listBenefitsByUse(used: boolean): UnusedBenefit[] {
+  const state = readState();
+  const now = new Date();
+  const result: UnusedBenefit[] = [];
+
+  // Every card is listed, whatever its currency: each entry carries its own
+  // currency, and dropping a Hong Kong card's benefits from a mostly-US wallet
+  // left its "Mark used" button doing nothing visible.
+  for (const walletCard of listWalletCards(state)) {
+    const localCard = state.walletCards.find((card) => card.id === walletCard.id);
+    const usedBenefitIds = new Set(walletCard.usedBenefitIds ?? []);
+    const usageByBenefit = new Map(
+      state.benefitUsage
+        .filter((usage) => usage.walletCardId === walletCard.id)
+        .map((usage) => [usage.benefitId, usage]),
+    );
+
+    for (const benefit of walletCard.card.benefits) {
+      // A "No Annual Fee" style row carries no allowance to spend, so listing
+      // it as an unused benefit is just noise on the dashboard.
+      if (!used && !benefit.annualValue) continue;
+      if (usedBenefitIds.has(benefit.id) !== used) continue;
+
+      result.push({
+        benefitId: benefit.id,
+        walletCardId: walletCard.id,
+        cardName: walletCard.nickname || walletCard.card.name,
+        name: benefit.name,
+        description: benefit.description,
+        annualValue: benefit.annualValue ?? null,
+        currency: getCardCurrency(walletCard.card) ?? "USD",
+        ...getBenefitPeriodState(
+          benefit,
+          localCard,
+          now,
+          usageByBenefit.get(benefit.id),
+        ),
+      });
+    }
+  }
+
+  // Soonest-expiring first: a monthly credit about to lapse matters more than
+  // an annual one with eleven months to go.
+  return result.sort((a, b) => {
+    const aReset = a.resetsAt ? new Date(a.resetsAt).getTime() : Number.MAX_SAFE_INTEGER;
+    const bReset = b.resetsAt ? new Date(b.resetsAt).getTime() : Number.MAX_SAFE_INTEGER;
+    return aReset - bReset || (b.annualValue ?? 0) - (a.annualValue ?? 0);
+  });
+}
+
 export function useGetUnusedBenefits() {
   return useQuery({
     queryKey: queryKeys.unusedBenefits,
-    queryFn: async (): Promise<UnusedBenefit[]> => {
-      const state = readState();
-      const walletCards = listWalletCards(state);
-      const result: UnusedBenefit[] = [];
-
-      for (const walletCard of inDominantCurrency(walletCards)) {
-        const localCard = state.walletCards.find(
-          (card) => card.id === walletCard.id,
-        );
-        const usedBenefitIds = new Set(
-          state.benefitUsage
-            .filter(
-              (usage) =>
-                usage.walletCardId === walletCard.id &&
-                isBenefitUsedThisYear(usage, localCard),
-            )
-            .map((usage) => usage.benefitId),
-        );
-        for (const benefit of walletCard.card.benefits) {
-          // A "No Annual Fee" style row carries no allowance to spend, so
-          // listing it as an unused benefit is just noise on the dashboard.
-          if (!benefit.annualValue) continue;
-          if (!usedBenefitIds.has(benefit.id)) {
-            result.push({
-              benefitId: benefit.id,
-              walletCardId: walletCard.id,
-              cardName: walletCard.card.name,
-              name: benefit.name,
-              description: benefit.description,
-              annualValue: benefit.annualValue ?? null,
-            });
-          }
-        }
-      }
-
-      return result;
-    },
+    queryFn: async (): Promise<UnusedBenefit[]> => listBenefitsByUse(false),
   });
 }
 
 export function useGetUsedBenefits() {
   return useQuery({
     queryKey: queryKeys.usedBenefits,
-    queryFn: async (): Promise<UnusedBenefit[]> => {
-      const state = readState();
-      const walletCards = listWalletCards(state);
-      const result: UnusedBenefit[] = [];
-
-      for (const walletCard of inDominantCurrency(walletCards)) {
-        const localCard = state.walletCards.find(
-          (card) => card.id === walletCard.id,
-        );
-        const usedBenefitIds = new Set(
-          state.benefitUsage
-            .filter(
-              (usage) =>
-                usage.walletCardId === walletCard.id &&
-                isBenefitUsedThisYear(usage, localCard),
-            )
-            .map((usage) => usage.benefitId),
-        );
-        for (const benefit of walletCard.card.benefits) {
-          if (usedBenefitIds.has(benefit.id)) {
-            result.push({
-              benefitId: benefit.id,
-              walletCardId: walletCard.id,
-              cardName: walletCard.card.name,
-              name: benefit.name,
-              description: benefit.description,
-              annualValue: benefit.annualValue ?? null,
-            });
-          }
-        }
-      }
-
-      return result;
-    },
+    queryFn: async (): Promise<UnusedBenefit[]> => listBenefitsByUse(true),
   });
 }
 
@@ -2685,12 +3799,29 @@ type CategoryMatch = {
   score: number;
   matchedTags: string[];
   reason: string;
+  /** For a choice row: the option that covers this purchase. */
+  choiceOption?: string;
+  /** For a choice row: why the option applies (selected, top spend, ...). */
+  choiceNote?: string;
 };
+
+/** What a choice row needs to be resolved while ranking a purchase. */
+interface SuggestionChoiceContext {
+  walletCard: LocalWalletCard | null;
+  state: LocalState;
+  amount: number | null;
+}
 
 type CreditCardMetadata = CreditCard & {
   market?: string | null;
   currency?: string | null;
+  availability?: "open" | "closed-to-new-applicants" | "discontinued" | null;
 };
+
+/** Whether someone who does not hold this card could still apply for it. */
+function isOpenToNewApplicants(card: CreditCard): boolean {
+  return ((card as CreditCardMetadata).availability ?? "open") === "open";
+}
 
 const PURCHASE_ALIASES: PurchaseAlias[] = [
   {
@@ -2740,6 +3871,13 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
     weight: 90,
   },
   {
+    terms: ["instacart", "amazon fresh", "grocery delivery", "online groceries"],
+    tags: ["grocery", "online"],
+    purchaseType: "grocery",
+    channel: "online",
+    weight: 100,
+  },
+  {
     terms: ["walmart.com"],
     tags: ["walmart", "online_retail", "online"],
     merchant: "Walmart",
@@ -2770,8 +3908,17 @@ const PURCHASE_ALIASES: PurchaseAlias[] = [
     weight: 120,
   },
   {
+    // Amazon is a merchant some cards reward by name (Prime Visa), not just
+    // generic online shopping.
+    terms: ["amazon", "amazon.com"],
+    tags: ["amazon", "online_retail", "online"],
+    merchant: "Amazon",
+    purchaseType: "online_retail",
+    channel: "online",
+    weight: 90,
+  },
+  {
     terms: [
-      "amazon",
       "online shopping",
       "online order",
       "online purchase",
@@ -3317,6 +4464,9 @@ const TAG_WEIGHTS: Record<string, number> = {
   food_delivery: 55,
   hotel: 55,
   airfare: 55,
+  // A plain "Travel" bonus covers every kind of trip; scored low enough that
+  // a row naming the actual subtype still outranks it.
+  travel: 50,
   airline: 45,
   rental_car: 50,
   travel_portal: 50,
@@ -3484,7 +4634,7 @@ function parsePurchaseContext(
   explicitAmount: number | null,
   availableCategories: Set<string>,
 ): ParsedPurchaseContext {
-  const text = description.toLowerCase().trim();
+  const text = glossChinesePurchaseText(description).toLowerCase().trim();
   const tags = new Set<string>();
   const matchedTerms: string[] = [];
   const categoryHints: string[] = [];
@@ -3650,8 +4800,11 @@ function getCategoryTags(category: string): string[] {
     addTag(tags, "rental_car");
     addTag(tags, "travel");
   }
+  // Bare "choice" is not a hotel: Bank of America's "Choice Category" (and the
+  // grocery row that shares its cap) used to pick up hotel tags from it and
+  // pay their bonus on every hotel stay.
   if (
-    /hotel|hilton|hyatt|marriott|ihg|wyndham|choice|bonvoy|stays|lodging|vrbo/.test(
+    /hotel|hilton|hyatt|marriott|ihg|wyndham|choice (?:privileges|hotels)|bonvoy|stays|lodging|vrbo/.test(
       text,
     )
   ) {
@@ -3901,6 +5054,26 @@ function scoreCategoryForPurchase(
   if (categoryTags.has("citi_nights") && !contextTags.has("citi_nights")) {
     return null;
   }
+  // "Online Groceries" is not a Kroger run: an online-only row needs a
+  // purchase that was actually made online.
+  if (categoryTags.has("online") && !contextTags.has("online")) {
+    return null;
+  }
+  // Same travel rule as the transaction matcher: a flights row cannot pay on a
+  // hotel stay, and an unspecified "trip" cannot claim a flights-only bonus.
+  const categorySubtypes = [...TRAVEL_SUBTYPE_TAGS].filter((tag) => categoryTags.has(tag));
+  const contextSubtypes = [...TRAVEL_SUBTYPE_TAGS].filter((tag) => contextTags.has(tag));
+  const sharesNonTravelSubject = [...categoryTags].some(
+    (tag) =>
+      SUBJECT_TAGS.has(tag) &&
+      tag !== "travel" &&
+      !TRAVEL_SUBTYPE_TAGS.has(tag) &&
+      contextTags.has(tag),
+  );
+  if (categorySubtypes.length && !sharesNonTravelSubject) {
+    if (!contextSubtypes.length) return null;
+    if (!categorySubtypes.some((tag) => contextTags.has(tag))) return null;
+  }
   if (hasProviderSpecificMismatch(categoryTags, contextTags, matchedTags)) {
     return null;
   }
@@ -3941,13 +5114,90 @@ function scoreCategoryForPurchase(
   };
 }
 
+/**
+ * Scores a row whose bonus is a cardholder pick or the period's top category.
+ *
+ * Its own label ("Choice Category (... combined with groceries ...)") names
+ * no spend — scoring that text matched groceries and hotels at the choice
+ * rate — so only the options can match. For a card in the wallet those are the
+ * options actually in effect; for a card the user does not hold, any option
+ * they could pick counts, except an issuer calendar nobody can predict.
+ */
+function scoreChoiceRowForPurchase(
+  row: CreditCard["cashbackCategories"][number],
+  choice: CardCategoryChoice,
+  context: ParsedPurchaseContext,
+  choiceContext: SuggestionChoiceContext,
+): CategoryMatch | null {
+  const { walletCard, state, amount } = choiceContext;
+  const automatic = choice.mode === "automatic-top-spend";
+
+  let candidates: string[];
+  if (walletCard && !automatic) {
+    candidates = getActiveChoiceOptions(choice, { walletCard, state });
+  } else if (!walletCard && choice.mode === "rotating-calendar") {
+    return null;
+  } else {
+    candidates = choice.options;
+  }
+
+  let best: CategoryMatch | null = null;
+  for (const option of candidates) {
+    const match = scoreCategoryForPurchase({ ...row, category: option }, context);
+    if (!match) continue;
+
+    if (walletCard && automatic) {
+      // The bonus goes to the period's biggest categories, counting this
+      // purchase too — so it applies only if this purchase leaves the option
+      // among them.
+      const active = getActiveChoiceOptions(choice, {
+        walletCard,
+        state,
+        pending: { category: option, amount: amount ?? 0 },
+      });
+      if (!active.includes(option)) continue;
+    }
+
+    if (!best || match.score > best.score) {
+      best = {
+        ...match,
+        category: row,
+        choiceOption: option,
+        choiceNote: (() => {
+          // Issuer option names translate where a translation exists.
+          const vars = { option: uiText(option) };
+          if (walletCard) {
+            return automatic
+              ? uiText("{option} is this period's top category", vars)
+              : uiText("Your selected category: {option}", vars);
+          }
+          return automatic
+            ? uiText("Earns the bonus if {option} is your top category", vars)
+            : uiText("Earns the bonus if you choose {option}", vars);
+        })(),
+      };
+    }
+  }
+  return best;
+}
+
 function findBestCategoryMatch(
   card: CreditCard,
   context: ParsedPurchaseContext,
+  choiceContext: SuggestionChoiceContext,
 ): CategoryMatch | null {
+  const choicesByCategoryId = new Map(
+    (card.categoryChoices ?? []).map((choice) => [choice.categoryId, choice]),
+  );
+
   return (
     card.cashbackCategories
-      .map((category) => scoreCategoryForPurchase(category, context))
+      .map((category) => {
+        const choice = choicesByCategoryId.get(category.id);
+        return choice
+          ? scoreChoiceRowForPurchase(category, choice, context, choiceContext)
+          : scoreCategoryForPurchase(category, context);
+      })
       .filter((match): match is CategoryMatch => match !== null)
       .sort((a, b) => {
         const scoreDelta = b.score - a.score;
@@ -4014,9 +5264,9 @@ function getMarketScopedCatalog(
 }
 
 function getRewardUnitName(card: CreditCard): string {
-  if (card.rewardType === "miles") return "Miles";
-  if (card.rewardType === "points") return "Points";
-  return card.rewardUnitName ?? "Cash Back";
+  if (card.rewardType === "miles") return uiText("Miles");
+  if (card.rewardType === "points") return uiText("Points");
+  return card.rewardUnitName ?? uiText("Cash Back");
 }
 
 function formatNativeRewardEstimate(
@@ -4031,7 +5281,7 @@ function formatNativeRewardEstimate(
       style: "currency",
       currency,
     }).format(amount * rawRate);
-    return `${value} Cash Back`;
+    return uiText("{amount} Cash Back", { amount: value });
   }
   const units = Math.round(amount * rawRate * 100).toLocaleString("en-US");
   return `${units} ${getRewardUnitName(card)}`;
@@ -4058,6 +5308,11 @@ function applySpendCapToRate(
   const periodStart = spendCapPeriodStart(new Date(), spendCap.period);
   const capGroup = normalizeCapGroup(category.category, spendCap);
   const now = new Date();
+  // Choice rows only resolve with the wallet entry in hand; without it a
+  // purchase logged under the chosen category never counted toward the cap.
+  const capContext: CategoryChoiceContext = walletCard
+    ? { walletCard, state, onDate: now }
+    : {};
   const cappedSpendUsed = walletCard
     ? state.transactions
         .filter(
@@ -4065,21 +5320,29 @@ function applySpendCapToRate(
             matchesWalletCardId(transaction, walletCard.id) &&
             isPurchaseTransaction(transaction) &&
             isInLocalDateRange(transaction.date, periodStart, now) &&
-            transactionMatchesSpendCapGroup(card, transaction, capGroup),
+            transactionMatchesSpendCapGroup(card, transaction, capGroup, capContext),
         )
         .reduce((sum, transaction) => sum + transaction.amount, 0)
     : 0;
   const capRemaining = Math.max(0, spendCap.amount - cappedSpendUsed);
-  const capLabel = `$${spendCap.amount.toLocaleString("en-US")} per ${spendCap.period}`;
+  const capLabel = uiText("{amount} per {period}", {
+    amount: `$${spendCap.amount.toLocaleString("en-US")}`,
+    period: uiText(spendCap.period),
+  });
 
   if (capRemaining <= 0) {
-    rulesApplied.push(`${capLabel} cap already used — earning the base rate`);
+    rulesApplied.push(
+      uiText("{cap} cap already used — earning the base rate", { cap: capLabel }),
+    );
     return { rawRate: defaultRate, rulesApplied };
   }
 
   if (amount == null || amount <= 0) {
     rulesApplied.push(
-      `Bonus rate applies to the first $${capRemaining.toLocaleString("en-US", { maximumFractionDigits: 0 })} left under the ${capLabel} cap`,
+      uiText("Bonus rate applies to the first {amount} left under the {cap} cap", {
+        amount: `$${capRemaining.toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
+        cap: capLabel,
+      }),
     );
     return { rawRate: category.rate, rulesApplied };
   }
@@ -4091,8 +5354,10 @@ function applySpendCapToRate(
 
   rulesApplied.push(
     capRemaining >= amount
-      ? `Within ${capLabel} cap`
-      : `Cap split: ${bonusAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })} at bonus rate`,
+      ? uiText("Within {cap} cap", { cap: capLabel })
+      : uiText("Cap split: {amount} at bonus rate", {
+          amount: `$${bonusAmount.toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
+        }),
   );
 
   return { rawRate: Number(rawRate.toFixed(4)), rulesApplied };
@@ -4105,11 +5370,40 @@ function suggestedFromCard(
   context: ParsedPurchaseContext,
   amount: number | null,
 ): SuggestedCard {
-  const categoryMatch = findBestCategoryMatch(card, context);
+  const defaultCategory = getDefaultCategory(card);
+  let bestMatch = findBestCategoryMatch(card, context, {
+    walletCard,
+    state,
+    amount,
+  });
+  // A capped "everything" rate (Amex Blue Business 2% to $50K) beats any
+  // specific match that pays less; the cap itself is applied below.
+  const catchAll = card.cashbackCategories
+    .filter(isCatchAllBonusRow)
+    .sort((a, b) => b.rate - a.rate)[0];
+  if (
+    catchAll &&
+    catchAll.rate > (defaultCategory?.rate ?? 0) &&
+    (!bestMatch || bestMatch.category.rate < catchAll.rate)
+  ) {
+    bestMatch = {
+      category: catchAll,
+      score: 45,
+      matchedTags: [],
+      reason: `${catchAll.category} applies to every purchase.`,
+    };
+  }
+  // A "bonus" that pays exactly the base rate is not a bonus, and treating it
+  // as one would wrongly subject the purchase to that row's cap. A row that
+  // pays *less* is an exception (rent on a flat-2x card) and stands.
+  const categoryMatch =
+    bestMatch && defaultCategory && bestMatch.category.rate === defaultCategory.rate
+      ? null
+      : bestMatch;
   // A card with no priced categories cannot be ranked, but it must not take
   // down the whole suggestion list either.
   const effective = categoryMatch?.category ??
-    getDefaultCategory(card) ?? {
+    defaultCategory ?? {
       id: -1,
       cardId: card.id,
       category: "Other",
@@ -4117,14 +5411,16 @@ function suggestedFromCard(
       isDefault: true,
     };
   const isDefaultRate = !categoryMatch;
-  const matchedCategory = getSuggestedCategoryLabel(
-    effective,
-    context,
-    isDefaultRate,
-  );
-  const { rawRate, rulesApplied } = isDefaultRate
+  const matchedCategory = categoryMatch?.choiceOption
+    ? categoryMatch.choiceOption
+    : getSuggestedCategoryLabel(effective, context, isDefaultRate);
+  const capped = isDefaultRate
     ? { rawRate: effective.rate, rulesApplied: [] as string[] }
     : applySpendCapToRate(state, walletCard, card, effective, amount);
+  const rawRate = capped.rawRate;
+  const rulesApplied = categoryMatch?.choiceNote
+    ? [categoryMatch.choiceNote, ...capped.rulesApplied]
+    : capped.rulesApplied;
   const valueMultiplier = getRewardUnitValueMultiplier(card);
   const effectiveCashbackRate = rawRate * valueMultiplier;
   const confidence = isDefaultRate
@@ -4211,116 +5507,322 @@ function buildSuggestionReasoning(
   bestOverallCard: SuggestedCard | null,
 ): string {
   if (!bestWalletCard && !bestOverallCard)
-    return "No cards available to evaluate.";
+    return uiText("No cards available to evaluate.");
+  if (!bestWalletCard) {
+    return uiText(
+      "Add the cards you carry to My Wallet and this will tell you which one to use.",
+    );
+  }
   return "";
+}
+
+/** Purchase tags in the order they decide a logged category. */
+const QUICK_ENTRY_CATEGORIES: Array<[string, TransactionCategory]> = [
+  ["ev_charging", "EV Charging"],
+  ["gas", "Gas"],
+  ["food_delivery", "Food Delivery"],
+  ["dining", "Dining"],
+  ["warehouse_club", "Warehouse Clubs"],
+  ["grocery", "Groceries"],
+  ["airfare", "Flights"],
+  ["hotel", "Hotels"],
+  ["rental_car", "Rental Cars"],
+  ["rideshare", "Rideshare"],
+  ["transit", "Transit"],
+  ["streaming", "Streaming"],
+  ["drugstore", "Drugstores"],
+  ["home_improvement", "Home Improvement"],
+  ["office_supplies", "Office Supplies"],
+  ["phone", "Phone and Internet"],
+  ["utilities", "Utilities"],
+  ["advertising", "Advertising"],
+  ["shipping", "Shipping"],
+  ["rent", "Rent"],
+  ["fitness", "Fitness"],
+  ["entertainment", "Entertainment"],
+  ["online_retail", "Online Retail"],
+  ["travel", "Travel"],
+];
+
+function inferTransactionCategory(tags: Set<string>): TransactionCategory | null {
+  if (tags.has("grocery") && tags.has("online")) return "Online Groceries";
+  return QUICK_ENTRY_CATEGORIES.find(([tag]) => tags.has(tag))?.[1] ?? null;
+}
+
+/** The amount in a one-line entry, and the text with that amount taken out. */
+function takeQuickAmount(input: string): { amount: number | null; rest: string } {
+  // Chinese runs words and numbers together ("晚饭45", "45块"); spacing them
+  // lets the patterns below see the number on its own.
+  const text = input
+    .replace(/([\u3400-\u9fff])(?=[0-9])/g, "$1 ")
+    .replace(/([0-9])(?=[\u3400-\u9fff])/g, "$1 ");
+  const patterns = [
+    /(?:hk\$|s\$|us\$|c\$|\$|¥|￥)\s*([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(k)?\b/i,
+    /\b([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(k)?\s*(?:dollars?|bucks|usd|hkd|sgd|cad)\b/i,
+    /\b([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(k)?\s*(?:美元|美金|块钱|块|元|刀|港币|港元|加元|新币)/,
+    // A bare number standing on its own: "45 dinner at Nopa".
+    /(?:^|\s)([0-9][0-9,]*(?:\.[0-9]{1,2})?)(k)?(?=\s|$)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = pattern.exec(text);
+    if (!match) continue;
+    const amount = Number(match[1].replace(/,/g, "")) * (match[2] ? 1_000 : 1);
+    if (!Number.isFinite(amount) || amount <= 0) continue;
+    const rest = `${text.slice(0, match.index)} ${text.slice(match.index + match[0].length)}`
+      .replace(/\s+/g, " ")
+      .trim();
+    return { amount: Number(amount.toFixed(2)), rest };
+  }
+  return { amount: null, rest: text.trim() };
+}
+
+function tidyName(value: string): string {
+  const trimmed = value.trim().replace(/[.,;:!]+$/, "");
+  // Typed in lowercase: capitalise each word ("nopa" -> "Nopa"); otherwise
+  // keep the user's own capitalisation ("iPhone", "AT&T").
+  return trimmed === trimmed.toLowerCase()
+    ? trimmed.replace(/\b([a-z])/g, (letter) => letter.toUpperCase())
+    : trimmed;
+}
+
+export interface QuickEntryOption {
+  walletCardId: number;
+  /** Nickname, or the card's name. */
+  label: string;
+  cardName: string;
+  currency: string;
+  rewardType: CreditCard["rewardType"] | null;
+  rewardUnitName: string | null;
+  /** Value earned on this purchase, in the card's currency; null without an amount. */
+  cashbackEarned: number | null;
+  /** Value earned per unit spent, after the card's point valuation. */
+  cashbackRate: number;
+  /** The earn rate in the card's own units (3x, 3%). */
+  rewardRate: number;
+}
+
+export interface QuickEntryPlan {
+  amount: number | null;
+  category: TransactionCategory;
+  /** False when nothing in the text named a category and "Other" was assumed. */
+  categoryDetected: boolean;
+  merchantName: string | null;
+  description: string;
+  /** Wallet cards, best for this purchase first. */
+  options: QuickEntryOption[];
+}
+
+/**
+ * Reads a one-line entry ("45 dinner at Nopa", "$120 Costco gas") into the
+ * fields a logged purchase needs, and ranks the wallet for it.
+ *
+ * Each card is priced through the same function that prices a saved
+ * transaction — caps used this period, chosen categories, merchant bonuses —
+ * so the number shown next to a card is the number that gets recorded.
+ */
+export function planQuickEntry(
+  text: string,
+  options: { category?: string | null; date?: string } = {},
+  state: LocalState = readState(),
+): QuickEntryPlan {
+  const { amount, rest } = takeQuickAmount(text);
+  const catalogLabels = new Set(
+    getCatalog().flatMap((card) => card.cashbackCategories.map((row) => row.category)),
+  );
+  const context = parsePurchaseContext(text, amount, catalogLabels);
+
+  let merchantName: string | null = context.merchant ?? null;
+  let remainder = rest;
+  const at = /\s*(?:\bat\b|@|\bfrom\b)\s+(.+)$/i.exec(rest);
+  if (at && at[1].trim()) {
+    merchantName = tidyName(at[1]);
+    remainder = rest.slice(0, at.index).trim();
+  }
+
+  const detected = inferTransactionCategory(new Set(context.tags));
+  const override = TRANSACTION_CATEGORIES.find(
+    (category) => category === options.category,
+  );
+  const category: TransactionCategory = override ?? detected ?? "Other";
+  const description =
+    (remainder && tidyName(remainder.charAt(0).toUpperCase() + remainder.slice(1))) ||
+    merchantName ||
+    category;
+
+  const date = options.date ? new Date(options.date) : new Date();
+  const pricedAmount = amount ?? 100;
+  const ranked = state.walletCards
+    .map((walletCard): QuickEntryOption | null => {
+      const card = getCard(walletCard.cardId);
+      if (!card) return null;
+      const priced = calculateCashback(
+        state,
+        walletCard,
+        card,
+        {
+          walletCardId: walletCard.id,
+          amount: pricedAmount,
+          category,
+          description,
+          merchantName,
+        },
+        date,
+      );
+      return {
+        walletCardId: walletCard.id,
+        label: walletCard.nickname || card.name,
+        cardName: card.name,
+        currency: getCardCurrency(card) ?? "USD",
+        rewardType: card.rewardType ?? null,
+        rewardUnitName: card.rewardUnitName ?? null,
+        cashbackEarned: amount == null ? null : priced.cashbackEarned,
+        cashbackRate: priced.cashbackRate,
+        rewardRate: Number(
+          (priced.cashbackRate / getRewardUnitValueMultiplier(card)).toFixed(4),
+        ),
+      };
+    })
+    .filter((option): option is QuickEntryOption => option !== null)
+    // Rates, not amounts: a HK$ card and a US$ card cannot be compared on
+    // what they earn in their own currencies.
+    .sort((a, b) => b.cashbackRate - a.cashbackRate);
+
+  return {
+    amount,
+    category,
+    categoryDetected: Boolean(override ?? detected),
+    merchantName: merchantName ?? null,
+    description,
+    options: ranked,
+  };
+}
+
+export interface SuggestCardInput {
+  description: string;
+  amount?: number | null;
+}
+
+/**
+ * Ranks the wallet and the card library for one purchase described in free
+ * text. Pure apart from reading local state, so it can be tested directly.
+ */
+export function suggestCardForPurchase(
+  data: SuggestCardInput,
+  state: LocalState = readState(),
+): CardSuggestion {
+  const amount =
+    data.amount != null && Number.isFinite(data.amount) ? data.amount : null;
+  const cards = getCatalog();
+  const walletCards = state.walletCards.map((walletCard) => ({
+    local: walletCard,
+    card: getCard(walletCard.cardId) ?? placeholderCard(walletCard.cardId),
+  }));
+  const rawWalletByCardId = new Map(
+    state.walletCards.map((w) => [w.cardId, w]),
+  );
+  const availableCategories = new Set(
+    cards.flatMap((card) => card.cashbackCategories.map((c) => c.category)),
+  );
+  const parsedContext = parsePurchaseContext(
+    data.description,
+    amount,
+    availableCategories,
+  );
+  const effectiveAmount = parsedContext.amount ?? amount;
+  const marketScopedCards = getMarketScopedCatalog(
+    cards,
+    parsedContext,
+    walletCards.map((walletCard) => getCardMarket(walletCard.card)),
+  );
+
+  const walletSuggestions = walletCards
+    .map((walletCard) =>
+      suggestedFromCard(
+        state,
+        walletCard.card,
+        walletCard.local,
+        parsedContext,
+        effectiveAmount,
+      ),
+    )
+    .sort(compareSuggestedCards);
+  // A card that no longer takes applications is useless advice to someone who
+  // does not already hold it.
+  const overallSuggestions = marketScopedCards
+    .filter(
+      (card) => rawWalletByCardId.has(card.id) || isOpenToNewApplicants(card),
+    )
+    .map((card) =>
+      suggestedFromCard(
+        state,
+        card,
+        rawWalletByCardId.get(card.id) ?? null,
+        parsedContext,
+        effectiveAmount,
+      ),
+    )
+    .sort(compareSuggestedCards);
+
+  const bestWalletCard = walletSuggestions[0] ?? null;
+  const bestOverallCard = overallSuggestions[0] ?? null;
+  const topLibraryCards = overallSuggestions
+    .filter((suggestion) => suggestion.walletCardId == null)
+    .slice(0, 3);
+  const upgradeAvailable = Boolean(
+    topLibraryCards[0] &&
+    (!bestWalletCard ||
+      topLibraryCards[0].cashbackRate > bestWalletCard.cashbackRate + 0.0001),
+  );
+  const detectedCategory = getDetectedCategoryLabel(
+    parsedContext,
+    walletSuggestions.length > 0 ? walletSuggestions : overallSuggestions,
+  );
+  const reasoning = buildSuggestionReasoning(bestWalletCard, bestOverallCard);
+  const clarifyingQuestion =
+    parsedContext.missingContext.length > 0
+      ? uiText("Add {detail} for a sharper recommendation.", {
+          detail: uiText(parsedContext.missingContext[0]),
+        })
+      : null;
+
+  return {
+    description: data.description,
+    amount: effectiveAmount,
+    detectedCategory,
+    matchConfidence: parsedContext.confidence,
+    bestWalletCard,
+    bestOverallCard,
+    upgradeAvailable,
+    reasoning,
+    parsedContext: {
+      merchant: parsedContext.merchant,
+      purchaseType: parsedContext.purchaseType,
+      channel: parsedContext.channel,
+      paymentMethod: parsedContext.paymentMethod,
+      travelProvider: parsedContext.travelProvider,
+      location: parsedContext.location,
+      amount: parsedContext.amount,
+      tags: parsedContext.tags,
+      matchedTerms: parsedContext.matchedTerms,
+      missingContext: parsedContext.missingContext,
+    },
+    walletAlternatives: walletSuggestions
+      .filter((suggestion) => suggestion.cardId !== bestWalletCard?.cardId)
+      .slice(0, 4),
+    overallAlternatives: topLibraryCards,
+    clarifyingQuestion,
+    parserMode: "local-rule-engine",
+  };
 }
 
 export const useSuggestCard = () =>
   useMutation({
+    // Ranking a purchase writes nothing, so it must not trigger the global
+    // refresh that follows every data-changing mutation.
+    meta: { readOnly: true },
     mutationFn: async ({
       data,
     }: {
-      data: { description: string; amount?: number | null };
-    }): Promise<CardSuggestion> => {
-      const amount =
-        data.amount != null && Number.isFinite(data.amount)
-          ? data.amount
-          : null;
-      const state = readState();
-      const cards = getCatalog();
-      const walletCards = listWalletCards(state);
-      const rawWalletByCardId = new Map(
-        state.walletCards.map((w) => [w.cardId, w]),
-      );
-      const availableCategories = new Set(
-        cards.flatMap((card) => card.cashbackCategories.map((c) => c.category)),
-      );
-      const parsedContext = parsePurchaseContext(
-        data.description,
-        amount,
-        availableCategories,
-      );
-      const effectiveAmount = parsedContext.amount ?? amount;
-      const marketScopedCards = getMarketScopedCatalog(
-        cards,
-        parsedContext,
-        walletCards.map((walletCard) => getCardMarket(walletCard.card)),
-      );
-
-      const walletSuggestions = walletCards
-        .map((walletCard) =>
-          suggestedFromCard(
-            state,
-            walletCard.card,
-            rawWalletByCardId.get(walletCard.cardId) ?? null,
-            parsedContext,
-            effectiveAmount,
-          ),
-        )
-        .sort(compareSuggestedCards);
-      const overallSuggestions = marketScopedCards
-        .map((card) =>
-          suggestedFromCard(
-            state,
-            card,
-            rawWalletByCardId.get(card.id) ?? null,
-            parsedContext,
-            effectiveAmount,
-          ),
-        )
-        .sort(compareSuggestedCards);
-
-      const bestWalletCard = walletSuggestions[0] ?? null;
-      const bestOverallCard = overallSuggestions[0] ?? null;
-      const topLibraryCards = overallSuggestions
-        .filter((suggestion) => suggestion.walletCardId == null)
-        .slice(0, 3);
-      const upgradeAvailable = Boolean(
-        topLibraryCards[0] &&
-        (!bestWalletCard ||
-          topLibraryCards[0].cashbackRate >
-            bestWalletCard.cashbackRate + 0.0001),
-      );
-      const detectedCategory = getDetectedCategoryLabel(
-        parsedContext,
-        walletSuggestions.length > 0 ? walletSuggestions : overallSuggestions,
-      );
-      const reasoning = buildSuggestionReasoning(
-        bestWalletCard,
-        bestOverallCard,
-      );
-      const clarifyingQuestion =
-        parsedContext.missingContext.length > 0
-          ? `Add ${parsedContext.missingContext[0]} for a sharper recommendation.`
-          : null;
-
-      return {
-        description: data.description,
-        amount: effectiveAmount,
-        detectedCategory,
-        matchConfidence: parsedContext.confidence,
-        bestWalletCard,
-        bestOverallCard,
-        upgradeAvailable,
-        reasoning,
-        parsedContext: {
-          merchant: parsedContext.merchant,
-          purchaseType: parsedContext.purchaseType,
-          channel: parsedContext.channel,
-          paymentMethod: parsedContext.paymentMethod,
-          travelProvider: parsedContext.travelProvider,
-          location: parsedContext.location,
-          amount: parsedContext.amount,
-          tags: parsedContext.tags,
-          matchedTerms: parsedContext.matchedTerms,
-          missingContext: parsedContext.missingContext,
-        },
-        walletAlternatives: walletSuggestions
-          .filter((suggestion) => suggestion.cardId !== bestWalletCard?.cardId)
-          .slice(0, 3),
-        overallAlternatives: topLibraryCards,
-        clarifyingQuestion,
-        parserMode: "local-rule-engine",
-      };
-    },
+      data: SuggestCardInput;
+    }): Promise<CardSuggestion> => suggestCardForPurchase(data),
   });

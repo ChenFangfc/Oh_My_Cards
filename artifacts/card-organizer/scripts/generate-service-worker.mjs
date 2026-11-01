@@ -116,6 +116,9 @@ function shouldBypassCache(request) {
   if (request.cache === "no-store") return true;
 
   const url = new URL(request.url);
+  // Video needs range requests answered by the network (Safari won't play
+  // a cached whole-file reply), and it is too big to keep offline anyway.
+  if (/\.(mp4|webm|mov)$/i.test(url.pathname)) return true;
   return /card-rules|rules-manifest|rule-set|catalog-update/i.test(url.pathname);
 }
 

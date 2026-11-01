@@ -1,0 +1,470 @@
+[
+  {
+    "id": 0,
+    "name": "Atmos Rewards Summit Visa Infinite",
+    "issuer": "Bank of America / Alaska Airlines",
+    "network": "Visa",
+    "annualFee": 395,
+    "signupBonus": "80,000 bonus points plus a 25,000-point Global Companion Award after $4,000 spend in the first 90 days (limited-time online offer)",
+    "signupBonusValue": 1120,
+    "color": "linear-gradient(135deg, #050505, #3a3a3a)",
+    "logoUrl": "https://logo.clearbit.com/bankofamerica.com",
+    "cardImageUrl": null,
+    "rewardType": "points",
+    "rewardProgram": "Atmos Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.4,
+    "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 3x foreign-transaction category follows Bank of America's definition of a foreign transaction; a logged purchase category cannot show that, so that row is matched only from Smart Suggest text.",
+      "Cardholders with an eligible Bank of America account earn a 10% bonus on points from card purchases; it is not included in the rates shown.",
+      "The Global Companion Award is 25,000 points each account anniversary, or 100,000 points after $60,000 or more in purchases in the account year."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Alaska Airlines and Hawaiian Airlines purchases",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Dining",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Foreign transactions",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Global Companion Award",
+        "description": "25,000-point Global Companion Award on every account anniversary, or a 100,000-point award after $60,000 or more in purchases in the account year.",
+        "annualValue": 350,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Alaska Lounge Passes",
+        "description": "8 Alaska Lounge passes every calendar year, issued 2 per quarter.",
+        "annualValue": null,
+        "period": "quarterly"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "10,000 Anniversary Status Points",
+        "description": "10,000 Atmos Rewards status points on each account anniversary.",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 Airport Security Statement Credit toward Global Entry or TSA PreCheck, every four years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Instant Travel Delay Credit",
+        "description": "$50 Instant Travel Delay Credit for a cancellation or a departure delay of 2 hours or more.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Waived Same-Day Change Fees",
+        "description": "Waived fees for same-day confirmed Alaska flight changes, worth up to $75 per change.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Free Checked Bag and Preferred Boarding",
+        "description": "Free checked bag and preferred boarding for you and up to 6 guests on the same reservation when the Alaska or Hawaiian Airlines flight is paid with the card.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/alaska-airlines-infinite-credit-card/",
+    "imageSourceUrl": "https://www.bankofamerica.com/content/images/ContextualSiteGraphics/CreditCardArt/en_US/Approved_PCM/1bed_rewcm_v_atmos_visafront_infinite_250.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 0,
+    "name": "Bilt Blue Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 0,
+    "signupBonus": "$100 in Bilt Cash at account opening (no spend requirement)",
+    "signupBonusValue": 100,
+    "color": "linear-gradient(135deg, #1e3a8a, #3b82f6)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": null,
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee. The Rent row uses the 1X tier. Under the Housing-only option the housing multiplier is set each billing cycle by everyday spend as a share of the housing payment: 25% gives 0.5X, 50% gives 0.75X, 75% gives 1X, 100% or more gives 1.25X, and below 25% earns a flat 250 points per billing cycle.",
+      "Accounts opened before 2027-01-01 may instead elect the Flexible Bilt Cash option: 4% back in Bilt Cash on everyday purchases, and every $3 of Bilt Cash redeemed unlocks 100 points on housing payments (up to 1X). Bilt Cash is not modeled as an earn rate. Accounts opened on or after 2027-01-01 get only the Housing-only option.",
+      "Bilt Travel portal bookings add +2X on hotels and +1X on flights to the card rate, and linking Lyft adds +2X; those rows show the totals Bilt publishes. Bilt Dining partner restaurants add a variable bonus (advertised as up to 4X total on this card); it varies by restaurant and is not modeled.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee, by portal, ACH, Venmo or Bilt-issued check.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Blue Card.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Blue Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-tahoe.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 0,
+    "name": "Bilt Obsidian Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 95,
+    "signupBonus": "$200 in Bilt Cash at account opening (no spend requirement)",
+    "signupBonusValue": 200,
+    "color": "linear-gradient(135deg, #0b0b0f, #3f3f46)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": null,
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "3X applies to the cardholder's pick of dining (the default) or grocery stores and supermarkets; the other earns 1X. The pick can be changed once within 30 days of account opening, then is locked for the rest of the calendar year. Grocery earning is capped at $25,000 per calendar year, then 1X. The app applies the $25,000/year cap to whichever option is picked.",
+      "2X travel covers airlines, hotels, motels, resorts, cruise lines and car rental agencies booked directly. Bilt Travel portal bookings add +2X on hotels and +1X on flights, and linking Lyft adds +2X; those rows show the published totals. Bilt Dining partner restaurants add a variable bonus (advertised as up to 6X total with dining picked); it is not modeled.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee. The Rent row uses the 1X tier. Under the Housing-only option the multiplier is set each billing cycle by everyday spend as a share of the housing payment (25%: 0.5X, 50%: 0.75X, 75%: 1X, 100%+: 1.25X; below 25%: a flat 250 points). Accounts opened before 2027-01-01 may instead elect Flexible Bilt Cash: 4% back in Bilt Cash on everyday purchases, with $3 of Bilt Cash unlocking 100 housing points (up to 1X). Bilt Cash is not modeled as an earn rate.",
+      "From 2027-01-01, new accounts get $100 in Bilt Cash at opening and each card anniversary instead of the hotel credit. Existing accounts switch at their first card anniversary on or after 2027-01-01 unless they make a Legacy Election.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Dining or groceries, your pick (groceries up to $25,000/year)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Airlines, hotels, cruise lines and car rentals booked directly",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "categoryChoices": [
+      {
+        "categoryId": 0,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "year",
+        "options": [
+          "Dining",
+          "Grocery stores and supermarkets"
+        ]
+      }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Bilt Travel Hotel Credit",
+        "description": "Up to $50 in each half of the calendar year (January-June and July-December) toward hotel bookings of 2+ nights made through the Bilt Travel portal, for a total of $100 per calendar year. Ends at the first card anniversary on or after 2027-01-01 (replaced by $100 annual Bilt Cash) unless a Legacy Election is made.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Obsidian Card.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Trip Protection",
+        "description": "Trip cancellation/interruption protection, trip delay reimbursement and lost or damaged luggage insurance (Obsidian Card Guide to Benefits).",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Obsidian Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-vail.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 0,
+    "name": "Bilt Palladium Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 495,
+    "signupBonus": "$300 in Bilt Cash at account opening, plus 50,000 points and Bilt Gold status after $4,000 in everyday purchases (excluding rent and mortgage) in the first 90 days",
+    "signupBonusValue": 925,
+    "color": "linear-gradient(135deg, #6b7280, #d1d5db)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": null,
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "2X on all eligible purchases except housing payments. Bilt Travel portal bookings add +2X on hotels and +1X on flights, and linking Lyft adds +2X; those rows show the published totals. Bilt Dining partner restaurants add a variable bonus (advertised as up to 5X total); it is not modeled.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee and do not earn the 2X rate. The Rent row uses the 1X tier. Under the Housing-only option the multiplier is set each billing cycle by everyday spend as a share of the housing payment (25%: 0.5X, 50%: 0.75X, 75%: 1X, 100%+: 1.25X; below 25%: a flat 250 points). Accounts opened before 2027-01-01 may instead elect Flexible Bilt Cash: 4% back in Bilt Cash on everyday purchases, with $3 of Bilt Cash unlocking 100 housing points (up to 1X). Bilt Cash is not modeled as an earn rate.",
+      "From 2027-01-01, new accounts get $600 in Bilt Cash at opening and each card anniversary in place of the $400 hotel credit and $200 annual Bilt Cash. Existing accounts switch at their first card anniversary on or after 2027-01-01 unless they make a Legacy Election.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Other",
+        "rate": 0.02,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Bilt Travel Hotel Credit",
+        "description": "Up to $200 in each half of the calendar year (January-June and July-December) toward hotel bookings of 2+ nights made through the Bilt Travel portal, for a total of $400 per calendar year. Ends at the first card anniversary on or after 2027-01-01 (replaced by $600 annual Bilt Cash) unless a Legacy Election is made.",
+        "annualValue": 400,
+        "period": "semiannual"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Annual Bilt Cash",
+        "description": "$200 in Bilt Cash credited at account opening and on each card anniversary to the primary cardholder (Bilt Cash expires 12 months after it is earned). Replaced by $600 annual Bilt Cash at the first card anniversary on or after 2027-01-01 unless a Legacy Election is made.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Priority Pass Membership",
+        "description": "Priority Pass lounge membership covering 1,300+ airport lounges (Bilt lists it as worth $469 per year).",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Palladium Card.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Trip Protection",
+        "description": "Trip cancellation/interruption protection, trip delay reimbursement, lost or damaged luggage and baggage delay insurance (Palladium Card Guide to Benefits).",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Palladium Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-aspen.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  }
+]

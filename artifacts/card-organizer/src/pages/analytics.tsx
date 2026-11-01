@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearch } from "wouter";
 import {
   getGetBillingCyclesQueryKey,
   getGetCashbackByCategoryQueryKey,
@@ -6,12 +7,13 @@ import {
   getGetSpendingStatsQueryKey,
   getListTransactionsQueryKey,
   getListWalletQueryKey,
+  estimateTransactionReward,
   useCreateTransaction,
   useDeleteTransaction,
+  useUpdateTransaction,
   useGetSpendingStats,
   useListTransactions,
   useListWallet,
-  resolveCashbackCategory,
   TRANSACTION_CATEGORIES,
 } from "@workspace/api-client-react";
 import type {
@@ -20,7 +22,7 @@ import type {
   WalletCard,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+
 import {
   CartesianGrid,
   Cell,
@@ -44,9 +46,11 @@ import {
   DollarSign,
   Loader2,
   MapPin,
+  Pencil,
   Plus,
   Receipt,
   RotateCcw,
+  Search,
   Sparkles,
   Trash2,
   TriangleAlert,
@@ -92,7 +96,10 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { formatCardAmount, getCardCurrency } from "@/lib/card-format";
+import { formatFullDate, formatMonthDay, formatShortMonth, t, tn } from "@/lib/i18n";
 
+// Labels here are English keys, translated where they render.
 const PERIOD_LABELS = {
   thisMonth: "This Month",
   thisQuarter: "This Quarter",
@@ -168,44 +175,58 @@ interface AnalyticsProps {
   embedded?: boolean;
 }
 
-function formatMoney(n: number): string {
+function formatMoney(n: number, currency = "USD"): string {
   return n.toLocaleString("en-US", {
     style: "currency",
-    currency: "USD",
+    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+}
+
+/**
+ * The currency most of the wallet is in. Period totals add up every card, so
+ * they are labelled in the wallet's main currency rather than always in USD —
+ * a Hong Kong wallet's totals were printed as US dollars.
+ */
+function getDisplayCurrency(walletCards?: WalletCard[]): string {
+  const counts = new Map<string, number>();
+  for (const walletCard of walletCards ?? []) {
+    const currency = getCardCurrency(walletCard.card);
+    counts.set(currency, (counts.get(currency) ?? 0) + 1);
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "USD";
 }
 
 function formatRate(value: number): string {
   return `${value.toFixed(2)}%`;
 }
 
-/** Cash-equivalent multiplier for point/mile cards, mirroring what the engine stores. */
-function getRewardValueMultiplier(card: {
-  rewardUnitValueCents?: number | null;
-}): number {
-  const valueCents = card.rewardUnitValueCents ?? 1;
-  return valueCents > 0 ? valueCents : 1;
-}
-
 /**
- * Must go through the engine's matcher, not a string comparison of its own:
- * catalog rows are worded like "Groceries (US supermarkets, up to $6,000/yr)",
- * so comparing them to the picker's "Groceries" previews the default rate and
- * then the engine saves a different number.
+ * The engine prices the preview exactly as it will price the saved purchase:
+ * caps already used this period, automatic top-spend categories, point value.
+ * A preview computed any other way showed one number and saved another.
  */
-function getEffectiveRate(walletCard: WalletCard, category: string): number {
-  const matched = resolveCashbackCategory(walletCard.card, category, {
-    walletCard: {
-      id: walletCard.id,
-      cardId: walletCard.cardId,
-      addedAt: walletCard.addedAt,
-      openedAt: walletCard.openedAt ?? null,
-      selectedCategories: walletCard.selectedCategories ?? null,
-    },
+function estimateReward(
+  walletCardId: number,
+  category: string,
+  amount: number,
+  date: string,
+  excludeTransactionId?: number,
+  merchantName?: string,
+  description?: string,
+): { cashbackEarned: number; cashbackRate: number } | null {
+  if (!walletCardId || !category || !(amount > 0)) return null;
+  return estimateTransactionReward({
+    walletCardId,
+    category,
+    amount,
+    date,
+    excludeTransactionId,
+    // The merchant can unlock brand bonuses (United, Hilton, Chase Travel).
+    merchantName: merchantName?.trim() || null,
+    description: description?.trim() || null,
   });
-  return (matched?.rate ?? 0) * getRewardValueMultiplier(walletCard.card);
 }
 
 function toDateInputValue(date = new Date()): string {
@@ -228,7 +249,7 @@ function getDayKey(date: Date): string {
 }
 
 function monthLabel(date: Date): string {
-  return date.toLocaleDateString("en-US", { month: "short" });
+  return formatShortMonth(date);
 }
 
 function isPaymentTransaction(transaction: Transaction): boolean {
@@ -312,7 +333,7 @@ function buildTrendData(
       weekStart.setDate(weekStart.getDate() + 7), index += 1
     ) {
       weekStarts.push(new Date(weekStart));
-      addPoint(`w${index}`, `W${index}`);
+      addPoint(`w${index}`, t("W{index}", { index }));
     }
   } else {
     const earliest =
@@ -330,7 +351,7 @@ function buildTrendData(
       addPoint(
         getMonthKey(month),
         period === "lifetime" || month.getFullYear() !== now.getFullYear()
-          ? month.toLocaleDateString("en-US", { month: "short", year: "2-digit" })
+          ? formatShortMonth(month, true)
           : monthLabel(month),
       );
     }
@@ -406,59 +427,131 @@ function invalidateActivityData(queryClient: ReturnType<typeof useQueryClient>) 
   queryClient.invalidateQueries({ queryKey: getGetCashbackByCategoryQueryKey() });
 }
 
+function emptyTransactionValues(): TransactionFormValues {
+  return {
+    transactionType: "purchase",
+    walletCardId: 0,
+    date: toDateInputValue(),
+    amount: 0,
+    category: "",
+    merchantName: "",
+    description: "",
+    locationName: "",
+    latitude: null,
+    longitude: null,
+  };
+}
+
+function valuesFromTransaction(transaction: Transaction): TransactionFormValues {
+  const isPayment = isPaymentTransaction(transaction);
+  // A purchase saved without a description stores its category there; showing
+  // that back as typed text would duplicate it on the next save.
+  const description =
+    transaction.description === transaction.category ||
+    (isPayment && transaction.description === "Payment")
+      ? ""
+      : transaction.description;
+  return {
+    transactionType: isPayment ? "payment" : "purchase",
+    walletCardId: transaction.walletCardId,
+    date: toDateInputValue(new Date(transaction.date)),
+    amount: transaction.amount,
+    category: isPayment ? "Payment" : transaction.category,
+    merchantName: transaction.merchantName ?? "",
+    description,
+    locationName: transaction.locationName ?? "",
+    latitude: transaction.latitude ?? null,
+    longitude: transaction.longitude ?? null,
+  };
+}
+
 function ActivityLogDialog({
   walletCards,
   period,
   onPeriodChange,
+  transaction = null,
+  open,
+  onOpenChange,
 }: {
   walletCards?: WalletCard[];
   period: PeriodKey;
   onPeriodChange: (period: PeriodKey) => void;
+  /** When set, the dialog edits this transaction instead of logging a new one. */
+  transaction?: Transaction | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const isEditing = transaction !== null;
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const isOpen = open ?? uncontrolledOpen;
+  const setIsOpen = (next: boolean) => {
+    if (onOpenChange) onOpenChange(next);
+    else setUncontrolledOpen(next);
+  };
   const [locating, setLocating] = useState(false);
   const createTransaction = useCreateTransaction();
+  const updateTransaction = useUpdateTransaction();
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
-    defaultValues: {
-      transactionType: "purchase",
-      walletCardId: 0,
-      date: toDateInputValue(),
-      amount: 0,
-      category: "",
-      merchantName: "",
-      description: "",
-      locationName: "",
-      latitude: null,
-      longitude: null,
-    },
+    defaultValues: transaction
+      ? valuesFromTransaction(transaction)
+      : emptyTransactionValues(),
   });
+
+  useEffect(() => {
+    if (isOpen && transaction) form.reset(valuesFromTransaction(transaction));
+  }, [form, isOpen, transaction]);
 
   const transactionType = form.watch("transactionType");
   const category = form.watch("category");
   const walletCardId = form.watch("walletCardId");
   const amount = form.watch("amount");
+  const dateValue = form.watch("date");
+  const merchantValue = form.watch("merchantName");
+  const descriptionValue = form.watch("description");
   const latitude = form.watch("latitude");
   const longitude = form.watch("longitude");
   const isPaymentMode = transactionType === "payment";
+  const pricedDate = parseDateInput(dateValue || toDateInputValue());
+  // Rates per card are compared on the actual amount when there is one, so a
+  // nearly-spent cap ranks honestly; $100 stands in until one is typed.
+  const comparisonAmount = Number(amount) > 0 ? Number(amount) : 100;
 
-  const selectedCardRate = useMemo(() => {
-    if (isPaymentMode || !walletCardId || !category || !walletCards) return null;
-    const walletCard = walletCards.find((card) => card.id === Number(walletCardId));
-    if (!walletCard) return null;
-    return getEffectiveRate(walletCard, category);
-  }, [category, isPaymentMode, walletCardId, walletCards]);
+  const rateByWalletCard = useMemo(() => {
+    const rates = new Map<number, number>();
+    if (isPaymentMode || !category) return rates;
+    for (const walletCard of walletCards ?? []) {
+      const estimate = estimateReward(
+        walletCard.id,
+        category,
+        comparisonAmount,
+        pricedDate,
+        transaction?.id,
+        merchantValue,
+        descriptionValue,
+      );
+      rates.set(walletCard.id, estimate?.cashbackRate ?? 0);
+    }
+    return rates;
+  }, [
+    category,
+    comparisonAmount,
+    descriptionValue,
+    isPaymentMode,
+    merchantValue,
+    pricedDate,
+    transaction?.id,
+    walletCards,
+  ]);
 
   const bestCardForCategory = useMemo(() => {
-    if (isPaymentMode || !category || !walletCards || walletCards.length === 0) {
-      return null;
-    }
     let best: { walletCardId: number; label: string; rate: number } | null = null;
-    for (const walletCard of walletCards) {
-      const rate = getEffectiveRate(walletCard, category);
+    for (const walletCard of walletCards ?? []) {
+      const rate = rateByWalletCard.get(walletCard.id);
+      if (rate === undefined) continue;
       if (!best || rate > best.rate) {
         best = {
           walletCardId: walletCard.id,
@@ -468,19 +561,30 @@ function ActivityLogDialog({
       }
     }
     return best;
-  }, [category, isPaymentMode, walletCards]);
+  }, [rateByWalletCard, walletCards]);
 
+  const selectedWalletCard = walletCards?.find(
+    (card) => card.id === Number(walletCardId),
+  );
   const estimatedCashback =
-    !isPaymentMode && selectedCardRate && amount > 0
-      ? Number((Number(amount) * selectedCardRate).toFixed(2))
+    !isPaymentMode && selectedWalletCard && Number(amount) > 0
+      ? (estimateReward(
+          selectedWalletCard.id,
+          category ?? "",
+          Number(amount),
+          pricedDate,
+          transaction?.id,
+          merchantValue,
+          descriptionValue,
+        )?.cashbackEarned ?? null)
       : null;
 
   const captureLocation = () => {
     if (!("geolocation" in navigator)) {
       toast({
         variant: "destructive",
-        title: "Location not supported",
-        description: "Your browser does not expose geolocation.",
+        title: t("Location not supported"),
+        description: t("Your browser does not expose geolocation."),
       });
       return;
     }
@@ -496,13 +600,13 @@ function ActivityLogDialog({
           );
         }
         setLocating(false);
-        toast({ title: "Location captured" });
+        toast({ title: t("Location captured") });
       },
       (error) => {
         setLocating(false);
         toast({
           variant: "destructive",
-          title: "Could not get location",
+          title: t("Could not get location"),
           description: error.message,
         });
       },
@@ -510,22 +614,9 @@ function ActivityLogDialog({
     );
   };
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      form.reset({
-        transactionType: "purchase",
-        walletCardId: 0,
-        date: toDateInputValue(),
-        amount: 0,
-        category: "",
-        merchantName: "",
-        description: "",
-        locationName: "",
-        latitude: null,
-        longitude: null,
-      });
-    }
+  const handleOpenChange = (next: boolean) => {
+    setIsOpen(next);
+    if (!next && !isEditing) form.reset(emptyTransactionValues());
   };
 
   const onSubmit = (values: TransactionFormValues) => {
@@ -534,66 +625,96 @@ function ActivityLogDialog({
     const activeStart = getPeriodStart(period);
     const isVisibleInActivePeriod = !activeStart || savedDate >= activeStart;
     const containingPeriod = findPeriodContaining(savedDate);
-    createTransaction.mutate(
-      {
-        data: {
-          walletCardId: values.walletCardId,
-          transactionType: values.transactionType,
-          date: parseDateInput(values.date),
-          description:
-            values.description?.trim() ||
-            (isPayment ? "Payment" : values.category ?? "Purchase"),
-          amount: values.amount,
-          category: isPayment ? "Payment" : (values.category ?? "Other"),
-          merchantName: isPayment ? null : values.merchantName?.trim() || null,
-          locationName: isPayment ? null : values.locationName?.trim() || null,
-          latitude: isPayment ? null : values.latitude ?? null,
-          longitude: isPayment ? null : values.longitude ?? null,
-        },
+    const data = {
+      walletCardId: values.walletCardId,
+      transactionType: values.transactionType,
+      date: parseDateInput(values.date),
+      description:
+        values.description?.trim() ||
+        (isPayment ? "Payment" : values.category ?? "Purchase"),
+      amount: values.amount,
+      category: isPayment ? "Payment" : (values.category ?? "Other"),
+      merchantName: isPayment ? null : values.merchantName?.trim() || null,
+      locationName: isPayment ? null : values.locationName?.trim() || null,
+      latitude: isPayment ? null : values.latitude ?? null,
+      longitude: isPayment ? null : values.longitude ?? null,
+    };
+    const handlers = {
+      onSuccess: () => {
+        invalidateActivityData(queryClient);
+        if (!isVisibleInActivePeriod) {
+          onPeriodChange(containingPeriod);
+        }
+        toast({
+          title: isEditing
+            ? t("Activity updated")
+            : isPayment
+              ? t("Payment recorded")
+              : t("Transaction logged"),
+          description: isVisibleInActivePeriod
+            ? undefined
+            : t("Dated {date} — switched the range to {period} so it is visible.", {
+                date: formatFullDate(savedDate),
+                period: t(PERIOD_LABELS[containingPeriod]),
+              }),
+        });
+        handleOpenChange(false);
       },
-      {
-        onSuccess: () => {
-          invalidateActivityData(queryClient);
-          if (!isVisibleInActivePeriod) {
-            onPeriodChange(containingPeriod);
-          }
-          toast({
-            title: isPayment ? "Payment recorded" : "Transaction logged",
-            description: isVisibleInActivePeriod
-              ? undefined
-              : `Dated ${format(savedDate, "MMM d, yyyy")} — switched the range to ${PERIOD_LABELS[containingPeriod]} so it is visible.`,
-          });
-          handleOpenChange(false);
-        },
-        onError: () => {
-          toast({
-            variant: "destructive",
-            title: isPayment ? "Error recording payment" : "Error logging transaction",
-          });
-        },
+      onError: (error: unknown) => {
+        toast({
+          variant: "destructive",
+          title: isEditing
+            ? t("Couldn't save changes")
+            : isPayment
+              ? t("Couldn't record payment")
+              : t("Couldn't log purchase"),
+          description: error instanceof Error ? error.message : undefined,
+        });
       },
-    );
+    };
+
+    if (transaction) {
+      updateTransaction.mutate({ id: transaction.id, data }, handlers);
+    } else {
+      createTransaction.mutate({ data }, handlers);
+    }
   };
+
+  const isSaving = createTransaction.isPending || updateTransaction.isPending;
+  const dialogTitle = isEditing
+    ? isPaymentMode
+      ? t("Edit Payment")
+      : t("Edit Purchase")
+    : isPaymentMode
+      ? t("Record Payment")
+      : t("Log Purchase");
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button className="h-10 rounded-full px-4">
-          <Plus className="h-4 w-4" />
-          Log Activity
-        </Button>
-      </DialogTrigger>
+      {/* Only the page's own "Log Activity" instance has a trigger; the edit
+          instance is opened from a row and is controlled by its parent. */}
+      {open !== undefined ? null : (
+        <DialogTrigger asChild>
+          <Button className="h-10 rounded-full px-4">
+            <Plus className="h-4 w-4" />
+            {t("Log Activity")}</Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-h-[90vh] max-w-xl overflow-y-auto rounded-[28px]">
         <DialogHeader>
-          <DialogTitle>{isPaymentMode ? "Record Payment" : "Log Purchase"}</DialogTitle>
-          <DialogDescription>Purchase or payment details.</DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? t("Rewards are recalculated for this card's whole history.")
+              : t("Purchase or payment details.")}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 pt-2">
             <div className="grid grid-cols-2 gap-1 rounded-2xl bg-secondary/60 p-1">
               {[
-                { value: "purchase", label: "Purchase" },
-                { value: "payment", label: "Payment" },
+                { value: "purchase", label: t("Purchase") },
+                { value: "payment", label: t("Payment") },
               ].map((option) => (
                 <button
                   key={option.value}
@@ -630,9 +751,17 @@ function ActivityLogDialog({
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Amount</FormLabel>
+                    <FormLabel>{t("Amount")}</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      <Input
+                        type="number"
+                        inputMode="decimal"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        {...field}
+                        value={field.value === 0 ? "" : field.value}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -643,7 +772,7 @@ function ActivityLogDialog({
                 name="date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Date</FormLabel>
+                    <FormLabel>{t("Date")}</FormLabel>
                     <FormControl>
                       <Input type="date" max={toDateInputValue()} {...field} />
                     </FormControl>
@@ -659,14 +788,14 @@ function ActivityLogDialog({
                 name="walletCardId"
                 render={({ field }) => (
                   <FormItem className={isPaymentMode ? "sm:col-span-2" : undefined}>
-                    <FormLabel>{isPaymentMode ? "Card Paid" : "Card Used"}</FormLabel>
+                    <FormLabel>{isPaymentMode ? t("Card Paid") : t("Card Used")}</FormLabel>
                     <Select
                       onValueChange={(value) => field.onChange(Number(value))}
                       value={field.value ? String(field.value) : undefined}
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select card" />
+                          <SelectValue placeholder={t("Select card")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -682,16 +811,16 @@ function ActivityLogDialog({
                                 {walletCard.nickname || walletCard.card.name}
                                 {!isPaymentMode && category ? (
                                   <span
-                                    className={`text-xs font-medium ${
+                                    className={`text-xs font-medium tabular-nums ${
                                       isBest
                                         ? "text-emerald-700 dark:text-emerald-300"
                                         : "text-muted-foreground"
                                     }`}
                                   >
                                     {formatRate(
-                                      getEffectiveRate(walletCard, category) * 100,
+                                      (rateByWalletCard.get(walletCard.id) ?? 0) * 100,
                                     )}
-                                    {isBest ? " (best)" : ""}
+                                    {isBest ? t(" (best)") : ""}
                                   </span>
                                 ) : null}
                               </span>
@@ -710,17 +839,17 @@ function ActivityLogDialog({
                   name="category"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel>{t("Category")}</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
+                            <SelectValue placeholder={t("Select category")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {CATEGORIES.map((categoryName) => (
                             <SelectItem key={categoryName} value={categoryName}>
-                              {categoryName}
+                              {t(categoryName)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -737,11 +866,13 @@ function ActivityLogDialog({
                 <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700 dark:text-emerald-300" />
                 <div className="min-w-0">
                   <span className="font-medium text-foreground">
-                    Best card for {category}:
+                    {t("Best card for {category}:", { category: t(category) })}
                   </span>{" "}
                   <span className="text-muted-foreground">
                     {bestCardForCategory.label} ·{" "}
-                    {formatRate(bestCardForCategory.rate * 100)} back
+                    {t("{rate} back", {
+                      rate: formatRate(bestCardForCategory.rate * 100),
+                    })}
                   </span>
                 </div>
               </div>
@@ -749,9 +880,12 @@ function ActivityLogDialog({
 
             {estimatedCashback != null && (
               <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-100">
-                <span className="font-medium">Estimated reward</span>
+                <span className="font-medium">{t("Estimated reward")}</span>
                 <span className="font-semibold tabular-nums">
-                  +{formatMoney(estimatedCashback)}
+                  +
+                  {selectedWalletCard
+                    ? formatCardAmount(selectedWalletCard.card, estimatedCashback)
+                    : formatMoney(estimatedCashback)}
                 </span>
               </div>
             )}
@@ -764,10 +898,14 @@ function ActivityLogDialog({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex h-7 items-center">
-                        <FormLabel>Merchant</FormLabel>
+                        <FormLabel>{t("Merchant")}</FormLabel>
                       </div>
                       <FormControl>
-                        <Input placeholder="e.g. Trader Joe's" {...field} />
+                        <Input
+                          placeholder={t("e.g. Trader Joe's, United, Hilton…")}
+                          autoComplete="off"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -779,7 +917,7 @@ function ActivityLogDialog({
                   render={({ field }) => (
                     <FormItem>
                       <div className="flex h-7 items-center justify-between gap-2">
-                        <FormLabel>Location</FormLabel>
+                        <FormLabel>{t("Location")}</FormLabel>
                         <Button
                           type="button"
                           variant="ghost"
@@ -791,23 +929,20 @@ function ActivityLogDialog({
                           {locating ? (
                             <>
                               <Loader2 className="h-3 w-3 animate-spin" />
-                              Locating
-                            </>
+                              {t("Locating")}</>
                           ) : (
                             <>
                               <MapPin className="h-3 w-3" />
-                              Use Location
-                            </>
+                              {t("Use Location")}</>
                           )}
                         </Button>
                       </div>
                       <FormControl>
-                        <Input placeholder="Optional" {...field} />
+                        <Input placeholder={t("Optional")} {...field} />
                       </FormControl>
                       {latitude != null && longitude != null ? (
                         <p className="mt-1 text-xs text-muted-foreground">
-                          Coordinates saved
-                        </p>
+                          {t("Coordinates saved")}</p>
                       ) : null}
                       <FormMessage />
                     </FormItem>
@@ -821,10 +956,10 @@ function ActivityLogDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{isPaymentMode ? "Note" : "Description"}</FormLabel>
+                  <FormLabel>{isPaymentMode ? t("Note") : t("Description")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder={isPaymentMode ? "Optional payment note" : "Optional"}
+                      placeholder={isPaymentMode ? t("Optional payment note") : t("Optional")}
                       {...field}
                     />
                   </FormControl>
@@ -840,18 +975,15 @@ function ActivityLogDialog({
                 className="rounded-full"
                 onClick={() => handleOpenChange(false)}
               >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="rounded-full"
-                disabled={createTransaction.isPending}
-              >
-                {createTransaction.isPending
-                  ? "Saving..."
-                  : isPaymentMode
-                    ? "Record Payment"
-                    : "Log Purchase"}
+                {t("Cancel")}</Button>
+              <Button type="submit" className="rounded-full" disabled={isSaving}>
+                {isSaving
+                  ? t("Saving…")
+                  : isEditing
+                    ? t("Save Changes")
+                    : isPaymentMode
+                      ? t("Record Payment")
+                      : t("Log Purchase")}
               </Button>
             </div>
           </form>
@@ -904,11 +1036,14 @@ function PerCardRows({
   period: SpendingStatsPeriod;
   walletCards?: WalletCard[];
 }) {
+  const currencyFor = (walletCardId: number) => {
+    const walletCard = walletCards?.find((entry) => entry.id === walletCardId);
+    return walletCard ? getCardCurrency(walletCard.card) : "USD";
+  };
   if (period.perCard.length === 0) {
     return (
       <div className="rounded-[22px] border border-dashed border-card-border bg-secondary/25 py-10 text-center text-sm text-muted-foreground">
-        No card rewards in this period.
-      </div>
+        {t("No card rewards in this period.")}</div>
     );
   }
 
@@ -929,7 +1064,7 @@ function PerCardRows({
         return (
           <div
             key={row.walletCardId}
-            className="grid gap-3 border-b border-card-border bg-card px-4 py-3 last:border-b-0 md:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(90px,auto))] md:items-center"
+            className="grid gap-3 border-b border-card-border bg-card px-4 py-3 last:border-b-0 @2xl:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(90px,auto))] @2xl:items-center"
           >
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold text-foreground">
@@ -941,24 +1076,21 @@ function PerCardRows({
             </div>
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                Spent
-              </div>
+                {t("Spent")}</div>
               <div className="mt-1 text-sm font-semibold tabular-nums">
-                {formatMoney(row.totalSpent)}
+                {formatMoney(row.totalSpent, currencyFor(row.walletCardId))}
               </div>
             </div>
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                Reward
-              </div>
+                {t("Reward")}</div>
               <div className="mt-1 text-sm font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
-                {formatMoney(row.totalCashback)}
+                {formatMoney(row.totalCashback, currencyFor(row.walletCardId))}
               </div>
             </div>
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                Rate
-              </div>
+                {t("Rate")}</div>
               <div className="mt-1 text-sm font-semibold tabular-nums">
                 {formatRate(effectiveRate)}
               </div>
@@ -966,7 +1098,10 @@ function PerCardRows({
             <div className="hidden md:block">
               <div
                 className="h-2 rounded-full bg-secondary"
-                title={`${formatRate(effectiveRate)} effective rate, best in this period is ${formatRate(bestRate)}`}
+                title={t("{rate} effective rate, best in this period is {best}", {
+                  rate: formatRate(effectiveRate),
+                  best: formatRate(bestRate),
+                })}
               >
                 <div
                   className="h-2 rounded-full bg-emerald-500 dark:bg-emerald-400"
@@ -984,17 +1119,46 @@ function PerCardRows({
 function LoggedActivityList({
   transactions,
   period,
+  walletCards,
+  cardFilter,
+  query,
+  onEdit,
 }: {
   transactions: Transaction[];
   period: PeriodKey;
+  walletCards?: WalletCard[];
+  cardFilter: string;
+  query: string;
+  onEdit: (transaction: Transaction) => void;
 }) {
   const queryClient = useQueryClient();
   const deleteTransaction = useDeleteTransaction();
   const { toast } = useToast();
   const [visibleCount, setVisibleCount] = useState(ACTIVITY_PAGE_SIZE);
+  const cardById = useMemo(
+    () => new Map((walletCards ?? []).map((walletCard) => [walletCard.id, walletCard.card])),
+    [walletCards],
+  );
+  const amountFor = (transaction: Transaction, value: number) => {
+    const card = cardById.get(transaction.walletCardId);
+    return card ? formatCardAmount(card, value) : formatMoney(value);
+  };
 
-  const periodTransactions = transactions
-    .filter((transaction) => isTransactionInPeriod(transaction, period));
+  const needle = query.trim().toLowerCase();
+  const periodTransactions = transactions.filter((transaction) => {
+    if (!isTransactionInPeriod(transaction, period)) return false;
+    if (cardFilter !== "all" && transaction.walletCardId !== Number(cardFilter)) {
+      return false;
+    }
+    if (!needle) return true;
+    return [
+      transaction.merchantName,
+      transaction.description,
+      transaction.category,
+      transaction.cardName,
+      transaction.locationName,
+    ].some((field) => field?.toLowerCase().includes(needle));
+  });
   const visibleTransactions = periodTransactions.slice(0, visibleCount);
   const hiddenCount = periodTransactions.length - visibleTransactions.length;
 
@@ -1004,12 +1168,12 @@ function LoggedActivityList({
       {
         onSuccess: () => {
           invalidateActivityData(queryClient);
-          toast({ title: "Activity deleted" });
+          toast({ title: t("Activity deleted") });
         },
         onError: () => {
           toast({
             variant: "destructive",
-            title: "Error deleting activity",
+            title: t("Error deleting activity"),
           });
         },
       },
@@ -1018,11 +1182,15 @@ function LoggedActivityList({
 
   if (periodTransactions.length === 0) {
     return (
-      <div className="flex h-full min-h-[260px] flex-col items-center justify-center rounded-[22px] border border-dashed border-card-border bg-secondary/25 p-6 text-center">
+      <div className="flex min-h-[260px] flex-1 flex-col items-center justify-center rounded-[22px] border border-dashed border-card-border bg-secondary/25 p-6 text-center">
         <Receipt className="mb-3 h-8 w-8 text-muted-foreground/50" />
-        <div className="text-sm font-semibold text-foreground">No logged activity</div>
+        <div className="text-sm font-semibold text-foreground">
+          {needle || cardFilter !== "all" ? t("Nothing matches") : t("No logged activity")}
+        </div>
         <div className="mt-1 max-w-[220px] text-xs leading-relaxed text-muted-foreground">
-          No entries for this range.
+          {needle || cardFilter !== "all"
+            ? t("Try another card, search term or time range.")
+            : t("No entries for this range.")}
         </div>
       </div>
     );
@@ -1032,10 +1200,14 @@ function LoggedActivityList({
     <div className="max-h-[420px] space-y-1.5 overflow-y-auto pr-1">
       {visibleTransactions.map((transaction) => {
         const isPayment = isPaymentTransaction(transaction);
-        const title = transaction.merchantName || transaction.description || transaction.category;
+        // Descriptions default to the category name ("Payment", "Dining"),
+        // which t() translates; anything the user typed passes through.
+        const title = t(
+          transaction.merchantName || transaction.description || transaction.category,
+        );
         const secondaryParts = [
-          format(new Date(transaction.date), "MMM d"),
-          transaction.category,
+          formatMonthDay(new Date(transaction.date)),
+          transaction.category ? t(transaction.category) : null,
           transaction.cardName,
           transaction.locationName,
         ].filter(Boolean);
@@ -1083,14 +1255,24 @@ function LoggedActivityList({
                         : "text-foreground"
                     }`}
                   >
-                    {isPayment ? "-" : ""}{formatMoney(transaction.amount)}
+                    {isPayment ? "−" : ""}
+                    {amountFor(transaction, transaction.amount)}
                   </div>
                   {!isPayment && transaction.cashbackEarned > 0 ? (
                     <div className="text-xs font-semibold tabular-nums text-emerald-700 dark:text-emerald-300">
-                      +{formatMoney(transaction.cashbackEarned)}
+                      +{amountFor(transaction, transaction.cashbackEarned)}
                     </div>
                   ) : null}
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-9 w-9 text-muted-foreground transition-opacity md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+                  aria-label={t("Edit activity: {title}", { title })}
+                  onClick={() => onEdit(transaction)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
@@ -1098,29 +1280,32 @@ function LoggedActivityList({
                       size="icon"
                       className="h-9 w-9 text-muted-foreground transition-opacity hover:bg-destructive/10 hover:text-destructive md:opacity-0 md:focus-visible:opacity-100 md:group-hover:opacity-100 md:group-focus-within:opacity-100"
                       disabled={deleteTransaction.isPending}
-                      aria-label={`Delete activity: ${title}`}
+                      aria-label={t("Delete activity: {title}", { title })}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Delete this activity?</AlertDialogTitle>
+                      <AlertDialogTitle>{t("Delete this activity?")}</AlertDialogTitle>
                       <AlertDialogDescription>
-                        {title} · {formatMoney(transaction.amount)} on{" "}
-                        {format(new Date(transaction.date), "MMM d, yyyy")} will be
-                        permanently removed, along with the rewards it earned. This
-                        cannot be undone.
+                        {t(
+                          "{title} · {amount} on {date} will be permanently removed, along with the rewards it earned. This cannot be undone.",
+                          {
+                            title,
+                            amount: amountFor(transaction, transaction.amount),
+                            date: formatFullDate(new Date(transaction.date)),
+                          },
+                        )}
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleDelete(transaction.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Delete
-                      </AlertDialogAction>
+                        {t("Delete")}</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -1135,7 +1320,10 @@ function LoggedActivityList({
           className="w-full rounded-2xl"
           onClick={() => setVisibleCount((count) => count + ACTIVITY_PAGE_SIZE)}
         >
-          Show {Math.min(hiddenCount, ACTIVITY_PAGE_SIZE)} more ({hiddenCount} hidden)
+          {t("Show {count} more ({hidden} hidden)", {
+            count: Math.min(hiddenCount, ACTIVITY_PAGE_SIZE),
+            hidden: hiddenCount,
+          })}
         </Button>
       ) : null}
     </div>
@@ -1147,20 +1335,24 @@ function CategorySpendChart({
   selectedWalletCardId,
   onSelectedWalletCardIdChange,
   walletCards,
+  currency,
 }: {
   data: CategorySpendPoint[];
   selectedWalletCardId: string;
   onSelectedWalletCardIdChange: (value: string) => void;
   walletCards?: WalletCard[];
+  currency: string;
 }) {
   const totalSpent = data.reduce((sum, item) => sum + item.totalSpent, 0);
   // Every slice needs its own colour and its own legend row, so the tail beyond
   // the palette is rolled into a single explicit slice.
-  const slices = useMemo<CategorySpendPoint[]>(() => {
-    if (data.length <= MAX_CATEGORY_SLICES) return data;
+  const slices = useMemo<Array<CategorySpendPoint & { label: string }>>(() => {
+    const withLabels = (points: CategorySpendPoint[]) =>
+      points.map((point) => ({ ...point, label: t(point.category) }));
+    if (data.length <= MAX_CATEGORY_SLICES) return withLabels(data);
     const head = data.slice(0, MAX_CATEGORY_SLICES - 1);
     const tail = data.slice(MAX_CATEGORY_SLICES - 1);
-    return [
+    return withLabels([
       ...head,
       {
         category: OTHER_CATEGORIES_LABEL,
@@ -1169,16 +1361,16 @@ function CategorySpendChart({
         ),
         transactionCount: tail.reduce((sum, item) => sum + item.transactionCount, 0),
       },
-    ];
+    ]);
   }, [data]);
 
   return (
     <div className="rounded-[22px] border border-card-border bg-card p-4">
       <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
         <div>
-          <div className="text-sm font-semibold text-foreground">Spend by category</div>
-          <div className="mt-1 text-xs text-muted-foreground">
-            {formatMoney(totalSpent)}
+          <div className="text-sm font-semibold text-foreground">{t("Spend by category")}</div>
+          <div className="mt-1 text-xs tabular-nums text-muted-foreground">
+            {formatMoney(totalSpent, currency)}
           </div>
         </div>
         <Select
@@ -1186,10 +1378,10 @@ function CategorySpendChart({
           onValueChange={onSelectedWalletCardIdChange}
         >
           <SelectTrigger className="h-9 rounded-full bg-background sm:w-[220px]">
-            <SelectValue placeholder="All cards" />
+            <SelectValue placeholder={t("All cards")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Cards</SelectItem>
+            <SelectItem value="all">{t("All Cards")}</SelectItem>
             {walletCards?.map((walletCard) => (
               <SelectItem key={walletCard.id} value={String(walletCard.id)}>
                 {walletCard.nickname || walletCard.card.name}
@@ -1201,15 +1393,14 @@ function CategorySpendChart({
 
       {data.length === 0 ? (
         <div className="mt-4 flex h-72 items-center justify-center rounded-[20px] border border-dashed border-card-border text-sm text-muted-foreground">
-          No category spend for this range.
-        </div>
+          {t("No category spend for this range.")}</div>
       ) : (
         <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)] lg:items-center">
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Tooltip
-                  formatter={(value: number) => formatMoney(value)}
+                  formatter={(value: number) => formatMoney(value, currency)}
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
@@ -1218,9 +1409,10 @@ function CategorySpendChart({
                   }}
                 />
                 <Pie
+                  isAnimationActive={false}
                   data={slices}
                   dataKey="totalSpent"
-                  nameKey="category"
+                  nameKey="label"
                   innerRadius={62}
                   outerRadius={98}
                   paddingAngle={2}
@@ -1250,15 +1442,16 @@ function CategorySpendChart({
                         style={{ backgroundColor: CATEGORY_COLORS[index] }}
                       />
                       <span className="truncate text-sm font-semibold text-foreground">
-                        {item.category}
+                        {item.label}
                       </span>
                     </div>
                     <div className="mt-0.5 text-xs text-muted-foreground">
-                      {item.transactionCount} purchase{item.transactionCount === 1 ? "" : "s"} · {share.toFixed(1)}%
+                      {tn(item.transactionCount, "{count} purchase", "{count} purchases")} ·{" "}
+                      {share.toFixed(1)}%
                     </div>
                   </div>
                   <div className="text-right text-sm font-semibold tabular-nums">
-                    {formatMoney(item.totalSpent)}
+                    {formatMoney(item.totalSpent, currency)}
                   </div>
                 </div>
               );
@@ -1270,9 +1463,22 @@ function CategorySpendChart({
   );
 }
 
+function cardFilterFromSearch(search: string): string {
+  const card = new URLSearchParams(search).get("card");
+  return card && /^\d+$/.test(card) ? card : "all";
+}
+
 export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
+  const search = useSearch();
   const [periodKey, setPeriodKey] = useState<PeriodKey>("thisMonth");
-  const [categoryWalletCardId, setCategoryWalletCardId] = useState("all");
+  // A card tile's "Activity" link lands here pre-filtered to that card.
+  const [cardFilter, setCardFilter] = useState(() => cardFilterFromSearch(search));
+  const [query, setQuery] = useState("");
+  const [editing, setEditing] = useState<Transaction | null>(null);
+
+  useEffect(() => {
+    setCardFilter(cardFilterFromSearch(search));
+  }, [search]);
   const {
     data,
     isLoading,
@@ -1291,9 +1497,10 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
     [periodKey, transactions],
   );
   const categorySpendData = useMemo(
-    () => buildCategorySpendData(transactions, periodKey, categoryWalletCardId),
-    [categoryWalletCardId, periodKey, transactions],
+    () => buildCategorySpendData(transactions, periodKey, cardFilter),
+    [cardFilter, periodKey, transactions],
   );
+  const currency = getDisplayCurrency(walletCards);
 
   if (isLoading) {
     return (
@@ -1311,12 +1518,9 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
           <TriangleAlert className="h-5 w-5" />
         </div>
         <div className="text-lg font-semibold text-foreground">
-          Could not load your activity
-        </div>
+          {t("Could not load your activity")}</div>
         <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-          Your data is still stored on this device. This usually clears up on a
-          retry — if it does not, check the Data page for a backup to restore.
-        </p>
+          {t("Your data is still stored on this device. This usually clears up on a retry — if it does not, check the Data page for a backup to restore.")}</p>
         <Button
           className="mt-5 h-10 rounded-full px-4"
           onClick={() => {
@@ -1326,8 +1530,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
           }}
         >
           <RotateCcw className="h-4 w-4" />
-          Retry
-        </Button>
+          {t("Retry")}</Button>
       </div>
     );
   }
@@ -1335,7 +1538,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
   const period = data[periodKey];
   const effectiveRate =
     period.totalSpent > 0 ? (period.totalCashback / period.totalSpent) * 100 : 0;
-  const trendTitle = `${PERIOD_LABELS[periodKey]} trend`;
+  const trendTitle = t("{period} trend", { period: t(PERIOD_LABELS[periodKey]) });
 
   return (
     <div className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1343,46 +1546,45 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
         <div>
           <h2 className="flex items-center gap-3 text-2xl font-bold tracking-tight md:text-[28px]">
             <BarChart3 className="h-6 w-6 text-foreground" />
-            Analytics
-          </h2>
+            {t("Analytics")}</h2>
         </div>
       )}
 
       <section className="rounded-[30px] border border-card-border bg-card/95 p-4 shadow-[0_18px_48px_rgba(17,24,32,0.07)] md:p-5">
-        <div className="flex flex-col justify-between gap-3 md:flex-row md:items-center">
-          <div>
-            <div className="text-sm font-semibold text-foreground">Time Range</div>
+        <div className="flex flex-col justify-between gap-3 @3xl:flex-row @3xl:items-center">
+          <div className="shrink-0">
+            <div className="text-sm font-semibold text-foreground">{t("Time Range")}</div>
           </div>
           <Tabs value={periodKey} onValueChange={(value) => setPeriodKey(value as PeriodKey)}>
-            <TabsList className="grid w-full grid-cols-4 rounded-full bg-secondary/60 p-1 md:w-[520px]">
+            <TabsList className="grid w-full grid-cols-4 rounded-full bg-secondary/60 p-1 @3xl:w-[520px]">
               {PERIOD_ORDER.map((key) => (
                 <TabsTrigger key={key} value={key} className="rounded-full text-xs">
-                  {PERIOD_LABELS[key]}
+                  {t(PERIOD_LABELS[key])}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
         </div>
 
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-3 @xl:grid-cols-3">
           <SummaryTile
-            label="Total Spent"
-            value={formatMoney(period.totalSpent)}
+            label={t("Total Spent")}
+            value={formatMoney(period.totalSpent, currency)}
             icon={<DollarSign className="h-4 w-4" />}
-            detail={PERIOD_LABELS[periodKey]}
+            detail={t(PERIOD_LABELS[periodKey])}
           />
           <SummaryTile
-            label="Cash Back"
-            value={formatMoney(period.totalCashback)}
+            label={t("Rewards")}
+            value={formatMoney(period.totalCashback, currency)}
             icon={<Sparkles className="h-4 w-4" />}
-            detail={`Effective rate ${formatRate(effectiveRate)}`}
+            detail={t("Effective rate {rate}", { rate: formatRate(effectiveRate) })}
             tone="green"
           />
           <SummaryTile
-            label="Purchases"
+            label={t("Purchases")}
             value={period.transactionCount.toLocaleString("en-US")}
             icon={<Receipt className="h-4 w-4" />}
-            detail="Logged purchase count"
+            detail={t("Logged purchase count")}
             tone="gold"
           />
         </div>
@@ -1394,10 +1596,9 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
             <div>
               <CardTitle as="h3" className="flex items-center gap-2 text-base font-semibold">
                 <CreditCard className="h-4 w-4" />
-                Cashback by card
-              </CardTitle>
+                {t("Cashback by card")}</CardTitle>
               <div className="mt-1 text-xs text-muted-foreground">
-                {PERIOD_LABELS[periodKey]}
+                {t(PERIOD_LABELS[periodKey])}
               </div>
             </div>
             <ActivityLogDialog
@@ -1408,7 +1609,7 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
           </div>
         </CardHeader>
         <CardContent className="p-4 md:p-5">
-          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_390px]">
+          <div className="grid grid-cols-1 gap-4 @4xl:grid-cols-[minmax(0,1fr)_390px]">
             <div className="rounded-[24px] border border-card-border bg-background/70 p-4">
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
@@ -1420,18 +1621,16 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: SPENT_COLOR }}
                     />
-                    Spent (left axis)
-                  </span>
+                    {t("Spent (left axis)")}</span>
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
                     <span
                       className="h-2 w-2 rounded-full"
                       style={{ backgroundColor: CASHBACK_COLOR }}
                     />
-                    Cash Back (right axis)
-                  </span>
+                    {t("Cash Back (right axis)")}</span>
                   <Badge variant="outline" className="rounded-full bg-card px-2.5 py-1">
                     <CalendarDays className="mr-1 h-3.5 w-3.5" />
-                    {PERIOD_LABELS[periodKey]}
+                    {t(PERIOD_LABELS[periodKey])}
                   </Badge>
                 </div>
               </div>
@@ -1457,12 +1656,6 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       tickLine={false}
                       axisLine={false}
                       stroke={SPENT_COLOR}
-                      label={{
-                        value: "Spent",
-                        angle: -90,
-                        position: "insideLeft",
-                        style: { fontSize: 11, fill: "hsl(var(--muted-foreground))" },
-                      }}
                     />
                     <YAxis
                       yAxisId="cashback"
@@ -1473,15 +1666,9 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       axisLine={false}
                       stroke={CASHBACK_COLOR}
                       width={56}
-                      label={{
-                        value: "Cash back",
-                        angle: 90,
-                        position: "insideRight",
-                        style: { fontSize: 11, fill: "hsl(var(--muted-foreground))" },
-                      }}
                     />
                     <Tooltip
-                      formatter={(value: number) => formatMoney(value)}
+                      formatter={(value: number) => formatMoney(value, currency)}
                       contentStyle={{
                         backgroundColor: "hsl(var(--card))",
                         border: "1px solid hsl(var(--border))",
@@ -1490,20 +1677,22 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
                       }}
                     />
                     <Line
+                      isAnimationActive={false}
                       yAxisId="spent"
-                      type="monotone"
+                      type="linear"
                       dataKey="totalSpent"
-                      name="Spent"
+                      name={t("Spent")}
                       stroke={SPENT_COLOR}
                       strokeWidth={3}
                       dot={false}
                       activeDot={{ r: 5 }}
                     />
                     <Line
+                      isAnimationActive={false}
                       yAxisId="cashback"
-                      type="monotone"
+                      type="linear"
                       dataKey="totalCashback"
-                      name="Cash Back"
+                      name={t("Cash Back")}
                       stroke={CASHBACK_COLOR}
                       strokeWidth={3}
                       strokeDasharray="5 4"
@@ -1515,18 +1704,63 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
               </div>
             </div>
 
-            <div>
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm font-semibold text-foreground">
-                    Logged activity
+            {/* A column, so an empty state fills the rest of the row
+                instead of spilling into the section below. */}
+            <div className="flex min-w-0 flex-col">
+              <div className="mb-3 space-y-2">
+                <div className="text-sm font-semibold text-foreground">
+                  {t("Logged activity")}</div>
+                <div className="flex gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <Search
+                      aria-hidden="true"
+                      className="pointer-events-none absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground"
+                    />
+                    <Input
+                      type="search"
+                      aria-label={t("Search activity")}
+                      placeholder={t("Search merchant, category…")}
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      className="h-9 rounded-full bg-background pl-8"
+                    />
                   </div>
+                  <Select value={cardFilter} onValueChange={setCardFilter}>
+                    <SelectTrigger
+                      aria-label={t("Filter by card")}
+                      className="h-9 w-[44%] shrink-0 rounded-full bg-background"
+                    >
+                      <SelectValue placeholder={t("All cards")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("All Cards")}</SelectItem>
+                      {walletCards?.map((walletCard) => (
+                        <SelectItem key={walletCard.id} value={String(walletCard.id)}>
+                          {walletCard.nickname || walletCard.card.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <LoggedActivityList
-                key={periodKey}
+                key={`${periodKey}-${cardFilter}-${query}`}
                 transactions={transactions}
                 period={periodKey}
+                walletCards={walletCards}
+                cardFilter={cardFilter}
+                query={query}
+                onEdit={setEditing}
+              />
+              <ActivityLogDialog
+                walletCards={walletCards}
+                period={periodKey}
+                onPeriodChange={setPeriodKey}
+                transaction={editing}
+                open={editing !== null}
+                onOpenChange={(open) => {
+                  if (!open) setEditing(null);
+                }}
               />
             </div>
           </div>
@@ -1534,15 +1768,16 @@ export default function Analytics({ embedded = false }: AnalyticsProps = {}) {
           <div className="mt-5 rounded-[24px] border border-card-border bg-background/70 p-4">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <div className="text-sm font-semibold text-foreground">Card breakdown</div>
+                <div className="text-sm font-semibold text-foreground">{t("Card breakdown")}</div>
               </div>
             </div>
-            <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+            <div className="grid grid-cols-1 gap-5 @4xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
               <CategorySpendChart
                 data={categorySpendData}
-                selectedWalletCardId={categoryWalletCardId}
-                onSelectedWalletCardIdChange={setCategoryWalletCardId}
+                selectedWalletCardId={cardFilter}
+                onSelectedWalletCardIdChange={setCardFilter}
                 walletCards={walletCards}
+                currency={currency}
               />
               <PerCardRows period={period} walletCards={walletCards} />
             </div>

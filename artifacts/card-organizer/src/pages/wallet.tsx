@@ -16,6 +16,7 @@ import {
   getGetBillingCyclesQueryKey,
   getGetSpendingStatsQueryKey,
   getListTransactionsQueryKey,
+  type BenefitPeriodState,
   type CardCategoryChoice,
   type CashbackCategory,
   type CreditCard as CreditCardData,
@@ -82,8 +83,15 @@ import {
   formatCompactEarnRate,
   formatCompactRewardCategory,
   formatCompactRewardTotal,
+  rankRewardRows,
 } from "@/lib/reward-display";
 import { cn } from "@/lib/utils";
+import {
+  formatBenefitCadence,
+  formatBenefitReset,
+} from "@/lib/benefit-display";
+import { UpcomingPanel } from "@/components/upcoming-panel";
+import { TiltCard } from "@/components/tilt-card";
 import {
   type ComponentType,
   type ReactNode,
@@ -93,6 +101,7 @@ import {
 } from "react";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { formatFullDate, formatMonthDay, t, tn } from "@/lib/i18n";
 
 type DetailedCreditCard = CreditCardData & {
   sourceUrl?: string | null;
@@ -110,6 +119,7 @@ const CASHBACK_PERIODS: Array<{
   months: number;
   helper: string;
 }> = [
+  // Labels and helpers are English keys, translated where they render.
   { id: "1m", label: "1M", months: 1, helper: "Past Month" },
   { id: "3m", label: "3M", months: 3, helper: "Past 3 Months" },
   { id: "6m", label: "6M", months: 6, helper: "Past 6 Months" },
@@ -232,7 +242,7 @@ function formatEstimatedAmount(
     maximumFractionDigits: hasFraction ? 2 : 0,
   }).format(amount);
 
-  return `Est. Value ${formatted}`;
+  return t("Est. Value {amount}", { amount: formatted });
 }
 
 function formatCompactCardAmount(
@@ -414,12 +424,13 @@ function ChoiceCategoryPicker({
       </legend>
       <p className="text-xs text-muted-foreground">
         {choice.mode === "rotating-calendar"
-          ? "Pick the quarter you have activated with your issuer. Unactivated quarters earn the base rate."
-          : `${
-              choice.picks === 1
-                ? "Pick the category you have selected with your issuer"
-                : `Pick up to ${choice.picks} categories you have selected with your issuer`
-            }, changeable ${CHOICE_RESET_LABEL[choice.resets] ?? "periodically"}.`}
+          ? t("Pick the quarter you have activated with your issuer. Unactivated quarters earn the base rate.")
+          : tn(
+              choice.picks,
+              "Pick the category you have selected with your issuer, changeable {when}.",
+              "Pick up to {count} categories you have selected with your issuer, changeable {when}.",
+              { when: t(CHOICE_RESET_LABEL[choice.resets] ?? "periodically") },
+            )}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {choice.options.map((option) => {
@@ -438,15 +449,14 @@ function ChoiceCategoryPicker({
                   : "border-card-border bg-card text-muted-foreground hover:bg-secondary",
               )}
             >
-              {option}
+              {t(option)}
             </button>
           );
         })}
       </div>
       {selected.length === 0 ? (
         <p className="mt-2 text-xs text-muted-foreground">
-          Nothing selected, so this card earns its base rate everywhere.
-        </p>
+          {t("Nothing selected, so this card earns its base rate everywhere.")}</p>
       ) : null}
     </fieldset>
   );
@@ -515,28 +525,28 @@ function BillingSettingsForm({
     if (isInvalidDay(closingNum)) {
       setFieldError({
         field: "closing",
-        message: "Enter a whole day between 1 and 31.",
+        message: t("Enter a whole day between 1 and 31."),
       });
       return;
     }
     if (isInvalidDay(dueNum)) {
       setFieldError({
         field: "due",
-        message: "Enter a whole day between 1 and 31.",
+        message: t("Enter a whole day between 1 and 31."),
       });
       return;
     }
     if (limitNum !== null && (!Number.isFinite(limitNum) || limitNum < 0)) {
       setFieldError({
         field: "limit",
-        message: "Enter a credit limit of 0 or more.",
+        message: t("Enter a credit limit of 0 or more."),
       });
       return;
     }
     if (openedAt && openedAt > todayIso) {
       setFieldError({
         field: "opened",
-        message: "The opened date cannot be in the future.",
+        message: t("The opened date cannot be in the future."),
       });
       return;
     }
@@ -564,15 +574,15 @@ function BillingSettingsForm({
           queryClient.invalidateQueries({
             queryKey: getGetBillingCyclesQueryKey(),
           });
-          toast({ title: "Billing settings saved" });
+          toast({ title: t("Billing settings saved") });
           onClose();
         },
         onError: (error) =>
           toast({
             variant: "destructive",
-            title: "Could not save settings",
+            title: t("Could not save settings"),
             description:
-              error instanceof Error ? error.message : "Please try again.",
+              error instanceof Error ? error.message : t("Please try again."),
           }),
       },
     );
@@ -581,26 +591,28 @@ function BillingSettingsForm({
   return (
     <>
       <DialogHeader>
-        <DialogTitle>Billing Settings</DialogTitle>
+        <DialogTitle>{t("Billing Settings")}</DialogTitle>
         <DialogDescription>
-          Configure {walletCard.card.name} so we can compute statement balances,
-          due dates, and minimum payments.
+          {t(
+            "Configure {card} so we can compute statement balances, due dates, and minimum payments.",
+            { card: walletCard.card.name },
+          )}
         </DialogDescription>
       </DialogHeader>
       <div className="space-y-4 pt-2">
         <div>
-          <Label htmlFor="nickname">Nickname (optional)</Label>
+          <Label htmlFor="nickname">{t("Nickname (optional)")}</Label>
           <Input
             id="nickname"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            placeholder="e.g. Travel card"
+            placeholder={t("e.g. Travel card")}
             className="mt-1"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="closing">Statement closes on (day)</Label>
+            <Label htmlFor="closing">{t("Statement closes on (day)")}</Label>
             <Input
               id="closing"
               type="number"
@@ -620,7 +632,7 @@ function BillingSettingsForm({
             ) : null}
           </div>
           <div>
-            <Label htmlFor="due">Payment due on (day)</Label>
+            <Label htmlFor="due">{t("Payment due on (day)")}</Label>
             <Input
               id="due"
               type="number"
@@ -642,7 +654,9 @@ function BillingSettingsForm({
         </div>
         <div>
           <Label htmlFor="limit">
-            Credit limit ({getCardCurrency(walletCard.card)})
+            {t("Credit limit ({currency})", {
+              currency: getCardCurrency(walletCard.card),
+            })}
           </Label>
           <Input
             id="limit"
@@ -661,12 +675,11 @@ function BillingSettingsForm({
             </p>
           ) : (
             <p className="text-xs text-muted-foreground mt-1">
-              Used to track utilization in the current cycle.
-            </p>
+              {t("Used to track utilization in the current cycle.")}</p>
           )}
         </div>
         <div>
-          <Label htmlFor="opened">Account opened on</Label>
+          <Label htmlFor="opened">{t("Account opened on")}</Label>
           <Input
             id="opened"
             type="date"
@@ -682,9 +695,7 @@ function BillingSettingsForm({
             </p>
           ) : (
             <p className="text-xs text-muted-foreground mt-1">
-              Used to count down to your next annual fee charge and track
-              cashback earned this cardmember year.
-            </p>
+              {t("Used to count down to your next annual fee charge and track cashback earned this cardmember year.")}</p>
           )}
         </div>
         {userChoices.map(({ choice, row }) => (
@@ -706,10 +717,9 @@ function BillingSettingsForm({
       </div>
       <DialogFooter>
         <Button variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
+          {t("Cancel")}</Button>
         <Button onClick={handleSave} disabled={update.isPending}>
-          {update.isPending ? "Saving..." : "Save Settings"}
+          {update.isPending ? t("Saving…") : t("Save Settings")}
         </Button>
       </DialogFooter>
     </>
@@ -804,20 +814,21 @@ function WalletSummaryStrip({
     CASHBACK_PERIODS[3];
 
   return (
-    <div className="grid items-stretch gap-3 md:grid-cols-3">
+    <div className="grid grid-cols-1 items-stretch gap-3 @lg:grid-cols-2 @3xl:grid-cols-3">
       <WalletSummaryTile
-        className="hidden md:block"
-        title="Cards"
+        className="hidden @3xl:block"
+        title={t("Cards")}
         value={isLoading ? <Skeleton className="h-7 w-12" /> : totalCards}
         helper={
           isLoading ? (
-            "Active Wallet"
+            t("Active Wallet")
           ) : (
             <span>
-              Active Wallet ·{" "}
+              {t("Active Wallet")} ·{" "}
               <span className="font-semibold text-amber-900 dark:text-amber-200">
-                Total Annual Fee: {formatCurrencyTotals(annualFeeTotals)}
-                /yr
+                {t("Total Annual Fee: {amount}/yr", {
+                  amount: formatCurrencyTotals(annualFeeTotals),
+                })}
               </span>
             </span>
           )
@@ -826,12 +837,11 @@ function WalletSummaryStrip({
         tone="neutral"
       />
       <WalletSummaryTile
-        title="Cashback"
+        title={t("Cashback")}
         value={
           isCashbackError ? (
             <span className="text-base font-semibold text-destructive">
-              Unavailable
-            </span>
+              {t("Unavailable")}</span>
           ) : isLoading || isCashbackLoading ? (
             <Skeleton className="h-7 w-20" />
           ) : (
@@ -842,8 +852,8 @@ function WalletSummaryStrip({
           <div className="space-y-2">
             <div>
               {isCashbackError
-                ? "Couldn't read your transactions."
-                : selectedCashbackPeriod.helper}
+                ? t("Couldn't read your transactions.")
+                : t(selectedCashbackPeriod.helper)}
             </div>
             {isCashbackError ? (
               <Button
@@ -852,8 +862,7 @@ function WalletSummaryStrip({
                 className="h-7 px-2 text-[11px]"
                 onClick={onRetry}
               >
-                Try again
-              </Button>
+                {t("Try again")}</Button>
             ) : (
               <div className="inline-flex w-fit max-w-full flex-wrap gap-1 rounded-md bg-secondary/60 p-1">
                 {CASHBACK_PERIODS.map((period) => (
@@ -868,7 +877,7 @@ function WalletSummaryStrip({
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    {period.label}
+                    {t(period.label)}
                   </button>
                 ))}
               </div>
@@ -879,13 +888,12 @@ function WalletSummaryStrip({
         tone="value"
       />
       <WalletSummaryTile
-        title="Benefits"
+        title={t("Benefits")}
         className="relative z-20"
         value={
           isBenefitsError ? (
             <span className="text-base font-semibold text-destructive">
-              Unavailable
-            </span>
+              {t("Unavailable")}</span>
           ) : isLoading || isBenefitsLoading ? (
             <Skeleton className="h-7 w-20" />
           ) : (
@@ -899,15 +907,25 @@ function WalletSummaryStrip({
             >
               <div className="relative h-8 w-full overflow-hidden rounded-full bg-secondary">
                 <div
-                  className="absolute inset-y-0 left-0 rounded-full bg-emerald-300 transition-all"
-                  style={{ width: `${usedBenefitsPercent}%` }}
+                  className="absolute inset-0 bg-emerald-300 transition-[clip-path] duration-200 ease-out"
+                  style={{
+                    clipPath: `inset(0 ${100 - usedBenefitsPercent}% 0 0 round 9999px)`,
+                  }}
                 />
                 <div className="relative z-10 flex h-full items-center justify-between gap-2 px-3 text-xs font-semibold tabular-nums">
-                  <span className="text-emerald-950 dark:text-emerald-950">
-                    {usedBenefitsCount} Used
+                  {/* Dark text only where it sits on the light fill; with
+                      little or nothing used it sits on the track instead. */}
+                  <span
+                    className={
+                      usedBenefitsPercent >= 20
+                        ? "text-emerald-950"
+                        : "text-foreground"
+                    }
+                  >
+                    {t("{count} Used", { count: usedBenefitsCount })}
                   </span>
                   <span className="text-muted-foreground">
-                    {unusedBenefitsCount} Unused
+                    {t("{count} Unused", { count: unusedBenefitsCount })}
                   </span>
                 </div>
               </div>
@@ -917,20 +935,24 @@ function WalletSummaryStrip({
         helper={
           isBenefitsError ? (
             <div className="space-y-2">
-              <div>Couldn't read your benefits.</div>
+              <div>{t("Couldn't read your benefits.")}</div>
               <Button
                 variant="outline"
                 size="sm"
                 className="h-7 px-2 text-[11px]"
                 onClick={onRetry}
               >
-                Try again
-              </Button>
+                {t("Try again")}</Button>
             </div>
           ) : (
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-              <span className="tabular-nums">
-                Est. Used Value {formatCurrencyTotals(usedBenefitTotals)}
+              <span
+                className="tabular-nums"
+                title={t("Benefit value used since each card's account anniversary")}
+              >
+                {t("Captured this year {amount}", {
+                  amount: formatCurrencyTotals(usedBenefitTotals),
+                })}
               </span>
               <button
                 type="button"
@@ -940,7 +962,7 @@ function WalletSummaryStrip({
                 aria-controls={BENEFIT_DETAILS_PANEL_ID}
                 onClick={onBenefitDetailsToggle}
               >
-                {isBenefitDetailsOpen ? "Hide Details" : "View Details"}
+                {isBenefitDetailsOpen ? t("Hide Details") : t("View Details")}
               </button>
             </div>
           )
@@ -1016,7 +1038,7 @@ function WalletSummaryTile({
           id={BENEFIT_DETAILS_PANEL_ID}
           data-benefit-popover
           role="region"
-          aria-label="Benefit details"
+          aria-label={t("Benefit details")}
           className="absolute right-0 top-[calc(100%+0.75rem)] z-30 w-[min(44rem,calc(100vw-3rem))] animate-in fade-in slide-in-from-top-2 duration-300 md:w-[min(44rem,calc(100vw-19rem))]"
         >
           {overlay}
@@ -1026,13 +1048,40 @@ function WalletSummaryTile({
   );
 }
 
-interface WalletBenefit {
+interface WalletBenefit extends Partial<BenefitPeriodState> {
   walletCardId: number;
   benefitId: number;
   cardName: string;
   name: string;
   description: string;
   annualValue?: number | null;
+}
+
+/**
+ * The renewal line under a benefit: "$25/mo · Resets Nov 1". Sub-annual
+ * credits show their per-period value, because that is what is at stake now.
+ */
+function BenefitCadence({
+  card,
+  periodState,
+  className,
+}: {
+  card?: CreditCardData;
+  periodState?: Partial<BenefitPeriodState> | null;
+  className?: string;
+}) {
+  if (!periodState?.period) return null;
+  const cadence = card
+    ? formatBenefitCadence(card, periodState.period, periodState.periodValue)
+    : null;
+  const reset = formatBenefitReset(periodState.resetsAt);
+  const parts = [cadence, reset].filter(Boolean);
+  if (!parts.length) return null;
+  return (
+    <div className={cn("text-[11px] font-medium tabular-nums text-muted-foreground", className)}>
+      {parts.join(" · ")}
+    </div>
+  );
 }
 
 interface WalletBenefitsPanelProps {
@@ -1078,11 +1127,9 @@ function WalletBenefitsPanel({
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-foreground">
                 <Gift className="h-4 w-4" />
               </span>
-              Card Benefits
-            </div>
+              {t("Card Benefits")}</div>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Track wallet perks and undo accidental usage updates.
-            </p>
+              {t("Track wallet perks and undo accidental usage updates.")}</p>
           </div>
           <div className="flex items-center gap-2 rounded-lg border border-card-border bg-secondary/50 p-1">
             <button
@@ -1094,7 +1141,7 @@ function WalletBenefitsPanel({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Unused {unusedCount}
+              {t("Unused {count}", { count: unusedCount })}
             </button>
             <button
               type="button"
@@ -1105,7 +1152,7 @@ function WalletBenefitsPanel({
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              Used {usedCount}
+              {t("Used {count}", { count: usedCount })}
             </button>
           </div>
         </div>
@@ -1113,8 +1160,8 @@ function WalletBenefitsPanel({
         {activeBenefits.length === 0 ? (
           <div className="rounded-xl border border-dashed border-card-border bg-secondary/30 p-5 text-sm text-muted-foreground">
             {view === "unused"
-              ? "No unused benefits right now."
-              : "No benefits have been marked used yet."}
+              ? t("No unused benefits right now.")
+              : t("No benefits have been marked used yet.")}
           </div>
         ) : (
           <div className="max-h-[24rem] overflow-y-auto pr-1">
@@ -1148,6 +1195,11 @@ function WalletBenefitsPanel({
                         </Badge>
                       ) : null}
                     </div>
+                    <BenefitCadence
+                      card={cardsByWalletCardId.get(benefit.walletCardId)}
+                      periodState={benefit}
+                      className="mb-1"
+                    />
                     <p className="line-clamp-3 min-h-[3.75rem] text-sm text-muted-foreground">
                       {benefit.description}
                     </p>
@@ -1162,8 +1214,7 @@ function WalletBenefitsPanel({
                         disabled={isPending}
                       >
                         <Circle className="mr-2 h-4 w-4" />
-                        Mark Used
-                      </Button>
+                        {t("Mark Used")}</Button>
                     ) : (
                       <Button
                         variant="outline"
@@ -1175,8 +1226,7 @@ function WalletBenefitsPanel({
                         disabled={isPending}
                       >
                         <RotateCcw className="mr-2 h-4 w-4" />
-                        Mark Unused
-                      </Button>
+                        {t("Mark Unused")}</Button>
                     )}
                   </div>
                 );
@@ -1193,7 +1243,7 @@ function formatReviewedDate(value?: string | null): string | null {
   if (!value) return null;
   const reviewed = new Date(value);
   if (Number.isNaN(reviewed.getTime())) return null;
-  return format(reviewed, "MMM d, yyyy");
+  return formatFullDate(reviewed);
 }
 
 type CardBenefitItem = DetailedCreditCard["benefits"][number];
@@ -1201,6 +1251,7 @@ type CardBenefitItem = DetailedCreditCard["benefits"][number];
 interface WalletCardBenefitItemProps {
   benefit: CardBenefitItem;
   card: DetailedCreditCard;
+  periodState?: BenefitPeriodState;
   isUsed: boolean;
   isPending: boolean;
   compact?: boolean;
@@ -1211,6 +1262,7 @@ interface WalletCardBenefitItemProps {
 function WalletCardBenefitItem({
   benefit,
   card,
+  periodState,
   isUsed,
   isPending,
   compact = false,
@@ -1218,12 +1270,15 @@ function WalletCardBenefitItem({
   onMarkUnused,
 }: WalletCardBenefitItemProps) {
   const estimatedValue = formatEstimatedAmount(benefit.annualValue, card);
+  // Only allowances you spend can be "used"; insurance, status and other
+  // standing perks are just listed.
+  const trackable = Boolean(benefit.annualValue && benefit.annualValue > 0);
 
   return (
     <div
       className={cn(
         "rounded-lg border border-card-border bg-card px-3 py-1.5 shadow-[var(--app-shadow-soft)]",
-        isUsed ? "bg-secondary/35" : "",
+        trackable && isUsed ? "bg-secondary/35" : "",
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -1251,17 +1306,24 @@ function WalletCardBenefitItem({
           </Badge>
         ) : null}
       </div>
+      {!trackable ? (
+        <div className="mt-1 text-[11px] font-medium text-muted-foreground">
+          {t("Included with the card")}</div>
+      ) : (
       <div className="mt-1.5 flex items-center justify-between gap-2">
-        <span
-          className={cn(
-            "text-xs font-semibold",
-            isUsed
-              ? "text-emerald-800 dark:text-emerald-200"
-              : "text-muted-foreground",
-          )}
-        >
-          {isUsed ? "Used" : "Unused"}
-        </span>
+        <div className="min-w-0">
+          <span
+            className={cn(
+              "text-xs font-semibold",
+              isUsed
+                ? "text-emerald-800 dark:text-emerald-200"
+                : "text-muted-foreground",
+            )}
+          >
+            {isUsed ? t("Used") : t("Unused")}
+          </span>
+          <BenefitCadence card={card} periodState={periodState} />
+        </div>
         <Button
           type="button"
           variant="ghost"
@@ -1273,16 +1335,15 @@ function WalletCardBenefitItem({
           {isUsed ? (
             <>
               <RotateCcw className="mr-1 h-3.5 w-3.5" />
-              Mark Unused
-            </>
+              {t("Mark Unused")}</>
           ) : (
             <>
               <Circle className="mr-1 h-3.5 w-3.5" />
-              Mark Used
-            </>
+              {t("Mark Used")}</>
           )}
         </Button>
       </div>
+      )}
     </div>
   );
 }
@@ -1291,6 +1352,7 @@ interface CardRuleDetailsProps {
   card: DetailedCreditCard;
   walletCardId: number;
   usedBenefitIds: Set<number>;
+  benefitPeriods?: Record<number, BenefitPeriodState>;
   isPending: boolean;
   onMarkUsed: (walletCardId: number, benefitId: number) => void;
   onMarkUnused: (walletCardId: number, benefitId: number) => void;
@@ -1300,6 +1362,7 @@ function CardRuleDetails({
   card,
   walletCardId,
   usedBenefitIds,
+  benefitPeriods,
   isPending,
   onMarkUsed,
   onMarkUnused,
@@ -1324,8 +1387,7 @@ function CardRuleDetails({
       card.rewardRuleNotes?.length ? (
         <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
           <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Reward Program Notes
-          </div>
+            {t("Reward Program Notes")}</div>
           {card.rewardProgram ? (
             <div className="text-sm font-semibold text-foreground">
               {card.rewardProgram}
@@ -1349,8 +1411,7 @@ function CardRuleDetails({
       <div>
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            All Rewards
-          </div>
+            {t("All Rewards")}</div>
           <Badge variant="secondary" className="rounded-full">
             {rewards.length}
           </Badge>
@@ -1367,8 +1428,7 @@ function CardRuleDetails({
                 </div>
                 {category.isDefault ? (
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    Base earning rate
-                  </div>
+                    {t("Base earning rate")}</div>
                 ) : null}
               </div>
               <div className="shrink-0 rounded-md bg-secondary px-2 py-1 text-xs font-bold tabular-nums text-muted-foreground">
@@ -1382,8 +1442,7 @@ function CardRuleDetails({
       <div>
         <div className="mb-2 flex items-center justify-between gap-3">
           <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            All Benefits
-          </div>
+            {t("All Benefits")}</div>
           <Badge variant="secondary" className="rounded-full">
             {benefits.length}
           </Badge>
@@ -1394,6 +1453,7 @@ function CardRuleDetails({
               key={benefit.id}
               benefit={benefit}
               card={card}
+              periodState={benefitPeriods?.[benefit.id]}
               isUsed={usedBenefitIds.has(benefit.id)}
               isPending={isPending}
               onMarkUsed={() => onMarkUsed(walletCardId, benefit.id)}
@@ -1406,14 +1466,15 @@ function CardRuleDetails({
       {card.signupBonus ? (
         <div className="rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 dark:border-emerald-900/50 dark:bg-emerald-950/15">
           <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-emerald-900 dark:text-emerald-200">
-            Signup Bonus
-          </div>
+            {t("Signup Bonus")}</div>
           <div className="text-sm leading-relaxed text-foreground">
             {card.signupBonus}
           </div>
           {card.signupBonusValue ? (
             <div className="mt-1 text-xs font-semibold tabular-nums text-emerald-900 dark:text-emerald-200">
-              Est. value {formatCardAmount(card, card.signupBonusValue)}
+              {t("Est. value {amount}", {
+                amount: formatCardAmount(card, card.signupBonusValue),
+              })}
             </div>
           ) : null}
         </div>
@@ -1421,8 +1482,10 @@ function CardRuleDetails({
 
       <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-card-border bg-secondary/30 px-3 py-2 text-xs text-muted-foreground">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span>{card.market ?? "US"} rules</span>
-          {reviewedAt ? <span>Reviewed {reviewedAt}</span> : null}
+          <span>{t("{market} rules", { market: t(card.market ?? "US") })}</span>
+          {reviewedAt ? (
+            <span>{t("Reviewed {date}", { date: reviewedAt })}</span>
+          ) : null}
           {card.dataConfidence ? <span>{card.dataConfidence}</span> : null}
         </div>
         {card.sourceUrl ? (
@@ -1432,8 +1495,7 @@ function CardRuleDetails({
             rel="noreferrer noopener"
             className="inline-flex items-center gap-1 font-semibold text-foreground transition-colors hover:text-primary"
           >
-            Official terms
-            <ExternalLink className="h-3 w-3" />
+            {t("Official terms")}<ExternalLink className="h-3 w-3" />
           </a>
         ) : null}
       </div>
@@ -1520,17 +1582,16 @@ export default function Wallet() {
   }, [showBenefitDetails]);
 
   const usedBenefitsCount = usedBenefits?.length ?? 0;
+  // Straight from the engine, per card and per renewal period. Grouping the
+  // dashboard's used list dropped every card outside the wallet's main
+  // currency, so marking their benefits used appeared to do nothing.
   const usedBenefitIdsByWalletCard = useMemo(() => {
     const grouped = new Map<number, Set<number>>();
-
-    for (const benefit of usedBenefits ?? []) {
-      const benefitIds = grouped.get(benefit.walletCardId) ?? new Set<number>();
-      benefitIds.add(benefit.benefitId);
-      grouped.set(benefit.walletCardId, benefitIds);
+    for (const walletCard of walletCards ?? []) {
+      grouped.set(walletCard.id, new Set(walletCard.usedBenefitIds ?? []));
     }
-
     return grouped;
-  }, [usedBenefits]);
+  }, [walletCards]);
   const isBenefitMutationPending =
     markBenefitUsed.isPending || markBenefitUnused.isPending;
   const rewardPeriodStart = useMemo(
@@ -1593,20 +1654,21 @@ export default function Wallet() {
 
     return sortCurrencyTotals(totals);
   }, [cardsByWalletCardId, rewardPeriodStart, transactions, walletCards]);
+  // Value actually captured since each card's anniversary: a $25 monthly
+  // credit used in eight months counts $200, not its $300 annual face value.
   const usedBenefitTotals = useMemo(() => {
     const totals = new Map<string, CurrencyTotal>();
 
     for (const walletCard of walletCards ?? []) {
-      addCurrencyAmount(totals, walletCard.card, 0);
-    }
-    for (const benefit of usedBenefits ?? []) {
-      const card = cardsByWalletCardId.get(benefit.walletCardId);
-      if (!card) continue;
-      addCurrencyAmount(totals, card, benefit.annualValue ?? 0);
+      addCurrencyAmount(
+        totals,
+        walletCard.card,
+        walletCard.currentYearBenefitValue ?? 0,
+      );
     }
 
     return sortCurrencyTotals(totals);
-  }, [cardsByWalletCardId, usedBenefits, walletCards]);
+  }, [walletCards]);
 
   const handleRetrySummaryQueries = () => {
     refetchSummary();
@@ -1641,15 +1703,15 @@ export default function Wallet() {
             queryKey: getListTransactionsQueryKey(),
           });
           toast({
-            title: "Removed from Wallet",
-            description: "Card successfully removed.",
+            title: t("Removed from Wallet"),
+            description: t("Card successfully removed."),
           });
         },
         onError: () => {
           toast({
             variant: "destructive",
-            title: "Error",
-            description: "Failed to remove card.",
+            title: t("Error"),
+            description: t("Failed to remove card."),
           });
         },
       },
@@ -1671,22 +1733,21 @@ export default function Wallet() {
             queryKey: getGetDashboardSummaryQueryKey(),
           });
           toast({
-            title: "Benefit marked as used",
-            description: "You can restore it from the Used view.",
+            title: t("Benefit marked as used"),
+            description: t("You can restore it from the Used view."),
             action: (
               <ToastAction
-                altText="Undo benefit usage"
+                altText={t("Undo benefit usage")}
                 onClick={() => handleMarkBenefitUnused(walletCardId, benefitId)}
               >
-                Undo
-              </ToastAction>
+                {t("Undo")}</ToastAction>
             ),
           });
         },
         onError: () =>
           toast({
             variant: "destructive",
-            title: "Could not update benefit",
+            title: t("Could not update benefit"),
           }),
       },
     );
@@ -1706,12 +1767,12 @@ export default function Wallet() {
           queryClient.invalidateQueries({
             queryKey: getGetDashboardSummaryQueryKey(),
           });
-          toast({ title: "Benefit restored to unused" });
+          toast({ title: t("Benefit restored to unused") });
         },
         onError: () =>
           toast({
             variant: "destructive",
-            title: "Could not update benefit",
+            title: t("Could not update benefit"),
           }),
       },
     );
@@ -1724,7 +1785,7 @@ export default function Wallet() {
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-4 w-64 mt-2" />
         </div>
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 @2xl:grid-cols-2">
           {[1, 2].map((i) => (
             <Skeleton key={i} className="h-72 w-full rounded-xl" />
           ))}
@@ -1740,25 +1801,21 @@ export default function Wallet() {
           <AlertCircle className="h-8 w-8" />
         </div>
         <h2 className="mb-2 text-2xl font-bold tracking-tight">
-          Couldn't load your wallet
-        </h2>
+          {t("Couldn't load your wallet")}</h2>
         <p className="mb-2 max-w-[18rem] text-center leading-relaxed text-muted-foreground sm:max-w-sm">
-          Your cards are still stored on this device — reading them failed just
-          now. Try again, and export a backup from Data if it keeps happening.
-        </p>
+          {t("Your cards are still stored on this device — reading them failed just now. Try again, and export a backup from Data if it keeps happening.")}</p>
         <p className="mb-8 max-w-sm text-center text-xs text-muted-foreground">
           {walletError instanceof Error
             ? walletError.message
-            : "Unknown error."}
+            : t("Unknown error.")}
         </p>
         <div className="flex flex-wrap items-center justify-center gap-2">
-          <Button onClick={() => refetchWallet()}>Try again</Button>
+          <Button onClick={() => refetchWallet()}>{t("Try again")}</Button>
           <Link
             href="/data"
             className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Go to Data
-          </Link>
+            {t("Go to Data")}</Link>
         </div>
       </div>
     );
@@ -1771,18 +1828,14 @@ export default function Wallet() {
           <WalletIcon className="h-8 w-8" />
         </div>
         <h2 className="text-2xl font-bold tracking-tight mb-2">
-          Your wallet is empty
-        </h2>
+          {t("Your wallet is empty")}</h2>
         <p className="mb-8 max-w-[18rem] text-center leading-relaxed text-muted-foreground sm:max-w-sm">
-          Add credit cards to your wallet to start tracking your cashback,
-          unused benefits, and optimal spending categories.
-        </p>
+          {t("Add credit cards to your wallet to start tracking your cashback, unused benefits, and optimal spending categories.")}</p>
         <Link
           href="/cards"
           className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          Browse Card Library
-        </Link>
+          {t("Browse Card Library")}</Link>
       </div>
     );
   }
@@ -1800,19 +1853,19 @@ export default function Wallet() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold tracking-tight md:text-[28px]">
-            My Wallet
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground md:hidden">
-            {walletCards.length} card{walletCards.length === 1 ? "" : "s"} ·{" "}
-            {formatCurrencyTotals(annualFeeTotals)}/yr in fees
+            {t("My Wallet")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground @3xl:hidden">
+            {tn(walletCards.length, "{count} card", "{count} cards")} ·{" "}
+            {t("{amount}/yr in fees", {
+              amount: formatCurrencyTotals(annualFeeTotals),
+            })}
           </p>
         </div>
         <Link
           href="/cards"
           className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg border border-input bg-card px-4 py-2 text-sm font-semibold transition-colors hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          Add New Card
-        </Link>
+          {t("Add New Card")}</Link>
       </div>
 
       <WalletSummaryStrip
@@ -1849,25 +1902,30 @@ export default function Wallet() {
         usedBenefitsCount={usedBenefitsCount}
       />
 
+      <UpcomingPanel
+        walletCards={walletCards}
+        billingCycles={billingCycles}
+        unusedBenefits={unusedBenefits}
+        onOpenBilling={setBillingSettingsCardId}
+        onOpenDetails={setSelectedDetailCardId}
+      />
+
       {isBillingCyclesError ? (
         <Card className="border-destructive/50">
           <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
             <span className="text-destructive">
-              Couldn't load statement cycles — due dates and balances below fall
-              back to your saved billing days.
-            </span>
+              {t("Couldn't load statement cycles — due dates and balances below fall back to your saved billing days.")}</span>
             <Button
               variant="outline"
               size="sm"
               onClick={() => refetchBillingCycles()}
             >
-              Try again
-            </Button>
+              {t("Try again")}</Button>
           </CardContent>
         </Card>
       ) : null}
 
-      <div className="grid gap-4 transition-all md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3">
         {walletCards.map((walletCard) => {
           const cycle = cyclesByCard.get(walletCard.id);
           const isSelected = selectedDetailCardId === walletCard.id;
@@ -1887,13 +1945,8 @@ export default function Wallet() {
           );
           const usedBenefitIds =
             usedBenefitIdsByWalletCard.get(walletCard.id) ?? new Set<number>();
-          const usedBenefitValueForCard = detailedCard.benefits.reduce(
-            (sum, benefit) =>
-              usedBenefitIds.has(benefit.id)
-                ? sum + (benefit.annualValue ?? 0)
-                : sum,
-            0,
-          );
+          const usedBenefitValueForCard =
+            walletCard.currentYearBenefitValue ?? 0;
           const cardTransactions =
             transactionsByWalletCard.get(walletCard.id) ?? [];
           const purchasesTotal = cardTransactions
@@ -1953,6 +2006,11 @@ export default function Wallet() {
           const hasAnnualFee = walletCard.card.annualFee > 0;
           const topBenefits = [...detailedCard.benefits]
             .sort((a, b) => {
+              // Credits you can still use first, then used ones, then
+              // standing perks that have nothing to track.
+              const aTrackable = (a.annualValue ?? 0) > 0;
+              const bTrackable = (b.annualValue ?? 0) > 0;
+              if (aTrackable !== bTrackable) return aTrackable ? -1 : 1;
               const aIsUnused = !usedBenefitIds.has(a.id);
               const bIsUnused = !usedBenefitIds.has(b.id);
               if (aIsUnused !== bIsUnused) return aIsUnused ? -1 : 1;
@@ -2000,26 +2058,26 @@ export default function Wallet() {
           const dueCountdownLabel = cycle
             ? isOverdue
               ? daysOverdue
-                ? `Overdue by ${daysOverdue} day${daysOverdue === 1 ? "" : "s"}`
-                : "Payment overdue"
-              : `Due in ${cycle.daysUntilDue} day${
-                  cycle.daysUntilDue === 1 ? "" : "s"
-                }`
+                ? tn(daysOverdue, "Overdue by {count} day", "Overdue by {count} days")
+                : t("Payment overdue")
+              : tn(cycle.daysUntilDue, "Due in {count} day", "Due in {count} days")
             : hasDueDay && fallbackDueDate
-              ? `Due in ${fallbackDaysUntilDue} day${
-                  fallbackDaysUntilDue === 1 ? "" : "s"
-                }`
+              ? tn(
+                  fallbackDaysUntilDue ?? 0,
+                  "Due in {count} day",
+                  "Due in {count} days",
+                )
               : null;
           const billingDateLabel = cycle
-            ? format(new Date(cycle.nextDueDate), "MMM d")
+            ? formatMonthDay(new Date(cycle.nextDueDate))
             : hasDueDay && fallbackDueDate
-              ? format(fallbackDueDate, "MMM d")
+              ? formatMonthDay(fallbackDueDate)
               : null;
           const showDueInfo =
             hasDueDay && (dueCountdownLabel || billingDateLabel);
           const billingPrimaryMetric = cycle
             ? {
-                label: "Due Amount",
+                label: t("Due Amount"),
                 value: formatCardAmount(
                   detailedCard,
                   hasStatementDue
@@ -2031,7 +2089,7 @@ export default function Wallet() {
                 hasCreditLimit &&
                 effectiveAvailableCredit !== null
               ? {
-                  label: "Available",
+                  label: t("Available"),
                   value: formatCardAmount(
                     detailedCard,
                     effectiveAvailableCredit,
@@ -2045,15 +2103,20 @@ export default function Wallet() {
             (showDueInfo || cycle) &&
             hasCreditLimit &&
             effectiveAvailableCredit !== null
-              ? `Avail. ${formatCompactCardAmount(detailedCard, effectiveAvailableCredit)}`
+              ? t("Avail. {amount}", {
+                  amount: formatCompactCardAmount(
+                    detailedCard,
+                    effectiveAvailableCredit,
+                  ),
+                })
               : null,
-            !hasVisibleBillingInfo ? "Tap to edit" : null,
+            !hasVisibleBillingInfo ? t("Tap to edit") : null,
           ].filter(Boolean) as string[];
           const billingStatusLabel = showDueInfo
-            ? (dueCountdownLabel ?? "Payment due")
+            ? (dueCountdownLabel ?? t("Payment due"))
             : hasCreditLimit
-              ? "Available credit"
-              : "Add billing details";
+              ? t("Available credit")
+              : t("Add billing details");
           const billingBannerClass = isOverdue
             ? "border-rose-200 bg-rose-50/80 dark:border-rose-800 dark:bg-rose-950/25"
             : isDueSoon
@@ -2140,8 +2203,7 @@ export default function Wallet() {
                   </div>
                   <div className="min-w-[5.75rem] shrink-0 text-right">
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Earned
-                    </div>
+                      {t("Earned")}</div>
                     <div className="mt-1 text-lg font-extrabold leading-none tabular-nums text-emerald-900 dark:text-emerald-200">
                       {formatCardAmount(
                         detailedCard,
@@ -2149,8 +2211,7 @@ export default function Wallet() {
                       )}
                     </div>
                     <div className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
-                      All Time
-                    </div>
+                      {t("All Time")}</div>
                   </div>
                 </div>
               </div>
@@ -2158,7 +2219,9 @@ export default function Wallet() {
               <button
                 type="button"
                 aria-haspopup="dialog"
-                aria-label={`Billing settings for ${walletCard.card.name}`}
+                aria-label={t("Billing settings for {card}", {
+                  card: walletCard.card.name,
+                })}
                 onClick={() => setBillingSettingsCardId(walletCard.id)}
                 className={cn(
                   "min-h-[78px] w-full border-b px-5 py-2.5 text-left transition-colors hover:bg-secondary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
@@ -2227,7 +2290,7 @@ export default function Wallet() {
 
               <CardContent className="flex-1 px-5 py-4">
                 {hasAnnualFee ? (
-                  <div className="min-h-[116px] transition-all">
+                  <div className="min-h-[116px]">
                     {(() => {
                       const fee = walletCard.card.annualFee;
                       const cashbackEarned =
@@ -2274,20 +2337,25 @@ export default function Wallet() {
                           <div className="mb-1.5 flex items-center justify-between gap-2">
                             <div className="min-w-0 truncate text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                               {broken
-                                ? "Net of annual fee"
-                                : "Annual fee progress"}
+                                ? t("Net of annual fee")
+                                : t("Annual fee progress")}
                             </div>
                             <div
                               className={`shrink-0 text-right text-xs font-bold tabular-nums ${annualFeeTone.text}`}
                             >
                               {broken
                                 ? `+${formatCardAmount(walletCard.card, net)}`
-                                : `${formatCardAmount(walletCard.card, fee - recoveredValue)} left`}
+                                : t("{amount} left", {
+                                    amount: formatCardAmount(
+                                      walletCard.card,
+                                      fee - recoveredValue,
+                                    ),
+                                  })}
                             </div>
                           </div>
                           <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
                             <div
-                              className="absolute inset-0 transition-all"
+                              className="absolute inset-0 transition-[clip-path] duration-300 ease-out"
                               style={{
                                 background: annualFeeTone.fill,
                                 clipPath: `inset(0 ${100 - pct}% 0 0)`,
@@ -2296,29 +2364,33 @@ export default function Wallet() {
                           </div>
                           <div className="mt-1 flex justify-between text-xs text-muted-foreground tabular-nums">
                             <span>
-                              {formatCardAmount(walletCard.card, recouped)}{" "}
-                              covered of{" "}
-                              {formatCardAmount(walletCard.card, fee)}
+                              {t("{covered} covered of {fee}", {
+                                covered: formatCardAmount(
+                                  walletCard.card,
+                                  recouped,
+                                ),
+                                fee: formatCardAmount(walletCard.card, fee),
+                              })}
                             </span>
                             <span>{pct.toFixed(0)}%</span>
                           </div>
                           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground tabular-nums">
                             <span>
-                              Includes{" "}
-                              {formatCardAmount(
-                                walletCard.card,
-                                cashbackEarned,
-                              )}{" "}
-                              Cashback
+                              {t("Includes {amount} Cashback", {
+                                amount: formatCardAmount(
+                                  walletCard.card,
+                                  cashbackEarned,
+                                ),
+                              })}
                             </span>
                             {usedBenefitValueForCard > 0 ? (
                               <span>
-                                +{" "}
-                                {formatCardAmount(
-                                  walletCard.card,
-                                  usedBenefitValueForCard,
-                                )}{" "}
-                                Used Benefits
+                                {t("+ {amount} Used Benefits", {
+                                  amount: formatCardAmount(
+                                    walletCard.card,
+                                    usedBenefitValueForCard,
+                                  ),
+                                })}
                               </span>
                             ) : null}
                           </div>
@@ -2333,16 +2405,16 @@ export default function Wallet() {
                             <CalendarClock className="h-3.5 w-3.5 shrink-0" />
                             {hasOpenedDate ? (
                               <span className="min-w-0">
-                                Next {formatAnnualFee(walletCard.card)} fee in{" "}
+                                {t("Next {fee} fee in", {
+                                  fee: formatAnnualFee(walletCard.card),
+                                })}{" "}
                                 <span className="font-semibold text-foreground tabular-nums">
-                                  {daysUntil} day
-                                  {daysUntil === 1 ? "" : "s"}
+                                  {tn(daysUntil, "{count} day", "{count} days")}
                                 </span>
                               </span>
                             ) : (
                               <span className="min-w-0">
-                                Add account-opened date
-                              </span>
+                                {t("Add account-opened date")}</span>
                             )}
                           </button>
                         </div>
@@ -2357,8 +2429,7 @@ export default function Wallet() {
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                       <TrendingUp className="w-4 h-4 text-foreground" />
-                      Top Rewards
-                    </div>
+                      {t("Top Rewards")}</div>
                     <div className="shrink-0 text-right">
                       <div className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold tabular-nums text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
                         {formatCompactRewardTotal(
@@ -2367,13 +2438,12 @@ export default function Wallet() {
                         )}
                       </div>
                       <div className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                        {selectedCashbackPeriod.helper}
+                        {t(selectedCashbackPeriod.helper)}
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1.5">
-                    {[...walletCard.card.cashbackCategories]
-                      .sort((a, b) => b.rate - a.rate)
+                    {rankRewardRows(walletCard.card.cashbackCategories)
                       .slice(0, 3)
                       .map((cat) => {
                         const choice = choiceStateByCategoryId.get(cat.id);
@@ -2384,7 +2454,7 @@ export default function Wallet() {
                           >
                             <span className="min-w-0 truncate font-medium text-foreground">
                               {choice?.active.length
-                                ? choice.active.join(", ")
+                                ? choice.active.map((option) => t(option)).join(t(", "))
                                 : formatCompactRewardCategory(cat.category)}
                             </span>
                             {choice && !choice.active.length ? (
@@ -2395,8 +2465,7 @@ export default function Wallet() {
                                 }
                                 className="shrink-0 rounded-md bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900 dark:bg-amber-950/40 dark:text-amber-200"
                               >
-                                Choose
-                              </button>
+                                {t("Choose")}</button>
                             ) : (
                               <span className="shrink-0 rounded-md bg-secondary px-2 py-1 text-xs font-bold tabular-nums text-muted-foreground">
                                 {formatCompactEarnRate(detailedCard, cat.rate)}
@@ -2415,14 +2484,14 @@ export default function Wallet() {
                     <div className="mb-2 flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                         <Gift className="h-4 w-4 text-foreground" />
-                        Key Benefits
-                      </div>
+                        {t("Key Benefits")}</div>
                       <div className="rounded-md bg-emerald-50 px-2 py-1 text-xs font-semibold tabular-nums text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">
-                        Used{" "}
-                        {formatCardAmount(
-                          detailedCard,
-                          usedBenefitValueForCard,
-                        )}
+                        {t("Used {amount}", {
+                          amount: formatCardAmount(
+                            detailedCard,
+                            usedBenefitValueForCard,
+                          ),
+                        })}
                       </div>
                     </div>
                     <div className="space-y-1.5">
@@ -2431,6 +2500,7 @@ export default function Wallet() {
                           key={benefit.id}
                           benefit={benefit}
                           card={detailedCard}
+                          periodState={walletCard.benefitPeriods?.[benefit.id]}
                           compact
                           isUsed={usedBenefitIds.has(benefit.id)}
                           isPending={isBenefitMutationPending}
@@ -2463,22 +2533,23 @@ export default function Wallet() {
                     onClick={() => toggleCardDetails(walletCard.id)}
                   >
                     <PanelRightOpen className="h-4 w-4" />
-                    {isSelected ? "Close" : "Details"}
+                    {isSelected ? t("Close") : t("Details")}
                   </Button>
                   <Link
-                    href="/activity"
+                    href={`/activity?card=${walletCard.id}`}
                     className="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-semibold text-foreground hover:bg-secondary hover:no-underline"
                   >
                     <ReceiptText className="h-3.5 w-3.5" />
-                    All Activity
-                  </Link>
+                    {t("Activity")}</Link>
                 </div>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      aria-label={`Remove ${walletCard.card.name} from wallet`}
+                      aria-label={t("Remove {card} from wallet", {
+                        card: walletCard.card.name,
+                      })}
                       className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -2487,22 +2558,18 @@ export default function Wallet() {
                   <AlertDialogContent>
                     <AlertDialogHeader>
                       <AlertDialogTitle>
-                        Remove {walletCard.card.name}?
+                        {t("Remove {card}?", { card: walletCard.card.name })}
                       </AlertDialogTitle>
                       <AlertDialogDescription>
-                        This will remove the card from your wallet. Your
-                        transactions and cashback history for this card will be
-                        permanently deleted.
-                      </AlertDialogDescription>
+                        {t("This will remove the card from your wallet. Your transactions and cashback history for this card will be permanently deleted.")}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => handleRemove(walletCard.id)}
                         className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
-                        Remove Card
-                      </AlertDialogAction>
+                        {t("Remove Card")}</AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
@@ -2548,13 +2615,8 @@ export default function Wallet() {
                     (sum, transaction) => sum + transaction.cashbackEarned,
                     0,
                   );
-                const selectedUsedBenefitValue = detailedCard.benefits.reduce(
-                  (sum, benefit) =>
-                    usedBenefitIds.has(benefit.id)
-                      ? sum + (benefit.annualValue ?? 0)
-                      : sum,
-                  0,
-                );
+                const selectedUsedBenefitValue =
+                  selectedDetailCard.currentYearBenefitValue ?? 0;
 
                 return (
                   <div className="min-h-full">
@@ -2577,11 +2639,12 @@ export default function Wallet() {
                         ) : null}
                       </SheetHeader>
                       <div className="mt-5 grid gap-4 lg:grid-cols-[18rem_1fr]">
+                        <TiltCard className="rounded-xl">
                         <CardArt
                           cardImageUrl={detailedCard.cardImageUrl}
                           color={detailedCard.color}
                           alt={detailedCard.name}
-                          className="h-44"
+                          className="h-44 rounded-xl"
                           issuer={detailedCard.issuer}
                           logoUrl={detailedCard.logoUrl}
                           network={detailedCard.network}
@@ -2606,19 +2669,18 @@ export default function Wallet() {
                             </div>
                           }
                         />
+                        </TiltCard>
                         <div className="grid gap-3 sm:grid-cols-2">
                           <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
                             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                              Annual Fee
-                            </div>
+                              {t("Annual Fee")}</div>
                             <div className="mt-1 text-lg font-bold tabular-nums text-foreground">
                               {formatAnnualFee(detailedCard)}
                             </div>
                           </div>
                           <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
                             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                              Rewards Earned
-                            </div>
+                              {t("Rewards Earned")}</div>
                             <div className="mt-1 text-lg font-bold text-emerald-900 dark:text-emerald-200">
                               {formatCompactRewardTotal(
                                 detailedCard,
@@ -2626,13 +2688,12 @@ export default function Wallet() {
                               )}
                             </div>
                             <div className="mt-1 text-xs font-medium text-muted-foreground">
-                              {selectedCashbackPeriod.helper}
+                              {t(selectedCashbackPeriod.helper)}
                             </div>
                           </div>
                           <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
                             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                              Used Benefit Value
-                            </div>
+                              {t("Used Benefit Value")}</div>
                             <div className="mt-1 text-lg font-bold text-emerald-900 dark:text-emerald-200">
                               {formatCardAmount(
                                 detailedCard,
@@ -2640,17 +2701,15 @@ export default function Wallet() {
                               )}
                             </div>
                             <div className="mt-1 text-xs font-medium text-muted-foreground">
-                              Annual estimate
-                            </div>
+                              {t("Since the account anniversary")}</div>
                           </div>
                           <div className="rounded-lg border border-card-border bg-secondary/25 p-3">
                             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                              Source
-                            </div>
+                              {t("Source")}</div>
                             <div className="mt-1 text-sm font-semibold text-foreground">
                               {reviewedAt
-                                ? `Reviewed ${reviewedAt}`
-                                : "Official terms"}
+                                ? t("Reviewed {date}", { date: reviewedAt })
+                                : t("Official terms")}
                             </div>
                           </div>
                         </div>
@@ -2661,6 +2720,7 @@ export default function Wallet() {
                         card={detailedCard}
                         walletCardId={selectedDetailCard.id}
                         usedBenefitIds={usedBenefitIds}
+                        benefitPeriods={selectedDetailCard.benefitPeriods}
                         isPending={isBenefitMutationPending}
                         onMarkUsed={handleMarkBenefitUsed}
                         onMarkUnused={handleMarkBenefitUnused}

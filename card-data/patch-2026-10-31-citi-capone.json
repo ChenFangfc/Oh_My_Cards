@@ -1,0 +1,744 @@
+{
+  "_note": "Citi + Capital One / Discover refresh, reviewed 2026-10-31. Works the still-valid non-signup '## Queue' items from pending-corrections.md, adds issuer-confirmed changes since 2026-08-01 (AAdvantage Executive World Legend refresh, inKind credit, Discover Q4 2026 calendar, forward-looking notes for the 2027-01-24 Platinum Select / Business refresh), backfills benefit `period`, and fixes labels that cards:labels showed were credited for the wrong spend (Costco gas row, Capital One Entertainment rows, generic 'Capital One Business Travel' rows). Lounge/status/insurance benefits that are rewritten here get annualValue null per the catalog convention; per-stay experience credits also get null (no annual entitlement). Signup-bonus items are skipped. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-10-31-citi-capone.json",
+
+  "patches": [
+    {
+      "cardId": 5,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-double-cash-credit-card",
+      "confidence": "official",
+      "_why": "Queue #5 (non-signup items), re-checked on citi.com 2026-10-31: the page offers 'an additional 3% cash back on hotels, car rentals, and attractions booked through the Citi Travel portal' on top of the 1% + 1% (5% total; permanent since 2025-05-18, no end date shown). The page lists Extended Warranty and no Damage & Theft / purchase protection, so that benefit is replaced. Extended Warranty is insurance, so annualValue is null.",
+      "categories": {
+        "upsert": [
+          { "category": "Citi Travel hotels, car rentals, and attractions", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "remove": ["Damage and Theft Protection"],
+        "upsert": [
+          {
+            "name": "Extended Warranty",
+            "description": "Extended warranty coverage on eligible purchases made with the card; terms, conditions and coverage limits apply.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 6,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-strata-premier-credit-card",
+      "confidence": "official",
+      "_why": "citi.com (2026-10-31) lists 10x on hotels, car rentals and attractions booked on cititravel.com (row was missing) and 3x at 'Gas and EV charging stations' (row said only 'Gas', so EV charging was paid 1x). The $100 Annual Hotel Benefit applies 'once per calendar year' to a single $500+ stay booked through Citi Travel. Fee still $95; the reported $195 fee is only a survey (Doctor of Credit) and is not applied.",
+      "categories": {
+        "rename": [
+          { "from": "Gas", "to": "Gas and EV Charging Stations" }
+        ],
+        "upsert": [
+          { "category": "Citi Travel hotels, car rentals, and attractions", "rate": 0.10 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$100 Hotel Credit",
+            "description": "$100 off a single hotel stay of $500 or more (excluding taxes and fees) booked through Citi Travel, once per calendar year.",
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 12,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/venture-x/",
+      "confidence": "needs-review",
+      "_why": "Queue #12, re-checked 2026-10-31 on the product page and Capital One's 'All about Venture X' guide (2026-09-08, https://www.capitalone.com/learn-grow/more-than-money/all-about-venture-x/): 10X hotels/rental cars and 5X 'flights and vacation rentals' via Capital One Travel (the 5X row said generic 'Travel'); 5X on Capital One Entertainment (since 2024-02-28; label narrowed because 'Capital One Entertainment' alone was credited for all Entertainment spend); Global Entry/TSA PreCheck 'up to a $120 statement credit', 'one statement credit per account every four years' (was $100); 10,000 bonus miles every anniversary; Premier Collection ($100) and Lifestyle Collection ($50) experience credits are per stay, so annualValue null. Lounge rewrites take effect 2026-02-01: Capital One's account-user page (https://www.capitalone.com/credit-cards/benefits/account-user/) confirms lounge access for additional cardholders now costs an annual fee, but the consumer guest terms ($75,000 spend for free guests, $45/$25 guest passes, $35 Priority Pass guests) come from NerdWallet / Frequent Miler / Upgraded Points, so the card is needs-review. The old 429/150 values assumed free guests; lounge access is non-monetary, so annualValue is null. $300 credit renews on the account anniversary (Upgraded Points, and the same rule is in the Venture X Business footnote). Dropped: PRIOR subscription (no longer on the product page).",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "Capital One Entertainment 5X excludes tickets bought through cardholder pre-sales or at Capital One Hall/Arena box offices."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Travel (via Capital One Travel)", "to": "Flights and vacation rentals booked through Capital One Travel" }
+        ],
+        "upsert": [
+          { "category": "Capital One Entertainment purchases (online ticketing platform)", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$300 Travel Credit",
+            "description": "Up to $300 each account year on bookings through Capital One Travel (primary cardholder, applied at checkout).",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "10,000 Anniversary Bonus Miles",
+            "description": "10,000 bonus miles every year, starting on the first account anniversary.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Priority Pass Lounge Access",
+            "description": "Priority Pass lounge access for the primary cardholder (enrollment required). Since 2026-02-01 guests are no longer complimentary (reported $35 per guest) and additional cardholders need paid lounge access.",
+            "annualValue": null
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Capital One Lounge Access",
+            "description": "Capital One Lounge and Landing access for the primary cardholder. Since 2026-02-01 guests are free only on accounts spending $75,000+ a year (2 per Lounge visit, 1 per Landing visit); otherwise guest passes cost $45 (ages 2-17: $25). Additional cardholders need paid lounge access ($125/year each).",
+            "annualValue": null
+          },
+          {
+            "name": "Premier Collection Experience Credit",
+            "description": "Up to $100 experience credit per stay on Premier Collection hotels and vacation rentals booked through Capital One Travel, plus daily breakfast for two, Wi-Fi, and upgrades / early check-in / late checkout when available.",
+            "annualValue": null
+          },
+          {
+            "name": "Lifestyle Collection Experience Credit",
+            "description": "Up to $50 experience credit per stay on Lifestyle Collection hotels booked through Capital One Travel, plus Wi-Fi and upgrades / early check-in / late checkout when available.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 13,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/venture/",
+      "confidence": "official",
+      "_why": "Queue #13, re-checked 2026-10-31: the product page's 5X covers 'hotels, vacation rentals and rental car bookings' through Capital One Travel, so the two partial rows are merged into one. 'Activities' appears only in the learn-grow article, not the product page, so it is left out. The page also lists 5X on Capital One Entertainment purchases and 'up to a $120 statement credit' for Global Entry or TSA PreCheck (was $100). Capital One's 2026-08-06 Venture vs VentureOne guide (https://www.capitalone.com/learn-grow/money-management/venture-vs-ventureone/) gives the 'every 4 years' frequency. The $50 Lifestyle Collection credit is per stay, so annualValue is null.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Hotels (via Capital One Travel)", "to": "Hotels, vacation rentals and rental cars booked through Capital One Travel" }
+        ],
+        "remove": ["Rental Cars (via Capital One Travel)"],
+        "upsert": [
+          { "category": "Capital One Entertainment purchases (online ticketing platform)", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Lifestyle Collection Experience Credit",
+            "description": "$50 experience credit per stay on Lifestyle Collection hotels booked through Capital One Travel, plus room upgrades, early check-in and late checkout when available.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 14,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/savor/",
+      "confidence": "official",
+      "_why": "capitalone.com/credit-cards/savor (2026-10-31): 'Earn unlimited 5% cash back on hotels, vacation rentals and rental cars booked through Capital One Travel' (vacation rentals were missing; 'activities' stays out, per the verifier's corrected value in the refuted section) and 'unlimited 8% cash back on Capital One Entertainment purchases'. cards:labels showed the old 'Capital One Entertainment' label was credited for every Entertainment transaction at 8%, overriding the real 3% entertainment rate. The new label only matches the ticketing platform.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Hotels and rental cars via Capital One Travel", "to": "Hotels, vacation rentals and rental cars booked through Capital One Travel" },
+          { "from": "Capital One Entertainment", "to": "Capital One Entertainment purchases (online ticketing platform)" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 15,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/savorone/",
+      "confidence": "official",
+      "_why": "Queue #15 (non-signup item), re-checked on the $39-fee SavorOne page (relaunched 2025-08-21): it lists 5% on Capital One Travel hotels, vacation rentals and rental car bookings, and 8% on Capital One Entertainment purchases. Both rows were missing. The signup-bonus queue item is skipped.",
+      "categories": {
+        "upsert": [
+          { "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel", "rate": 0.05 },
+          { "category": "Capital One Entertainment purchases (online ticketing platform)", "rate": 0.08 }
+        ]
+      }
+    },
+
+    {
+      "cardId": 16,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/quicksilver/",
+      "confidence": "official",
+      "_why": "Queue #16, re-checked on capitalone.com/credit-cards/quicksilver: 'Earn unlimited 5% cash back on hotels, vacation rentals and rental car bookings' through Capital One Travel, and 5% on Capital One Entertainment purchases, on top of 1.5% everywhere. Not applied: the 3% gas/grocery tier that Doctor of Credit and NerdWallet reported (May 2026) for some accounts reissued on the Discover network. The public product page does not show it.",
+      "categories": {
+        "upsert": [
+          { "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel", "rate": 0.05 },
+          { "category": "Capital One Entertainment purchases (online ticketing platform)", "rate": 0.05 }
+        ]
+      }
+    },
+
+    {
+      "cardId": 17,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.discover.com/credit-cards/cash-back/it-card/",
+      "confidence": "needs-review",
+      "_why": "The Q4 2026 (Oct 1 - Dec 31) 5% categories are restaurants, entertainment and utilities. Discover's calendar page (https://www.discover.com/credit-cards/cash-back/cashback-calendar.html) failed to load on 2026-10-31 ('the rewards calendar is not working at this time'), so this comes from NerdWallet (https://www.nerdwallet.com/credit-cards/news/discover-bonus-categories-q4-2026) and Doctor of Credit (2026-09-01, https://www.doctorofcredit.com/discover-q4-2026-5-categories-utilities-restaurants-entertainment/), both citing that calendar. Per Doctor of Credit, Discover's utilities include phone, internet and cable bought online or by phone. The Q3 option was reworded because 'transportation' and 'drug stores' resolved to nothing in cards:labels (Q1-Q3 per NerdWallet / Frequent Miler). Cashback Match covers only the first 365 days, so it is one-time. Dropped queue items: Capital One Travel / Capital One Entertainment 5% and 'Capital One Offers'. Capital One's Discover FAQ (https://www.capitalone.com/updates/discover/card-faqs/) says 'Your credit card rewards earn rate will remain the same' and lists no new categories, and the product page shows none.",
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+            "Q2 2026: Restaurants and home improvement stores",
+            "Q3 2026: Gas stations, transportation (transit) and drugstores",
+            "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
+          ]
+        }
+      ],
+      "benefits": {
+        "upsert": [
+          { "name": "Cashback Match First Year", "period": "one-time" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 18,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.discover.com/credit-cards/travel/",
+      "confidence": "official",
+      "_why": "The Discover it Miles page is now a Capital One page and is unchanged: 1.5x miles on all purchases, $0 fee, and Miles Match on miles earned in the first 365 days, for new cardmembers only. Miles Match is therefore marked one-time. It has no Capital One Travel / Entertainment earning, so the refuted queue items stay refuted.",
+      "benefits": {
+        "upsert": [
+          { "name": "Miles Match First Year", "period": "one-time" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 34,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-aadvantage-platinum-select-world-elite-mastercard",
+      "confidence": "official",
+      "_why": "Citi/AA release of 2026-10-27 (https://www.citigroup.com/global/news/press-release/2026/american-airlines-citi-enhance-aadvantage-platinum-select-business-world-elite-mastercard) announces a refresh effective 2027-01-24: fee $99 -> $150, new 3x/2x categories, $150 flight discount, Global Entry and inflight credits. Today's terms still apply, so it is recorded only as a note. The same release lists 'up to $180 annually on Turo rentals ($30 per eligible trip)' as an existing benefit; Turo's partner page caps it per calendar year. The $125 flight discount is earned after $20,000 in purchases in a cardmembership year and renewal (https://creditcards.aa.com/citi-platinum-card-american-airlines-cardmember). Name unchanged: Barclays Aviator Red accounts were converted into this card on 2026-04-24 (Upgraded Points), and Citi now issues every AAdvantage card.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Announced 2026-10-27, effective 2027-01-24: annual fee rises from $99 to $150 (first year still waived); adds 3x on AAdvantage Hotels and Cars bookings and 2x at gas and EV charging stations, select streaming and eligible Rides and Rails purchases; flight discount rises to $150; adds an up-to-$120 Global Entry/TSA PreCheck credit every 4 years and up to $100 a year in inflight credits. The catalog keeps today's terms until then."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$125 American Airlines Flight Discount",
+            "description": "$125 American Airlines flight discount after $20,000 in purchases in a cardmembership year and card renewal.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Turo Credit",
+            "description": "Up to $30 back per eligible completed Turo trip paid with the card (card linked to the Turo account), up to $180 per calendar year.",
+            "annualValue": 180,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 44,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/costco-anywhere-visa-card",
+      "confidence": "official",
+      "_why": "citi.com: 5% on gas at Costco and 4% on other eligible gas and EV charging, on a combined $7,000 of spend per year, then 1%. The old 5% row named 'Costco gas', and cards:labels shows that label is credited for Warehouse Clubs, Gas and EV Charging. So Costco merchandise and all gas/EV were paid 5%, and the 4% EV row could never win. It is replaced by one 4% gas + EV row that carries the $7,000 cap. The 5% Costco-fuel rate moves to a note, because any label naming Costco is also credited for Costco warehouse spend.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Gas bought at Costco earns 5%; other eligible gas and EV charging earn 4%; both share a $7,000 combined annual cap, then 1%. The bonus row uses 4% because a logged gas purchase does not say whether it was Costco fuel.",
+          "Cash back is paid once a year as a Costco credit card reward certificate after the February billing statement closes."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Eligible Gas, including Costco gas (first $7,000/yr combined with EV charging)",
+            "to": "Eligible gas and EV charging (first $7,000/yr combined)"
+          }
+        ],
+        "remove": ["Eligible EV Charging (first $7,000/yr combined with eligible gas)"],
+        "upsert": [
+          { "category": "Eligible gas and EV charging (first $7,000/yr combined)", "rate": 0.04 }
+        ]
+      }
+    },
+
+    {
+      "cardId": 60,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-strata-credit-card",
+      "confidence": "official",
+      "_why": "Queue #60, re-checked on citi.com 2026-10-31. The page shows '5 points per dollar spent on Hotels, Car Rentals, and Attractions booked on cititravel.com' (row was missing) and '2 points per dollar spent at Restaurants' (catalog overstated it at 3). It never mentions Round Up or 10% points back, which were Rewards+ features; grandfathering ended 2026-07-19. The self-select relabel was already applied by patch-2026-08-06-choices.",
+      "categories": {
+        "upsert": [
+          { "category": "Citi Travel hotels, car rentals, and attractions", "rate": 0.05 },
+          { "category": "Restaurants", "rate": 0.02 }
+        ]
+      },
+      "benefits": {
+        "remove": ["Round Up Rewards"]
+      }
+    },
+
+    {
+      "cardId": 62,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card",
+      "confidence": "official",
+      "_why": "AA/Citi refresh effective 2026-08-23 (Citi release 2026-08-03, https://www.citigroup.com/global/news/press-release/2026/american-airlines-citi-elevate-premium-travel-enhanced-citi-aadvantage-executive-world-legend-mastercard), confirmed on the live product page. Changes: annual fee $695 for new cardmembers (was $595). AAdvantage Hotels and Cars now earns 12x; that row was missing. Lyft is $15 after 3 rides in a calendar month, up to $180/yr (was $120). New: up to $500 per calendar year in AA Vacations credit ($250 Jan-Jun + $250 Jul-Dec) and up to $100 per calendar year for inflight and Admirals Club purchases. The existing Avis/Budget credit (up to $120 per calendar year) was missing. Omni Champion status with a yearly Free Night, and Avis President's Club through 2028-08-31, are non-monetary. The product page also lists a $200/yr inKind dining credit ($100 Jan-Jun + $100 Jul-Dec), added around 2026-10-25 per Doctor of Credit and Frequent Miler. The Admirals Club description is corrected to 'primary cardmember plus up to 2 guests or immediate family', valued by Citi at up to $1,400, and its annualValue is set to null per the lounge convention. The 5x tier after $150k stays a note, not a row, as the verifier advised.",
+      "set": {
+        "annualFee": 695,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Annual fee is $695 for new cardmembers from 2026-08-23 (was $595); Citi's announcement does not give the date existing cardmembers move to the new fee.",
+          "After $150,000 in purchases in a calendar year, eligible American Airlines purchases earn 5 miles per $1 (instead of 4) for the rest of that year.",
+          "Rebranded from World Elite to World Legend Mastercard effective 2026-08-23."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          { "category": "AAdvantage Hotels and AAdvantage Cars bookings", "rate": 0.12 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Admirals Club Membership",
+            "description": "Admirals Club membership for the primary cardmember, with access for up to 2 guests or immediate family members; Citi values it at up to $1,400 a year.",
+            "annualValue": null
+          },
+          {
+            "name": "Global Entry / TSA PreCheck",
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Lyft Credit",
+            "description": "$15 back after 3 eligible Lyft rides in a calendar month, up to $180 a year.",
+            "annualValue": 180,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis / Budget Car Rental Credit",
+            "description": "Up to $120 in statement credits per calendar year on eligible prepaid Avis or Budget rentals booked directly on avis.com or budget.com.",
+            "annualValue": 120,
+            "period": "calendar-year"
+          },
+          {
+            "name": "American Airlines Vacations Credit",
+            "description": "Up to $250 back January-June and up to $250 back July-December on eligible packages or experiences booked at aavacations.com.",
+            "annualValue": 500,
+            "period": "semiannual"
+          },
+          {
+            "name": "Inflight and Admirals Club Purchase Credit",
+            "description": "Up to $100 in statement credits per calendar year on eligible American Airlines inflight and Admirals Club purchases.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "inKind Dining Credit",
+            "description": "Up to $100 January-June and up to $100 July-December at inKind restaurants, used by paying with the card through the inKind app.",
+            "annualValue": 200,
+            "period": "semiannual"
+          },
+          {
+            "name": "Omni Hotels Champion Status",
+            "description": "Complimentary Omni Select Guest Champion status for the primary cardmember (enrollment required).",
+            "annualValue": null
+          },
+          {
+            "name": "Omni Hotels Annual Free Night",
+            "description": "Once per calendar year, an Omni Free Night Award after a qualifying stay of 2+ consecutive nights booked directly on omnihotels.com (Champion enrollment required).",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Avis President's Club Status",
+            "description": "Complimentary Avis President's Club status for enrolled primary cardmembers, available through 2028-08-31.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 69,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.discover.com/credit-cards/cash-back/chrome/",
+      "confidence": "official",
+      "_why": "The Discover it Chrome page is now a Capital One page ('You are now on a Capital One webpage', apply links go to capitalone.com), so the issuer is set to 'Capital One / Discover' like #17 and #18. Earning is unchanged: 2% at gas stations (including some EV charging) and restaurants on $1,000 combined per quarter, 1% otherwise. Cashback Match covers only the first 365 days, so it is one-time.",
+      "set": {
+        "issuer": "Capital One / Discover"
+      },
+      "benefits": {
+        "upsert": [
+          { "name": "Cashback Match", "period": "one-time" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 70,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
+      "confidence": "needs-review",
+      "_why": "Same Q4 2026 calendar update as #17. Discover's calendar page (https://www.discover.com/credit-cards/cash-back/cashback-calendar.html) was erroring, so the categories come from NerdWallet and Doctor of Credit (2026-09-01); The Points Guy names the Student card. Queue #70: Good Grades Reward removed, as it is absent from the product page. Cashback Match is one-time (first 365 days). Issuer is set to 'Capital One / Discover': the page is a Capital One page, and Doctor of Credit reports Student accounts migrated 2026-10-19.",
+      "set": {
+        "issuer": "Capital One / Discover"
+      },
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+            "Q2 2026: Restaurants and home improvement stores",
+            "Q3 2026: Gas stations, transportation (transit) and drugstores",
+            "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
+          ]
+        }
+      ],
+      "benefits": {
+        "remove": ["Good Grades Reward"],
+        "upsert": [
+          { "name": "Cashback Match", "period": "one-time" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 71,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.discover.com/credit-cards/secured/",
+      "confidence": "needs-review",
+      "_why": "Queue #71, re-checked on the issuer page 2026-10-31. The card is now titled 'Discover it Secured Cash Back' (the verifier's corrected name, without the title-tag 'Credit Card' suffix). It earns 5% in quarterly categories ('up to the quarterly maximum when you activate') plus 1%; the 2% gas/restaurant tiers are gone (relaunch effective 2026-06-02). The deposit is 'as low as $49 for a minimum $200 credit line' ($49/$99/$200 by creditworthiness). Graduation is 'when you establish a positive track record', and the 7-month review timeline is no longer published. The refuted 'Periodic account reviews' wording and the 'discontinued' premise are not used. The rotating calendar is copied from #17 (needs-review: Discover's calendar page erroring). Issuer set to 'Capital One / Discover'.",
+      "set": {
+        "name": "Discover it Secured Cash Back",
+        "issuer": "Capital One / Discover",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Rotating categories require current-quarter activation and are subject to the issuer quarterly cap before base earning applies.",
+          "Discover bonus categories and first-year Cashback Match terms are issuer-program specific and may require activation or eligibility."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Gas (up to $1,000/quarter combined)", "to": "Rotating Categories (up to $1,500/quarter)" }
+        ],
+        "remove": ["Restaurants (up to $1,000/quarter combined)"],
+        "upsert": [
+          { "category": "Rotating Categories (up to $1,500/quarter)", "rate": 0.05 }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+            "Q2 2026: Restaurants and home improvement stores",
+            "Q3 2026: Gas stations, transportation (transit) and drugstores",
+            "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
+          ]
+        }
+      ],
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Build Credit Securely",
+            "description": "Refundable security deposit of $49, $99 or $200 (set by creditworthiness) secures a credit line of at least $200; depositing more raises the line."
+          },
+          {
+            "name": "Automatic Account Reviews",
+            "description": "Once you establish a positive track record, the deposit is returned and the account becomes an unsecured Discover it Cash Back; Discover no longer publishes a review timeline."
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 98,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/credit-cards/ventureone/",
+      "confidence": "official",
+      "_why": "Queue #98. The product page lists 'unlimited 5 miles per dollar on hotels, vacation rentals and rental cars booked through Capital One Travel' (row relabelled) and 1.25X otherwise. Capital One's 2026-08-06 Venture vs VentureOne guide (https://www.capitalone.com/learn-grow/money-management/venture-vs-ventureone/) confirms 'they can earn 5X miles on purchases through Capital One Entertainment'.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Capital One Travel hotels and rental cars", "to": "Hotels, vacation rentals and rental cars booked through Capital One Travel" }
+        ],
+        "upsert": [
+          { "category": "Capital One Entertainment purchases (online ticketing platform)", "rate": 0.05 }
+        ]
+      }
+    },
+
+    {
+      "cardId": 99,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/venture-business/",
+      "confidence": "official",
+      "_why": "Queue #99 (non-signup items), re-checked 2026-10-31. 5X is on 'hotels, vacation rentals, and rental cars booked through Capital One Business Travel'. The placeholder 'Available Annual Credits' is replaced by the two real credits from the 2026-04-14 rebrand: a $50 Capital One Business Travel credit and a $50 advertising/software statement credit, each expiring on the account-open anniversary. The page lists Global Entry/TSA PreCheck at 'up to a $120 credit ... every 4 years', so annualValue is 30 ($120 / 4 years).",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Capital One Business Travel hotels and rental cars", "to": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel" }
+        ]
+      },
+      "benefits": {
+        "remove": ["Available Annual Credits"],
+        "upsert": [
+          {
+            "name": "$50 Annual Capital One Business Travel Credit",
+            "description": "Up to $50 each account year for bookings through Capital One Business Travel; expires on the next account-open anniversary.",
+            "annualValue": 50,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$50 Annual Advertising/Software Statement Credit",
+            "description": "Up to $50 statement credit each account year for purchases at qualifying advertising or software merchants; unused credit expires on the account-open anniversary.",
+            "annualValue": 50,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 100,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/venture-x-business/",
+      "confidence": "official",
+      "_why": "Queue #100, re-checked 2026-10-31. The product page lists Global Entry/TSA PreCheck up to $120 ('one credit is processed per account every 4 years') and a $100 Premier Collection experience credit per booking; that credit is per stay, so annualValue is null. Capital One's business travel guide (2026-08-04, https://www.capitalone.com/learn-grow/business-resources/how-capital-one-business-cards-enhance-travel-experiences/) confirms the lounge limits also apply to Venture X Business: access is for the primary cardholder; additional cardholders pay $125/yr each (up to 4); and 2 free Lounge guests / 1 Landing guest are allowed only on accounts spending $75,000+ a year. This closes the earlier 'could not verify' gap. The $300 travel credit expires the day before the account anniversary, and 10,000 miles post every anniversary. Dropped: the Capital One Entertainment 5X item, which is not on the Venture X Business page.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$300 Business Travel Credit",
+            "description": "Up to $300 each account year for bookings through Capital One Business Travel; expires the day before the next account-open anniversary.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "10,000 Anniversary Miles",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Airport Lounge Access",
+            "description": "Capital One Lounge and Landing access plus Priority Pass (enrollment required) for the primary cardholder. Additional cardholders need paid lounge access ($125/year each, up to 4). Complimentary guests (2 per Lounge visit, 1 per Landing visit) only on accounts spending $75,000+ a year.",
+            "annualValue": null
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Premier Collection Experience Credit",
+            "description": "Up to $100 experience credit per booking on Premier Collection hotels and vacation rentals booked through Capital One Business Travel, plus daily breakfast for two, Wi-Fi, and upgrades / early check-in / late checkout when available.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 103,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-strata-elite-credit-card",
+      "confidence": "official",
+      "_why": "Queue #103: citi.com lists a Global Entry or TSA PreCheck credit of up to $120 once every four years. Period backfill from the same page: the $300 hotel benefit and the $200 Splurge credit renew each calendar year, and Blacklane is $100 for Jan-Jun plus $100 for Jul-Dec.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$300 Annual Hotel Benefit",
+            "description": "Up to $300 off one hotel stay of 2+ nights booked through Citi Travel, once each calendar year.",
+            "period": "calendar-year"
+          },
+          {
+            "name": "$200 Splurge Credit",
+            "description": "Up to $200 in statement credits each calendar year on up to 2 of: 1stDibs, American Airlines, Best Buy, Future Personal Training and Live Nation (exclusions apply).",
+            "period": "calendar-year"
+          },
+          {
+            "name": "$200 Blacklane Credit",
+            "description": "Up to $100 in Blacklane credits for January-June and up to $100 for July-December.",
+            "period": "semiannual"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 134,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/spark-cash-plus/",
+      "confidence": "official",
+      "_why": "capitalone.com (2026-10-31): 5% is on 'hotels, vacation rentals and rental cars booked through Capital One Business Travel'. The old label 'Capital One Business Travel' also covered flights. The $150 fee is refunded each year once $150,000 is spent by the membership anniversary, so that benefit is cardmember-year. Signup-bonus queue item skipped.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Capital One Business Travel", "to": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel" }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          { "name": "Annual Fee Refund Threshold", "period": "cardmember-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 135,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/spark-cash-select/",
+      "confidence": "official",
+      "_why": "Queue #135: the page's H1 is 'Spark 1.5% Cash Select' (title 'Spark 1.5% Cash Select Business Card'), so the card is renamed to match the #156/#157 naming. Its 5% is on 'hotels and rental cars booked through Capital One Business Travel' (no vacation rentals); the old generic label also covered flights.",
+      "set": {
+        "name": "Capital One Spark 1.5% Cash Select",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Capital One Business Travel", "to": "Hotels and rental cars booked through Capital One Business Travel" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 148,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citi.com/credit-cards/citi-aadvantage-business-credit-card",
+      "confidence": "official",
+      "_why": "Queue #148: citi.com lists the Companion Certificate, earned after $30,000 in purchases each cardmembership year and renewal, with a $99 ticketing fee plus taxes and fees. Citi gives no dollar value, so annualValue is null. The Citi/AA release of 2026-10-27 (https://www.citigroup.com/global/news/press-release/2026/american-airlines-citi-enhance-aadvantage-platinum-select-business-world-elite-mastercard) announces a refresh effective 2027-01-24: fee $99 -> $150; 3x AAdvantage Hotels and Cars; 2x on one self-selected category; Global Entry and inflight credits. It is recorded only as a forward-looking note.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Announced 2026-10-27, effective 2027-01-24: annual fee rises from $99 to $150 (first year waived); adds 3x on AAdvantage Hotels and Cars bookings and 2x on one self-selected category (U.S. shipping, office supply stores or U.S. advertising); adds an up-to-$120 Global Entry/TSA PreCheck credit every 4 years and up to $100 a year in inflight credits. The catalog keeps today's terms until then."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "American Airlines Companion Certificate",
+            "description": "After $30,000 in purchases in a cardmembership year and renewal: one round-trip domestic Main Cabin companion ticket for a $99 ticketing fee plus taxes and fees.",
+            "annualValue": null,
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 155,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/ventureone-business/",
+      "confidence": "official",
+      "_why": "Queue #155 (non-signup items). The page says 'Earn unlimited 1.5X miles on every purchase for your business'; the catalog had the consumer VentureOne's 1.25X. Its 5X is on 'hotels, vacation rentals and rentals cars booked through Capital One Business Travel'. Rates have been in effect since the 2026-04-14 rebrand from Spark Miles Select.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Capital One Business Travel hotels and rental cars", "to": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel" }
+        ],
+        "upsert": [
+          { "category": "Other", "rate": 0.015 }
+        ]
+      }
+    },
+
+    {
+      "cardId": 156,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.capitalone.com/small-business/credit-cards/spark-cash/",
+      "confidence": "official",
+      "_why": "Queue #156 (non-signup item): the 5% is on 'hotels and rental cars booked through Capital One Business Travel', the business portal, not consumer Capital One Travel. The fee is $0 the first year and $95 after, so the catalog's 95 is the ongoing fee.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Hotels and rental cars through Capital One Travel", "to": "Hotels and rental cars booked through Capital One Business Travel" }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,774 @@
+{
+  "_note": "American Express group refresh, 2026-10-31. Every change was checked against the issuer page in each patch's source, fetched 2026-10-31; other URLs in _why only corroborate or date a change. Signup bonuses are out of scope. Benefits newly added as non-monetary perks (status, lounge access, insurance, free checked bags, elite night credits, spend-earned free nights) use annualValue null; benefits renamed via remove + add keep their previous annualValue. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-10-31-amex.json",
+
+  "patches": [
+    {
+      "cardId": 8,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/gold-card/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the issuer page: The Hotel Collection $100 credit on each booking of two nights or more through AmexTravel.com, and complimentary Hertz Five Star status (enrollment required; the queue dates the 2026 Gold refresh to 2026-05-01). annualValue 100 for the per-stay credit assumes one qualifying stay a year. Cadence backfilled from the page: Uber Cash $10/month, Dining Credit $10/month, Dunkin' $7/month, Resy $50 Jan-Jun plus $50 Jul-Dec. $325 fee and earn rates (4x restaurants to $50K, 4x U.S. supermarkets to $25K, 5x prepaid hotels via Amex Travel, 3x flights, 2x prepaid car rentals and cruises) unchanged.",
+      "benefits": {
+        "upsert": [
+          { "name": "Uber Cash", "period": "monthly" },
+          { "name": "Dining Credit", "period": "monthly" },
+          { "name": "Dunkin Credit", "period": "monthly" },
+          { "name": "Resy Credit", "period": "semiannual" },
+          {
+            "name": "Hotel Collection Credit",
+            "description": "$100 credit toward eligible on-property charges (such as dining or spa) on each The Hotel Collection booking of two nights or more made through AmexTravel.com or the Amex Travel App. Eligible charges vary by property.",
+            "annualValue": 100
+          },
+          {
+            "name": "Hertz Five Star Status",
+            "description": "Complimentary upgrade to Hertz Five Star status; enrollment required.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 9,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/platinum/",
+      "confidence": "official",
+      "_why": "CLEAR+ credit raised from $209 to $219 per calendar year after CLEAR's 2026-07-01 price increase (the product page and https://www.americanexpress.com/en-us/travel/benefits/clear/ both show $219). Added the queue's credits, all listed on the product page: airline fee $200/calendar year, Uber Cash $15/month plus $20 in December, Uber One $120/calendar year, lululemon $75/quarter, Walmart+ $12.95/month, Oura Ring $200/calendar year, Global Entry $120 every 4 years or TSA PreCheck up to $85 every 4.5 years. Cadence backfilled: hotel credit $300 semi-annually, digital entertainment $25/month, Resy $100/quarter. The hotel credit description now carries the page's announced rule that Fine Hotels + Resorts bookings need a two-night minimum from 2027-01-01. The queue's Equinox credit is NOT added: it is missing from the page's current benefit lists and appears only in stale page components next to the Saks credit Amex removed on 2026-07-01. $895 fee and 5x flights/prepaid hotels unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "CLEAR Plus Credit",
+            "description": "Up to $219 in statement credits per calendar year for an auto-renewing CLEAR+ membership (excluding taxes and fees).",
+            "annualValue": 219,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Fine Hotels + Resorts / Hotel Collection Credit",
+            "description": "Up to $300 in statement credits semi-annually (up to $600 per calendar year) on prepaid Fine Hotels + Resorts or The Hotel Collection bookings through American Express Travel. The Hotel Collection requires a two-night minimum stay; from January 1, 2027, Fine Hotels + Resorts bookings also need two nights to qualify.",
+            "period": "semiannual"
+          },
+          { "name": "Digital Entertainment Credit", "period": "monthly" },
+          { "name": "Resy Credit", "period": "quarterly" },
+          {
+            "name": "Airline Fee Credit",
+            "description": "Up to $200 in statement credits per calendar year for incidental fees, such as checked bags and in-flight refreshments, charged by one selected qualifying airline.",
+            "annualValue": 200,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Uber Cash",
+            "description": "$15 in Uber Cash each month plus a $20 bonus in December (up to $200 per year) for U.S. Uber rides and orders after adding the card to an Uber account.",
+            "annualValue": 200,
+            "period": "monthly"
+          },
+          {
+            "name": "Uber One Credit",
+            "description": "Up to $120 in statement credits each calendar year toward an auto-renewing Uber One membership.",
+            "annualValue": 120,
+            "period": "calendar-year"
+          },
+          {
+            "name": "lululemon Credit",
+            "description": "Up to $75 in statement credits each quarter (up to $300 per year) at U.S. lululemon retail stores (excluding outlets) and lululemon.com.",
+            "annualValue": 300,
+            "period": "quarterly"
+          },
+          {
+            "name": "Walmart+ Credit",
+            "description": "Up to $12.95 plus applicable taxes back each month on one auto-renewing monthly Walmart+ membership (up to $155 per year).",
+            "annualValue": 155,
+            "period": "monthly"
+          },
+          {
+            "name": "Oura Ring Credit",
+            "description": "Up to $200 in statement credits each calendar year toward an Oura Ring purchased at ouraring.com.",
+            "annualValue": 200,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A $120 statement credit for a Global Entry application every 4 years, or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider every 4.5 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 10,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/",
+      "confidence": "official",
+      "_why": "Disney credit raised from $7 to $10 per month ($120/yr) and renamed Disney Streaming Credit (effective 2025-08-01 per the queue's sources; the issuer page shows the $120 Disney Streaming Credit today). Renamed via remove + add because the old name carries the stale $84. Earn rates (6% U.S. supermarkets to $6,000/yr, 6% streaming, 3% transit, 3% gas) and $95 fee unchanged.",
+      "benefits": {
+        "remove": ["$84 Disney Bundle Credit"],
+        "upsert": [
+          {
+            "name": "$120 Disney Streaming Credit",
+            "description": "Up to $10 back each month in statement credits after using the enrolled card for a subscription, including bundle subscriptions, at DisneyPlus.com, Hulu.com or Stream.ESPN.com (U.S. websites); subscription subject to auto-renewal.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 11,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/",
+      "confidence": "official",
+      "_why": "Amex renamed the credit Disney Streaming Credit (effective 2025-08-01 per the queue's sources); the issuer page shows the $84 Disney Streaming Credit at $7/month, so the value is unchanged and only the name, description and monthly cadence change. Earn rates (3% U.S. supermarkets, online retail and gas, each to $6,000/yr) and $0 fee unchanged.",
+      "benefits": {
+        "remove": ["$84 Disney Bundle Credit"],
+        "upsert": [
+          {
+            "name": "$84 Disney Streaming Credit",
+            "description": "Up to $7 back each month in statement credits after using the enrolled card for a subscription, including bundle subscriptions, at DisneyPlus.com, Hulu.com or Stream.ESPN.com (U.S. websites); subscription subject to auto-renewal.",
+            "annualValue": 84,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 31,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-gold-american-express-card/",
+      "confidence": "official",
+      "_why": "Delta/Amex refresh announced 2026-06-04 (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): new $120 rideshare credit ($10/month, available after the first card renewal) and a free second checked bag on domestic Delta flights, both marked NEW on the issuer page. Added the $100 Delta Stays credit (queue). The issuer page says 'per year'; calendar-year cadence per https://thepointsparty.com/articles/delta-stays-credit ('runs on the calendar year, not your card anniversary'). Flight credit cadence backfilled ($10,000 of purchases in a calendar year). 2x Delta/restaurants/U.S. supermarkets and $150 fee unchanged.",
+      "benefits": {
+        "remove": ["Free First Checked Bag"],
+        "upsert": [
+          {
+            "name": "Free First and Second Checked Bag",
+            "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; the Basic Card Member's second checked bag is also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": 240
+          },
+          {
+            "name": "$120 Rideshare Credit",
+            "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers, available after the first card renewal; enrollment required.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "$100 Delta Stays Credit",
+            "description": "Up to $100 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          { "name": "$200 Delta Flight Credit", "period": "calendar-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 32,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-platinum-american-express-card/",
+      "confidence": "official",
+      "_why": "2026-06-04 Delta refresh (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): free second checked bag on domestic Delta flights, and the Companion Certificate is now also redeemable toward the flight portion of a Delta Vacations package (both on the issuer page, with $22-$250 taxes/fees). Delta retired Medallion Qualification Miles, so MQM Boost is replaced by MQD Headstart ($2,500 MQD each Medallion Qualification Year) and MQD Boost ($1 MQD per $20 spent). Added the $150 Delta Stays credit (queue; calendar-year cadence as for #31) and the Global Entry/TSA PreCheck credit the issuer page lists ($120 GE or up to $85 TSA every 4 years; not in the queue, added for parity with the Reserve). Cadence backfilled: Resy and rideshare $10/month, companion certificate each renewal year. 3x Delta/hotels, 2x restaurants/U.S. supermarkets and $350 fee unchanged.",
+      "benefits": {
+        "remove": ["Free First Checked Bag", "MQM Boost"],
+        "upsert": [
+          {
+            "name": "Free First and Second Checked Bag",
+            "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": 240
+          },
+          {
+            "name": "Companion Certificate",
+            "description": "Each year after card renewal, a round-trip Delta Main companion certificate within the U.S. and to Mexico, the Caribbean or Central America; also redeemable toward the eligible flight portion of a Delta Vacations package. Government taxes and fees of $22-$250 apply.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "MQD Headstart and MQD Boost",
+            "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $20 of eligible purchases on the card in a calendar year (MQD Boost).",
+            "annualValue": null
+          },
+          {
+            "name": "$150 Delta Stays Credit",
+            "description": "Up to $150 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 150,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          { "name": "$120 Resy Credit", "period": "monthly" },
+          { "name": "$120 Rideshare Credit", "period": "monthly" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 33,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/",
+      "confidence": "official",
+      "_why": "2026-06-04 Delta refresh (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): free second checked bag on domestic Delta flights (NEW on the issuer page), and the Companion Certificate is now also redeemable toward the flight portion of a Delta Vacations package. Queue items confirmed on the issuer page: $200 Delta Stays credit (calendar-year cadence as for #31), Global Entry/TSA PreCheck credit ($120 GE every 4 years or up to $85 TSA), MQD Headstart ($2,500) and MQD Boost ($1 MQD per $10). Certificate cabins follow the issuer page (Delta First, Delta Comfort, Delta Main; the queue's Premium Select is not listed). Cadence backfilled: Resy $20/month, rideshare $10/month, companion certificate each renewal year. 3x Delta and $650 fee unchanged.",
+      "benefits": {
+        "remove": ["Free First Checked Bag"],
+        "upsert": [
+          {
+            "name": "Free First and Second Checked Bag",
+            "description": "First checked bag free on Delta flights worldwide; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": 240
+          },
+          {
+            "name": "Companion Certificate (First/Comfort+/Main)",
+            "description": "Each year after card renewal, a round-trip companion certificate in Delta First, Delta Comfort or Delta Main within the U.S. and to Mexico, the Caribbean or Central America; also redeemable toward the eligible flight portion of a Delta Vacations package. Government taxes and fees of $22-$250 apply.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$200 Delta Stays Credit",
+            "description": "Up to $200 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 200,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A statement credit every 4 years for a Global Entry application ($120), or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "MQD Headstart and MQD Boost",
+            "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $10 of purchases on the card in a calendar year (MQD Boost).",
+            "annualValue": null
+          },
+          { "name": "$240 Resy Credit", "period": "monthly" },
+          { "name": "$120 Rideshare Credit", "period": "monthly" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 39,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-brilliant/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the issuer page: the $300 dining credit is up to $25/month at restaurants worldwide, not only Marriott restaurants (renamed to the issuer's $300 Brilliant Dining Credit via remove + add), and the card grants 25 Elite Night Credits each calendar year. Global Entry credit corrected from $100 to $120 (issuer page: $120 Global Entry or up to $85 TSA PreCheck); renamed because the old name carried $100. Free Night Award cadence backfilled (each year after the renewal month, up to 85,000 points). $650 fee and 6x Marriott / 3x restaurants / 3x flights / 2x other unchanged.",
+      "benefits": {
+        "remove": ["$300 Marriott Bonvoy Dining Credit", "$100 Global Entry / TSA PreCheck Credit"],
+        "upsert": [
+          {
+            "name": "$300 Brilliant Dining Credit",
+            "description": "Up to $25 in statement credits each month (up to $300 per calendar year) for eligible purchases at restaurants worldwide.",
+            "annualValue": 300,
+            "period": "monthly"
+          },
+          {
+            "name": "25 Elite Night Credits",
+            "description": "25 Elite Night Credits each calendar year toward the next level of Marriott Bonvoy Elite status.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A $120 statement credit for a Global Entry application every 4 years, or up to $85 toward a five-year TSA PreCheck membership through an official enrollment provider.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          { "name": "Annual Free Night (85K points)", "period": "cardmember-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 40,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the issuer page: 4X on U.S. online retail purchases (added), a $200 Hilton credit paid as up to $50 per quarter, and complimentary National Car Rental Emerald Club Executive status. Priority Pass visits are no longer a Surpass benefit (ended by 2024-11-01 after the 2023 refresh, per the queue's sources) and are absent from the page. Free Night Reward cadence backfilled ($15,000 of purchases in a calendar year). $150 fee and 12x/6x/6x/6x/3x rates unchanged.",
+      "categories": {
+        "upsert": [{ "category": "U.S. Online Retail", "rate": 0.04 }]
+      },
+      "benefits": {
+        "remove": ["10 Priority Pass Lounge Visits"],
+        "upsert": [
+          {
+            "name": "$200 Hilton Credit",
+            "description": "Up to $50 in statement credits each quarter (up to $200 per year) on purchases made directly with a property in the Hilton portfolio.",
+            "annualValue": 200,
+            "period": "quarterly"
+          },
+          {
+            "name": "National Car Rental Emerald Club Executive Status",
+            "description": "Complimentary National Car Rental Emerald Club Executive status, including Executive Area access in the U.S. and Canada; enrollment required.",
+            "annualValue": null
+          },
+          { "name": "Free Night Reward", "period": "calendar-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 41,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/",
+      "confidence": "official",
+      "_why": "CLEAR+ credit is $219 per calendar year (the issuer product page, and https://www.americanexpress.com/en-us/travel/benefits/clear/, which names the Aspire); the refuted $209 proposal is not used. Renamed via remove + add because the old name carried $199. Queue items confirmed on the issuer page: no Priority Pass membership (removed in the 2023 refresh, effective 2024-02-01 per the queue), Free Night Rewards after $30,000 and a further $30,000 of spend each calendar year, National Car Rental Emerald Club Executive status, a $100 Waldorf Astoria/Conrad property credit on two-night stays, and cell phone protection ($800 per claim, 2 claims per 12 months, $50 deductible). Cadence backfilled: resort credit $200 semi-annually, flight credit $50 quarterly, annual Free Night Reward each renewal year. $550 fee and 14x/7x/7x/7x/3x rates unchanged.",
+      "benefits": {
+        "remove": ["Priority Pass Lounge Access", "$199 CLEAR Plus Credit"],
+        "upsert": [
+          {
+            "name": "$219 CLEAR Plus Credit",
+            "description": "Up to $219 in statement credits per calendar year for an annual CLEAR+ membership paid with the card.",
+            "annualValue": 219,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Bonus Free Night Rewards at Spend Thresholds",
+            "description": "Each calendar year, a Hilton Free Night Reward after $30,000 in purchases on the card and another after an additional $30,000.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "National Car Rental Emerald Club Executive Status",
+            "description": "Complimentary National Car Rental Emerald Club Executive status, including Executive Area access in the U.S. and Canada; enrollment required.",
+            "annualValue": null
+          },
+          {
+            "name": "$100 Waldorf Astoria & Conrad Property Credit",
+            "description": "Up to $100 credit for qualifying charges at Waldorf Astoria and Conrad properties on a two-night minimum stay booked with the card at HiltonHonorsAspireCard.com using the Aspire Card Benefit rate.",
+            "annualValue": 100
+          },
+          {
+            "name": "Cell Phone Protection",
+            "description": "Reimbursement to repair or replace a damaged or stolen phone, up to $800 per claim and 2 approved claims per 12 months with a $50 deductible, when the prior month's wireless bill was paid with the card.",
+            "annualValue": null
+          },
+          { "name": "$400 Hilton Resort Credit", "period": "semiannual" },
+          { "name": "$200 Flight Credit", "period": "quarterly" },
+          { "name": "Annual Free Night Reward", "period": "cardmember-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 56,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card-amex/",
+      "confidence": "official",
+      "_why": "Flexible Business Credit: UPS.com shipments replaced FedEx on 2026-10-01 (issuer page now lists Grubhub, office supply stores and UPS.com, with FedEx 'through 10/01/2026' in older copy; dated by https://www.doctorofcredit.com/american-express-business-gold-adds-ups-to-240-flexible-credit-benefit-replaces-fedex/). This supersedes the queue's FedEx wording. Added the issuer-listed $300 ChatGPT Business credit (per calendar year; the queue dates it 2026-05-12) and $150 Squarespace credit (per calendar year; the queue dates it 2025-10-23). Removed 25% Airline Bonus: not on the issuer page, and reported dropped in the 2024 Business Gold refresh (https://milestalk.com/amex-refreshes-business-gold-card-new-benefits-new-annual-fee). The 3x row is relabelled because the page limits 3X to flights and prepaid hotels booked on AmexTravel.com. Notes record the page's announced change: from 2027-02-17 the 4X advertising category counts select merchants only. sourceUrl updated because the old product URL now lands on Amex's 404 page. $375 fee and the top-2 4X structure ($150,000 combined per calendar year) unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Top two 4x categories are selected automatically from eligible business categories each billing cycle and are capped at $150,000 in combined purchases per calendar year before base earning applies.",
+          "3X applies only to flights and prepaid hotels booked on AmexTravel.com.",
+          "From 2027-02-17 the 4X advertising category counts only purchases at select merchants (issuer page footnote)."
+        ]
+      },
+      "categories": {
+        "rename": [{ "from": "Flights & Hotels", "to": "Flights and prepaid hotels via Amex Travel" }]
+      },
+      "benefits": {
+        "remove": ["25% Airline Bonus"],
+        "upsert": [
+          {
+            "name": "$240 Flexible Business Credit",
+            "description": "Up to $20 in statement credits each month (up to $240 per year) on eligible U.S. purchases at Grubhub, U.S. office supply stores and UPS.com shipments; enrollment required. UPS replaced FedEx on 2026-10-01.",
+            "period": "monthly"
+          },
+          { "name": "$155 Walmart+ Credit", "period": "monthly" },
+          {
+            "name": "$300 ChatGPT Business Credit",
+            "description": "Up to $300 in statement credits per calendar year on U.S. purchases of ChatGPT Business subscriptions (subject to auto-renewal).",
+            "annualValue": 300,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$150 Squarespace Credit",
+            "description": "Up to $150 back each calendar year on U.S. Squarespace purchases; enrollment required, subscription purchases subject to auto-renewal.",
+            "annualValue": 150,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 57,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-platinum-credit-card-amex/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the issuer page (2025 Business Platinum refresh): the key-business-category and $5K+ tier earns 2X, not 1.5X, on up to $2 million per calendar year; the Dell credit is $150 per calendar year plus $1,000 more after $5,000 of Dell spend (up to $1,150), replacing the stale $400; the Adobe credit is $250 per calendar year after $600 of Adobe spend; new rows for the $600 hotel credit ($300 semi-annually), $200 Hilton credit ($50/quarter), $219 CLEAR+ credit, $120 wireless credit ($10/month), $300 ChatGPT Business credit (queue dates it 2026-05-12) and the Global Entry/TSA PreCheck credit. New since 2026-08-01: a complimentary ZO membership from Tishman Speyer with up to $500 in statement credits per calendar year for ZO event space or a Dining Club membership, marked NEW on the issuer page and launched 2026-10-22 (https://thepointsparty.com/articles/amex-business-platinum-zo-tishman-speyer-membership). Both bonus rows relabelled: 5X needs AmexTravel.com bookings, and the old 2X label matched no logged category. Notes record two announced future changes shown on the page: Fine Hotels + Resorts bookings need two nights for the hotel credit from 2027-01-01, and the 2X shipping category and the wireless credit become select-merchants-only on 2027-02-17. sourceUrl updated because the old product URL now lands on Amex's 404 page. $895 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "5X applies only to flights and prepaid hotels booked on AmexTravel.com.",
+          "2X covers eligible U.S. construction-material and hardware suppliers, electronic goods retailers, software and cloud providers, shipping providers, and single purchases of $5,000 or more, on up to $2 million of these purchases per calendar year, then 1X.",
+          "From 2027-02-17 the 2X shipping category and the wireless credit apply at select merchants only (issuer page footnote).",
+          "From 2027-01-01 Fine Hotels + Resorts bookings need a two-night minimum stay to count toward the $600 hotel credit."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Flights & Prepaid Hotels", "to": "Flights and prepaid hotels via Amex Travel" },
+          {
+            "from": "Select Business Categories and Large Purchases $5k+ (up to $2,000,000/yr combined)",
+            "to": "U.S. construction, hardware, electronics, software & cloud, shipping and $5k+ purchases (up to $2,000,000/year combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "U.S. construction, hardware, electronics, software & cloud, shipping and $5k+ purchases (up to $2,000,000/year combined)",
+            "rate": 0.02
+          }
+        ]
+      },
+      "benefits": {
+        "remove": ["$400 Dell Credit", "$150 Adobe Credit"],
+        "upsert": [
+          {
+            "name": "$150 Dell Technologies Credit",
+            "description": "Up to $150 in statement credits per calendar year on U.S. purchases made directly with Dell Technologies, plus an additional $1,000 statement credit after $5,000 or more of those purchases in the same calendar year (up to $1,150 in total).",
+            "annualValue": 150,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$250 Adobe Credit",
+            "description": "A $250 statement credit per calendar year after spending $600 or more on eligible U.S. Adobe purchases.",
+            "annualValue": 250,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$600 Hotel Credit",
+            "description": "Up to $300 in statement credits semi-annually (up to $600 per calendar year) on prepaid Fine Hotels + Resorts or The Hotel Collection bookings through American Express Travel. The Hotel Collection requires a two-night minimum stay; from January 1, 2027, Fine Hotels + Resorts bookings also need two nights to qualify.",
+            "annualValue": 600,
+            "period": "semiannual"
+          },
+          {
+            "name": "$200 Hilton Credit",
+            "description": "Up to $50 in statement credits each quarter (up to $200 per calendar year) on eligible purchases made directly with a property in the Hilton portfolio; enrollment required.",
+            "annualValue": 200,
+            "period": "quarterly"
+          },
+          {
+            "name": "$219 CLEAR Plus Credit",
+            "description": "Up to $219 in statement credits per calendar year for an auto-renewing CLEAR+ membership (excluding taxes and fees).",
+            "annualValue": 219,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$120 Wireless Credit",
+            "description": "Up to $10 in statement credits each month on wireless telephone service purchased directly from a U.S. wireless provider. From February 17, 2027, select merchants only.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "$300 ChatGPT Business Credit",
+            "description": "Up to $300 in statement credits per calendar year on U.S. purchases of ChatGPT Business (subject to auto-renewal).",
+            "annualValue": 300,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "ZO Membership from Tishman Speyer",
+            "description": "Complimentary ZO membership (added 2026-10-22): access to ZO Clubhouse locations in select U.S. cities with 4 guest passes per week, 4 Studio day passes per month, and up to $500 in statement credits per calendar year toward ZO event space bookings and/or a Dining Club membership.",
+            "annualValue": 500,
+            "period": "calendar-year"
+          },
+          { "name": "$200 Airline Fee Credit", "period": "calendar-year" },
+          { "name": "$360 Indeed Credit", "period": "quarterly" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 58,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-bevy/",
+      "confidence": "official",
+      "_why": "Encodes the issuer's cap, flagged as a caveat in the 2026-08-06 review: 4X at restaurants worldwide and U.S. supermarkets applies to up to $15,000 of combined purchases per calendar year, then 2X (the card's default). Both rows now carry the cap and share one combined cap group. Free Night Award cadence backfilled ($15,000 of purchases in a calendar year; up to 50,000 points). $250 fee and 6X Marriott unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "4X at restaurants worldwide and U.S. supermarkets applies to the first $15,000 of combined purchases per calendar year, then 2X."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Restaurants", "to": "Restaurants worldwide (up to $15,000/year combined)" },
+          { "from": "Groceries", "to": "U.S. supermarkets (up to $15,000/year combined)" }
+        ]
+      },
+      "benefits": {
+        "upsert": [{ "name": "1 Free Night (50k pts)", "period": "calendar-year" }]
+      }
+    },
+
+    {
+      "cardId": 88,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/en-us/company/legal/cardmember-agreements/",
+      "confidence": "needs-review",
+      "_why": "Renamed American Express Classic Green Card on 2026-08-20: Amex's Q3-2026 cardmember-agreements index lists the product under that name (american-express-classic-green-card-09-30-2026.pdf). The 2026-08-06 pass refuted this rename only as premature; it is corroborated after the date by https://www.insideflyer.com/posts/three-amex-cards-remain-closed-to-new-applicants/. Still closed to new applicants: the old product URL redirects to the card index. CLEAR+ credit raised to $219 per calendar year (https://www.americanexpress.com/en-us/travel/benefits/clear/ lists the Green Card at $219). Earn rates still cannot be checked against a live product page, so the card stays needs-review.",
+      "set": {
+        "name": "American Express Classic Green Card",
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-07-23, when American Express removed the product page. Existing cardholders keep the card.",
+          "Renamed from American Express Green Card to American Express Classic Green Card on 2026-08-20; cardholder notices said the fee, rewards and benefits did not change.",
+          "Earn rates have not been re-verified against a live product page since 2026-07-23."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "CLEAR Plus Credit",
+            "description": "Up to $219 in statement credits per calendar year for an annual CLEAR+ membership paid with the card.",
+            "annualValue": 219,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 123,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/hilton-honors/",
+      "confidence": "official",
+      "_why": "Issuer page: 5X on non-Hilton purchases covers the first $100,000 of eligible purchases per calendar year, then 3X (queue item). Not added as a 0.03 row: the engine never applies a row priced below the default and cannot cap the default row, so a post-cap row would match no spend; the rule is recorded in rewardRuleNotes instead (replacing an auto-generated note). Hilton credit cadence backfilled: up to $60 per quarter ($240/yr). 12X Hilton unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "5X on non-Hilton purchases applies to the first $100,000 of eligible purchases each calendar year, then 3X. The app keeps 5X as the default rate and cannot enforce this cap, so spend past $100,000 is overstated."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$240 Hilton Credit",
+            "description": "Up to $60 in statement credits each quarter (up to $240 per year) on purchases made directly with a property in the Hilton portfolio.",
+            "period": "quarterly"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 124,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/amex-marriott-bonvoy-business-credit-card/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the issuer page: the renewal Free Night Award is valid up to 35,000 points, a second Free Night Award follows $60,000 of purchases in a calendar year (its own row, since it renews on a different cadence), and the card grants 15 Elite Night Credits each calendar year. The queue's 25,000-point top-off clause is omitted because the issuer page does not state it. 6X Marriott / 4X restaurants, U.S. gas, wireless and shipping / 2X other unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Night Award",
+            "description": "One Free Night Award each year after the card renewal month, valid for one night at a redemption level up to 35,000 Marriott Bonvoy points.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Second Free Night Award ($60,000 spend)",
+            "description": "An additional Free Night Award (redemption level up to 35,000 points) after $60,000 in purchases on the card in a calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "15 Elite Night Credits",
+            "description": "15 Elite Night Credits each calendar year toward the next level of Marriott Bonvoy Elite status; can be combined with the credits from one eligible Marriott Bonvoy consumer Amex card.",
+            "annualValue": null,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 150,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/graphite-business-cash-unlimited-card/",
+      "confidence": "official",
+      "_why": "Cadence backfill only: One AP credits unlock after $250,000 of purchases in a calendar year and are usable January 1 to December 31 of the following calendar year (issuer page). $295 fee and unlimited 2% unchanged. Not changed: the page's 5% on flights and prepaid hotels via Amex Travel Online, which the catalog note deliberately leaves unmodeled.",
+      "benefits": {
+        "upsert": [{ "name": "One AP Statement Credit", "period": "calendar-year" }]
+      }
+    },
+
+    {
+      "cardId": 152,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-gold/",
+      "confidence": "official",
+      "_why": "2026-06-04 Delta refresh (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): $120 rideshare credit ($10/month after the first card renewal) and a free second checked bag on domestic Delta flights, both marked NEW on the issuer page. Added the $150 Delta Stays credit (queue; calendar-year cadence as for #31). The page caps 2X on U.S. shipping and on U.S. advertising at $50,000 of purchases per year each; the caps are now in the labels. Replaced a stray IHG note copied from another card. Flight credit cadence backfilled ($10,000 of purchases in a calendar year). sourceUrl updated because the old product URL now lands on Amex's 404 page. 2X Delta/restaurants and the $150 fee (after a $0 first year) unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "2X at U.S. shipping providers and 2X on U.S. advertising in select media each apply to up to $50,000 of purchases per year, then 1X."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "U.S. shipping", "to": "U.S. shipping (up to $50,000/year)" },
+          { "from": "U.S. advertising", "to": "U.S. advertising (up to $50,000/year)" }
+        ]
+      },
+      "benefits": {
+        "remove": ["First Checked Bag Free"],
+        "upsert": [
+          {
+            "name": "First and Second Checked Bag Free",
+            "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": 160
+          },
+          {
+            "name": "$120 Rideshare Credit",
+            "description": "After the first card renewal, up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers; enrollment required.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "$150 Delta Stays Credit",
+            "description": "Up to $150 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 150,
+            "period": "calendar-year"
+          },
+          { "name": "$200 Delta Flight Credit", "period": "calendar-year" }
+        ]
+      }
+    },
+
+    {
+      "cardId": 153,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-platinum/",
+      "confidence": "official",
+      "_why": "2026-06-04 Delta refresh (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): free first and (domestic) second checked bag, marked NEW on the issuer page; the card had no bag row. Queue items confirmed on the issuer page: $200 Delta Stays credit (calendar-year cadence as for #31), $120 Resy credit ($10/month), $120 rideshare credit ($10/month) and the companion certificate's $22-$250 taxes/fees. The queue's Delta Vacations wording is NOT applied: Delta's release ties it to Platinum and Reserve certificates without naming business cards, and the Amex business page does not mention it. Also from the issuer page: the Global Entry/TSA PreCheck credit ($120 GE or up to $85 TSA every 4 years) and 1.5X on transit (including rideshare and taxis), U.S. shipping and single $5K+ purchases on up to $100K of combined purchases per year. The shipping and $5K+ rows are merged into one capped row that also covers transit, matching the Reserve Business's single-row layout. sourceUrl updated because the old product URL now lands on Amex's 404 page. 3X Delta/hotels and $350 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "1.5X on transit (including rideshare and taxis), U.S. shipping and single purchases of $5,000 or more applies to up to $100,000 of combined purchases per year, then 1X. A large purchase qualifies only when the single transaction is $5,000 or more."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "U.S. shipping",
+            "to": "Transit, rideshare, U.S. shipping and $5k+ purchases (up to $100,000/year combined)"
+          }
+        ],
+        "remove": ["Large purchases $5k+"]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "First and Second Checked Bag Free",
+            "description": "First checked bag free on Delta flights; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": null
+          },
+          {
+            "name": "Annual Companion Certificate",
+            "description": "Each year after card renewal, a round-trip Delta Main companion certificate for domestic, Caribbean or Central American travel. Government taxes and fees of $22-$250 apply.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$200 Delta Stays Credit",
+            "description": "Up to $200 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 200,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$120 Resy Credit",
+            "description": "Up to $10 in statement credits each month (up to $120 per year) at qualifying U.S. Resy restaurants; enrollment required.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "$120 Rideshare Credit",
+            "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+
+    {
+      "cardId": 154,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-reserve/",
+      "confidence": "official",
+      "_why": "2026-06-04 Delta refresh (https://news.delta.com/more-travel-value-added-delta-skymiles-cards-no-increase-annual-fees): free first and (domestic) second checked bag, marked NEW on the issuer page; the card had no bag row. Queue items confirmed on the issuer page: $250 Delta Stays credit (calendar-year cadence as for #31), $240 Resy credit ($20/month), $120 rideshare credit ($10/month), MQD Headstart ($2,500) and MQD Boost ($1 MQD per $10), the Global Entry/TSA PreCheck credit, Centurion Lounge, Sidecar and Escape Lounge access on Delta flights bought with the card, and the companion certificate's cabins (Delta First, Delta Comfort, Delta Main; the queue's Premium Select is not listed) and $22-$250 taxes/fees. Delta Vacations wording not applied (see #153). A note records the page's 1.5X on all purchases after $150,000 of spend in a year, which the engine cannot model. sourceUrl updated because the old product URL now lands on Amex's 404 page. 3X Delta and 1.5X transit/shipping/office supplies unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "After $150,000 in purchases on the card in a year, all eligible purchases earn 1.5X for the rest of that year; the app keeps the 1X default."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "First and Second Checked Bag Free",
+            "description": "First checked bag free on international and domestic Delta flights; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+            "annualValue": null
+          },
+          {
+            "name": "Annual Companion Certificate",
+            "description": "Each year after card renewal, a round-trip companion certificate in Delta First, Delta Comfort or Delta Main for domestic, Caribbean or Central American travel. Government taxes and fees of $22-$250 apply.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$250 Delta Stays Credit",
+            "description": "Up to $250 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+            "annualValue": 250,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$240 Resy Credit",
+            "description": "Up to $20 in statement credits each month (up to $240 per year) at qualifying U.S. Resy restaurants; enrollment required.",
+            "annualValue": 240,
+            "period": "monthly"
+          },
+          {
+            "name": "$120 Rideshare Credit",
+            "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "MQD Headstart and MQD Boost",
+            "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $10 of purchases on the card in a calendar year (MQD Boost).",
+            "annualValue": null
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "A statement credit every 4 years for a Global Entry application ($120), or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Centurion Lounge Access",
+            "description": "Complimentary access to The Centurion Lounge, Sidecar by The Centurion Lounge and Escape Lounges when flying on a Delta flight purchased with the card.",
+            "annualValue": null
+          }
+        ]
+      }
+    }
+  ]
+}

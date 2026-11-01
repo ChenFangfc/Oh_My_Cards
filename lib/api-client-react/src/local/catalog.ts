@@ -31,7 +31,7 @@ export type VerifiedCreditCard = CreditCard & {
   availabilityChangedAt?: string;
 };
 
-export const BUILTIN_RULESET_VERSION = "2026.08.07.1";
+export const BUILTIN_RULESET_VERSION = "2026.11.01.13";
 
 export const BUILTIN_CARDS = [
   {
@@ -52,7 +52,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Chase Ultimate Rewards can be redeemed for cash at 1 cent per point or for higher travel value depending on card and redemption path; this app uses 1.25 cents per point for Sapphire Preferred annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "The Peloton bonus applies only to equipment and accessory purchases over $150 made directly with Peloton, on up to $5,000 in total purchases from 4/1/2025 through 12/31/2027; this app does not enforce that lifetime cap."
     ],
     "cashbackCategories": [
       {
@@ -110,6 +111,20 @@ export const BUILTIN_CARDS = [
         "category": "Vacation Home Rentals",
         "rate": 0.03,
         "isDefault": false
+      },
+      {
+        "id": 9118,
+        "cardId": 1,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9119,
+        "cardId": 1,
+        "category": "Peloton Equipment and Accessories (through 12/31/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -118,7 +133,8 @@ export const BUILTIN_CARDS = [
         "cardId": 1,
         "name": "Annual Hotel Credit",
         "description": "Up to $100 in statement credits each account anniversary year for hotels booked through Chase Travel.",
-        "annualValue": 100
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
         "id": 271,
@@ -132,21 +148,24 @@ export const BUILTIN_CARDS = [
         "cardId": 1,
         "name": "Trip Cancellation / Interruption Insurance",
         "description": "Coverage for eligible prepaid travel when a covered reason applies.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 704,
         "cardId": 1,
         "name": "Global Entry / TSA PreCheck / NEXUS Credit",
         "description": "Up to $120 in statement credits toward Global Entry, TSA PreCheck or NEXUS every four years.",
-        "annualValue": 30
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 705,
         "cardId": 1,
         "name": "DashPass Membership",
-        "description": "Complimentary DashPass membership plus up to $10 per month in DoorDash credits on groceries and daily essentials.",
-        "annualValue": 120
+        "description": "Complimentary DashPass when activated by 12/31/2029 (through 12/31/2029 or 12 months, whichever is longer), plus a $10 promo each calendar month on one non-restaurant DoorDash order.",
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
         "id": 706,
@@ -154,6 +173,14 @@ export const BUILTIN_CARDS = [
         "name": "Emergency Evacuation and Transportation",
         "description": "Up to $100,000 in emergency evacuation and transportation coverage when a covered reason applies.",
         "annualValue": 0
+      },
+      {
+        "id": 707,
+        "cardId": 1,
+        "name": "Complimentary Apple TV Subscription (1 year)",
+        "description": "At least 12 months of complimentary Apple TV (Chase values it at $180) after a one-time activation on chase.com or the Chase Mobile app by 12/31/2026.",
+        "annualValue": 180,
+        "period": "one-time"
       }
     ],
     "inWallet": false,
@@ -161,7 +188,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
     "imageSourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -182,7 +209,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Chase Ultimate Rewards can be redeemed for cash at 1 cent per point or for higher travel value depending on card and redemption path; this app uses 1.50 cents per point for Sapphire Reserve annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "The Peloton bonus applies only to equipment and accessory purchases over $150 made directly with Peloton, on up to $5,000 in total purchases from 4/1/2025 through 12/31/2027; this app does not enforce that lifetime cap."
     ],
     "cashbackCategories": [
       {
@@ -195,7 +223,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 287,
         "cardId": 2,
-        "category": "Flights and Hotels",
+        "category": "Flights and hotels booked direct",
         "rate": 0.04,
         "isDefault": false
       },
@@ -212,6 +240,20 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9120,
+        "cardId": 2,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9121,
+        "cardId": 2,
+        "category": "Peloton Equipment and Accessories (through 12/31/2027)",
+        "rate": 0.1,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -220,7 +262,8 @@ export const BUILTIN_CARDS = [
         "cardId": 2,
         "name": "Annual Travel Credit",
         "description": "Up to $300 in annual travel statement credits.",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "cardmember-year"
       },
       {
         "id": 274,
@@ -233,15 +276,80 @@ export const BUILTIN_CARDS = [
         "id": 275,
         "cardId": 2,
         "name": "Global Entry, TSA PreCheck or NEXUS Credit",
-        "description": "Statement credit for an eligible application fee every four years.",
-        "annualValue": 120
+        "description": "One statement credit of up to $120 every four years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 276,
         "cardId": 2,
         "name": "Premium Travel Protections",
         "description": "Includes trip cancellation/interruption, trip delay, baggage delay and rental car coverage.",
-        "annualValue": 300
+        "annualValue": null
+      },
+      {
+        "id": 708,
+        "cardId": 2,
+        "name": "The Edit Hotel Credit",
+        "description": "Up to $250 back per prepaid ('Pay Now') stay of two or more nights booked with The Edit through Chase Travel, up to $500 per calendar year.",
+        "annualValue": 500,
+        "period": "calendar-year"
+      },
+      {
+        "id": 709,
+        "cardId": 2,
+        "name": "Sapphire Exclusive Tables Dining Credit",
+        "description": "Up to $150 in statement credits January-June and up to $150 July-December at Sapphire Reserve Exclusive Tables restaurants on OpenTable.",
+        "annualValue": 300,
+        "period": "semiannual"
+      },
+      {
+        "id": 710,
+        "cardId": 2,
+        "name": "StubHub / viagogo Credits",
+        "description": "Up to $150 in statement credits January-June and up to $150 July-December on StubHub and viagogo purchases, through 12/31/2027. One-time activation required.",
+        "annualValue": 300,
+        "period": "semiannual"
+      },
+      {
+        "id": 711,
+        "cardId": 2,
+        "name": "Apple TV and Apple Music Subscriptions",
+        "description": "At least 12 months each of complimentary Apple TV and Apple Music after a one-time activation by 6/22/2027; Chase values them at $324 a year.",
+        "annualValue": 324,
+        "period": "one-time"
+      },
+      {
+        "id": 712,
+        "cardId": 2,
+        "name": "DashPass Membership",
+        "description": "Complimentary DashPass (activate by 12/31/2029) plus up to $35 in DoorDash promos each calendar month through 12/31/2029: $15 off one qualifying order and two $10 promos on non-restaurant orders.",
+        "annualValue": 420,
+        "period": "monthly"
+      },
+      {
+        "id": 713,
+        "cardId": 2,
+        "name": "Lyft Credits",
+        "description": "$10 in-app Lyft ride credit each calendar month through 9/30/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 714,
+        "cardId": 2,
+        "name": "Peloton Membership Credits",
+        "description": "Up to $10 in statement credits each month on an eligible Peloton membership through 12/31/2027. One-time activation required.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 715,
+        "cardId": 2,
+        "name": "IHG One Rewards Platinum Elite Status",
+        "description": "Complimentary IHG One Rewards Platinum Elite status through 12/31/2027 after linking an IHG One Rewards account.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -249,7 +357,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve",
     "imageSourceUrl": "https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -300,6 +408,13 @@ export const BUILTIN_CARDS = [
         "category": "All Purchases",
         "rate": 0.015,
         "isDefault": true
+      },
+      {
+        "id": 9122,
+        "cardId": 3,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -315,7 +430,7 @@ export const BUILTIN_CARDS = [
         "cardId": 3,
         "name": "Extended Warranty",
         "description": "Extends eligible US manufacturer warranties by an additional year",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -323,7 +438,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited",
     "imageSourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -382,22 +497,29 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9123,
+        "cardId": 4,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
-      {
-        "id": 13,
-        "cardId": 4,
-        "name": "Cell Phone Protection",
-        "description": "Up to $800 per claim when you pay your monthly cell phone bill with the card",
-        "annualValue": 100
-      },
       {
         "id": 14,
         "cardId": 4,
         "name": "Purchase Protection",
         "description": "New purchases protected for 120 days against damage or theft",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 716,
+        "cardId": 4,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees on purchases abroad or with international online merchants since September 2026 (previously 3%).",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -405,7 +527,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
     "imageSourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -414,10 +536,10 @@ export const BUILTIN_CARDS = [
         "picks": 1,
         "resets": "quarter",
         "options": [
-          "Q1 2026: Dining and select charities",
           "Q2 2026: Amazon and Chase Travel",
           "Q3 2026: Gas, public transit, EV charging and select live entertainment",
-          "Q4 2026: not yet announced"
+          "Q4 2026: Grocery stores, dining and American Red Cross donations",
+          "Q1 2027: Grocery stores and top streaming services"
         ]
       }
     ]
@@ -448,6 +570,13 @@ export const BUILTIN_CARDS = [
         "category": "All Purchases",
         "rate": 0.02,
         "isDefault": true
+      },
+      {
+        "id": 9145,
+        "cardId": 5,
+        "category": "Citi Travel hotels, car rentals, and attractions",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -456,14 +585,14 @@ export const BUILTIN_CARDS = [
         "cardId": 5,
         "name": "Citi Entertainment",
         "description": "Special access to purchase tickets to thousands of events",
-        "annualValue": 50
+        "annualValue": null
       },
       {
-        "id": 16,
+        "id": 822,
         "cardId": 5,
-        "name": "Damage and Theft Protection",
-        "description": "Purchase protection for 120 days on new purchases",
-        "annualValue": 75
+        "name": "Extended Warranty",
+        "description": "Extended warranty coverage on eligible purchases made with the card; terms, conditions and coverage limits apply.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -471,7 +600,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-double-cash-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-double-cash-credit-card",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -525,7 +654,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 24,
         "cardId": 6,
-        "category": "Gas",
+        "category": "Gas and EV Charging Stations",
         "rate": 0.03,
         "isDefault": false
       },
@@ -535,6 +664,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9146,
+        "cardId": 6,
+        "category": "Citi Travel hotels, car rentals, and attractions",
+        "rate": 0.1,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -542,22 +678,23 @@ export const BUILTIN_CARDS = [
         "id": 17,
         "cardId": 6,
         "name": "$100 Hotel Credit",
-        "description": "$100 off a single hotel stay of $500+ booked via CitiTravel.com",
-        "annualValue": 100
+        "description": "$100 off a single hotel stay of $500 or more (excluding taxes and fees) booked through Citi Travel, once per calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
       },
       {
         "id": 18,
         "cardId": 6,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 19,
         "cardId": 6,
         "name": "Citi Entertainment Access",
         "description": "Presale and preferred tickets for concerts, sports, dining, and more",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -565,7 +702,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-strata-premier-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-strata-premier-credit-card",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -610,14 +747,14 @@ export const BUILTIN_CARDS = [
         "cardId": 7,
         "name": "Citi Entertainment",
         "description": "Special access to purchase tickets to thousands of events",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 21,
         "cardId": 7,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -720,28 +857,46 @@ export const BUILTIN_CARDS = [
         "cardId": 8,
         "name": "Uber Cash",
         "description": "Up to $120 per year in monthly Uber Cash after adding the card to Uber.",
-        "annualValue": 120
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
         "id": 278,
         "cardId": 8,
         "name": "Dining Credit",
         "description": "Up to $120 per year in statement credits with participating dining partners.",
-        "annualValue": 120
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
         "id": 279,
         "cardId": 8,
         "name": "Dunkin Credit",
         "description": "Up to $84 per year in monthly statement credits at Dunkin.",
-        "annualValue": 84
+        "annualValue": 84,
+        "period": "monthly"
       },
       {
         "id": 280,
         "cardId": 8,
         "name": "Resy Credit",
         "description": "Up to $100 per year in statement credits at U.S. Resy restaurants.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 870,
+        "cardId": 8,
+        "name": "Hotel Collection Credit",
+        "description": "$100 credit toward eligible on-property charges (such as dining or spa) on each The Hotel Collection booking of two nights or more made through AmexTravel.com or the Amex Travel App. Eligible charges vary by property.",
         "annualValue": 100
+      },
+      {
+        "id": 871,
+        "cardId": 8,
+        "name": "Hertz Five Star Status",
+        "description": "Complimentary upgrade to Hertz Five Star status; enrollment required.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -749,7 +904,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/gold-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/gold-card/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -800,29 +955,33 @@ export const BUILTIN_CARDS = [
         "id": 281,
         "cardId": 9,
         "name": "Fine Hotels + Resorts / Hotel Collection Credit",
-        "description": "Up to $600 per year for eligible prepaid hotel bookings through Amex Travel.",
-        "annualValue": 600
+        "description": "Up to $300 in statement credits semi-annually (up to $600 per calendar year) on prepaid Fine Hotels + Resorts or The Hotel Collection bookings through American Express Travel. The Hotel Collection requires a two-night minimum stay; from January 1, 2027, Fine Hotels + Resorts bookings also need two nights to qualify.",
+        "annualValue": 600,
+        "period": "semiannual"
       },
       {
         "id": 282,
         "cardId": 9,
         "name": "Digital Entertainment Credit",
         "description": "Up to $300 per year in eligible digital entertainment credits.",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "monthly"
       },
       {
         "id": 283,
         "cardId": 9,
         "name": "Resy Credit",
         "description": "Up to $400 per year in eligible Resy dining credits.",
-        "annualValue": 400
+        "annualValue": 400,
+        "period": "quarterly"
       },
       {
         "id": 284,
         "cardId": 9,
         "name": "CLEAR Plus Credit",
-        "description": "Up to $209 per year for CLEAR Plus membership.",
-        "annualValue": 209
+        "description": "Up to $219 in statement credits per calendar year for an auto-renewing CLEAR+ membership (excluding taxes and fees).",
+        "annualValue": 219,
+        "period": "calendar-year"
       },
       {
         "id": 285,
@@ -830,6 +989,63 @@ export const BUILTIN_CARDS = [
         "name": "Airport Lounge Access",
         "description": "Access to Centurion Lounges, Priority Pass Select and other eligible lounges.",
         "annualValue": 500
+      },
+      {
+        "id": 872,
+        "cardId": 9,
+        "name": "Airline Fee Credit",
+        "description": "Up to $200 in statement credits per calendar year for incidental fees, such as checked bags and in-flight refreshments, charged by one selected qualifying airline.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 873,
+        "cardId": 9,
+        "name": "Uber Cash",
+        "description": "$15 in Uber Cash each month plus a $20 bonus in December (up to $200 per year) for U.S. Uber rides and orders after adding the card to an Uber account.",
+        "annualValue": 200,
+        "period": "monthly"
+      },
+      {
+        "id": 874,
+        "cardId": 9,
+        "name": "Uber One Credit",
+        "description": "Up to $120 in statement credits each calendar year toward an auto-renewing Uber One membership.",
+        "annualValue": 120,
+        "period": "calendar-year"
+      },
+      {
+        "id": 875,
+        "cardId": 9,
+        "name": "lululemon Credit",
+        "description": "Up to $75 in statement credits each quarter (up to $300 per year) at U.S. lululemon retail stores (excluding outlets) and lululemon.com.",
+        "annualValue": 300,
+        "period": "quarterly"
+      },
+      {
+        "id": 876,
+        "cardId": 9,
+        "name": "Walmart+ Credit",
+        "description": "Up to $12.95 plus applicable taxes back each month on one auto-renewing monthly Walmart+ membership (up to $155 per year).",
+        "annualValue": 155,
+        "period": "monthly"
+      },
+      {
+        "id": 877,
+        "cardId": 9,
+        "name": "Oura Ring Credit",
+        "description": "Up to $200 in statement credits each calendar year toward an Oura Ring purchased at ouraring.com.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 878,
+        "cardId": 9,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A $120 statement credit for a Global Entry application every 4 years, or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider every 4.5 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
@@ -837,7 +1053,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/platinum/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/platinum/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -899,13 +1115,6 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 34,
-        "cardId": 10,
-        "name": "$84 Disney Bundle Credit",
-        "description": "$7/month for Disney Bundle (Disney+, Hulu, ESPN+)",
-        "annualValue": 84
-      },
-      {
         "id": 35,
         "cardId": 10,
         "name": "Return Protection",
@@ -917,7 +1126,15 @@ export const BUILTIN_CARDS = [
         "cardId": 10,
         "name": "Purchase Protection",
         "description": "Coverage for new purchases for 90 days against theft or accidental damage",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 879,
+        "cardId": 10,
+        "name": "$120 Disney Streaming Credit",
+        "description": "Up to $10 back each month in statement credits after using the enrolled card for a subscription, including bundle subscriptions, at DisneyPlus.com, Hulu.com or Stream.ESPN.com (U.S. websites); subscription subject to auto-renewal.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -925,7 +1142,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -980,18 +1197,19 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 37,
-        "cardId": 11,
-        "name": "$84 Disney Bundle Credit",
-        "description": "$7/month for Disney Bundle (Disney+, Hulu, ESPN+)",
-        "annualValue": 84
-      },
-      {
         "id": 38,
         "cardId": 11,
         "name": "Car Rental Loss and Damage Insurance",
         "description": "Protection when you use the card to reserve and pay for your rental",
-        "annualValue": 50
+        "annualValue": null
+      },
+      {
+        "id": 880,
+        "cardId": 11,
+        "name": "$84 Disney Streaming Credit",
+        "description": "Up to $7 back each month in statement credits after using the enrolled card for a subscription, including bundle subscriptions, at DisneyPlus.com, Hulu.com or Stream.ESPN.com (U.S. websites); subscription subject to auto-renewal.",
+        "annualValue": 84,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -999,7 +1217,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1012,7 +1230,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 750,
     "color": "linear-gradient(135deg, #1e1b4b, #4338ca)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/12-capital-one-venture-x.png",
+    "cardImageUrl": "/card-images/12-capital-one-venture-x.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -1020,8 +1238,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hotels (via Capital One Travel); Rental Cars (via Capital One Travel); Travel (via Capital One Travel); Other.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "Capital One Entertainment 5X excludes tickets bought through cardholder pre-sales or at Capital One Hall/Arena box offices."
     ],
     "cashbackCategories": [
       {
@@ -1041,7 +1259,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 47,
         "cardId": 12,
-        "category": "Travel (via Capital One Travel)",
+        "category": "Flights and vacation rentals booked through Capital One Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -1051,6 +1269,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.02,
         "isDefault": true
+      },
+      {
+        "id": 9147,
+        "cardId": 12,
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -1058,36 +1283,40 @@ export const BUILTIN_CARDS = [
         "id": 39,
         "cardId": 12,
         "name": "$300 Travel Credit",
-        "description": "Annual credit for travel booked through Capital One Travel",
-        "annualValue": 300
+        "description": "Up to $300 each account year on bookings through Capital One Travel (primary cardholder, applied at checkout).",
+        "annualValue": 300,
+        "period": "cardmember-year"
       },
       {
         "id": 40,
         "cardId": 12,
         "name": "10,000 Anniversary Bonus Miles",
-        "description": "Bonus miles every account anniversary",
-        "annualValue": 100
+        "description": "10,000 bonus miles every year, starting on the first account anniversary.",
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
         "id": 41,
         "cardId": 12,
         "name": "Priority Pass Lounge Access",
-        "description": "Unlimited Priority Pass lounge access for cardholder + 2 guests",
-        "annualValue": 429
+        "description": "Priority Pass lounge access for the primary cardholder (enrollment required). Since 2026-02-01 guests are no longer complimentary (reported $35 per guest) and additional cardholders need paid lounge access.",
+        "annualValue": null
       },
       {
         "id": 42,
         "cardId": 12,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Up to $100 credit for Global Entry or TSA PreCheck application fee",
-        "annualValue": 25
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 43,
         "cardId": 12,
         "name": "Capital One Lounge Access",
-        "description": "Unlimited access to Capital One airport lounges",
-        "annualValue": 150
+        "description": "Capital One Lounge and Landing access for the primary cardholder. Since 2026-02-01 guests are free only on accounts spending $75,000+ a year (2 per Lounge visit, 1 per Landing visit); otherwise guest passes cost $45 (ages 2-17: $25). Additional cardholders need paid lounge access ($125/year each).",
+        "annualValue": null
       },
       {
         "id": 44,
@@ -1095,6 +1324,20 @@ export const BUILTIN_CARDS = [
         "name": "Cell Phone Protection",
         "description": "Up to $800 per claim, max 2 claims per year when you pay your cell phone bill with the card",
         "annualValue": 100
+      },
+      {
+        "id": 823,
+        "cardId": 12,
+        "name": "Premier Collection Experience Credit",
+        "description": "Up to $100 experience credit per stay on Premier Collection hotels and vacation rentals booked through Capital One Travel, plus daily breakfast for two, Wi-Fi, and upgrades / early check-in / late checkout when available.",
+        "annualValue": null
+      },
+      {
+        "id": 824,
+        "cardId": 12,
+        "name": "Lifestyle Collection Experience Credit",
+        "description": "Up to $50 experience credit per stay on Lifestyle Collection hotels booked through Capital One Travel, plus Wi-Fi and upgrades / early check-in / late checkout when available.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1102,8 +1345,8 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/venture-x/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/venture-x/",
-    "lastReviewedAt": "2026-05-17",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review"
   },
   {
     "id": 13,
@@ -1123,21 +1366,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hotels (via Capital One Travel); Rental Cars (via Capital One Travel); All Purchases.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 49,
         "cardId": 13,
-        "category": "Hotels (via Capital One Travel)",
-        "rate": 0.05,
-        "isDefault": false
-      },
-      {
-        "id": 50,
-        "cardId": 13,
-        "category": "Rental Cars (via Capital One Travel)",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -1147,6 +1382,13 @@ export const BUILTIN_CARDS = [
         "category": "All Purchases",
         "rate": 0.02,
         "isDefault": true
+      },
+      {
+        "id": 9148,
+        "cardId": 13,
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -1154,22 +1396,31 @@ export const BUILTIN_CARDS = [
         "id": 45,
         "cardId": 13,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Up to $100 credit every 4 years",
-        "annualValue": 25
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 46,
         "cardId": 13,
         "name": "Travel Accident Insurance",
         "description": "Coverage when you pay for travel with the card",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 47,
         "cardId": 13,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 825,
+        "cardId": 13,
+        "name": "Lifestyle Collection Experience Credit",
+        "description": "$50 experience credit per stay on Lifestyle Collection hotels booked through Capital One Travel, plus room upgrades, early check-in and late checkout when available.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1177,7 +1428,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/venture/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/venture/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1198,21 +1449,20 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Entertainment; Hotels and rental cars via Capital One Travel; Dining; Entertainment; Streaming; Groceries; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 299,
         "cardId": 14,
-        "category": "Capital One Entertainment",
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
         "rate": 0.08,
         "isDefault": false
       },
       {
         "id": 300,
         "cardId": 14,
-        "category": "Hotels and rental cars via Capital One Travel",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -1258,21 +1508,21 @@ export const BUILTIN_CARDS = [
         "cardId": 14,
         "name": "No Annual Fee",
         "description": "Current Savor Rewards product has no annual fee.",
-        "annualValue": 95
+        "annualValue": null
       },
       {
         "id": 287,
         "cardId": 14,
         "name": "No Foreign Transaction Fees",
         "description": "No foreign transaction fees on purchases outside the U.S.",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 288,
         "cardId": 14,
         "name": "Capital One Entertainment Access",
         "description": "Access to Capital One Entertainment tickets and elevated rewards where eligible.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1280,7 +1530,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/savor/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/savor/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1337,6 +1587,20 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9149,
+        "cardId": 15,
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9150,
+        "cardId": 15,
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
+        "rate": 0.08,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -1345,14 +1609,14 @@ export const BUILTIN_CARDS = [
         "cardId": 15,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 52,
         "cardId": 15,
         "name": "Extended Warranty",
         "description": "Doubles the original warranty period up to one additional year",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1360,7 +1624,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/savorone/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/savorone/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1389,6 +1653,20 @@ export const BUILTIN_CARDS = [
         "category": "All Purchases",
         "rate": 0.015,
         "isDefault": true
+      },
+      {
+        "id": 9151,
+        "cardId": 16,
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9152,
+        "cardId": 16,
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -1397,14 +1675,14 @@ export const BUILTIN_CARDS = [
         "cardId": 16,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 54,
         "cardId": 16,
         "name": "Travel Accident Insurance",
         "description": "Coverage when you purchase travel with the card",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1412,7 +1690,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/quicksilver/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/quicksilver/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1458,7 +1736,8 @@ export const BUILTIN_CARDS = [
         "cardId": 17,
         "name": "Cashback Match First Year",
         "description": "Discover automatically matches all cash back earned at the end of your first year",
-        "annualValue": 150
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 56,
@@ -1472,7 +1751,7 @@ export const BUILTIN_CARDS = [
         "cardId": 17,
         "name": "No Foreign Transaction Fees",
         "description": "No fee on purchases made outside the US",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1480,7 +1759,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/cash-back/it-card/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/cash-back/it-card.html",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "categoryChoices": [
       {
@@ -1491,8 +1770,8 @@ export const BUILTIN_CARDS = [
         "options": [
           "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
           "Q2 2026: Restaurants and home improvement stores",
-          "Q3 2026: Gas stations, transportation and drug stores",
-          "Q4 2026: not yet announced"
+          "Q3 2026: Gas stations, transportation (transit) and drugstores",
+          "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
         ]
       }
     ]
@@ -1532,14 +1811,15 @@ export const BUILTIN_CARDS = [
         "cardId": 18,
         "name": "Miles Match First Year",
         "description": "Discover matches all miles earned at the end of your first year",
-        "annualValue": 150
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 59,
         "cardId": 18,
         "name": "No Foreign Transaction Fees",
         "description": "No fee on purchases made outside the US",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 60,
@@ -1554,8 +1834,8 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/travel/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/travel/",
-    "lastReviewedAt": "2026-08-06",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 19,
@@ -1598,7 +1878,7 @@ export const BUILTIN_CARDS = [
         "cardId": 19,
         "name": "Visa Signature Concierge",
         "description": "24/7 concierge service for dining, travel, and entertainment assistance",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1692,7 +1972,7 @@ export const BUILTIN_CARDS = [
         "cardId": 20,
         "name": "Visa Signature Concierge",
         "description": "24/7 concierge service for travel, dining, and entertainment",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 65,
@@ -1700,6 +1980,13 @@ export const BUILTIN_CARDS = [
         "name": "Auto Rental Collision Damage Waiver",
         "description": "Coverage when you rent a car and pay with the card",
         "annualValue": 50
+      },
+      {
+        "id": 846,
+        "cardId": 20,
+        "name": "No Foreign Transaction Fees",
+        "description": "Wells Fargo charges no foreign transaction fee on Autograph Card purchases converted to U.S. dollars.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1707,7 +1994,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.wellsfargo.com/autograph-visa-credit-card/",
     "imageSourceUrl": "https://creditcards.wellsfargo.com/autograph-visa-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1751,14 +2038,14 @@ export const BUILTIN_CARDS = [
         "cardId": 21,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 68,
         "cardId": 21,
         "name": "Preferred Rewards Bonus",
-        "description": "Up to 75% rewards bonus for Preferred Rewards members",
-        "annualValue": 75
+        "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1766,7 +2053,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1809,29 +2096,32 @@ export const BUILTIN_CARDS = [
         "id": 69,
         "cardId": 22,
         "name": "$100 Airline Incidental Credit",
-        "description": "Up to $100 per year for qualifying airline incidental purchases",
-        "annualValue": 100
+        "description": "Up to $100 in Airline Incidental Statement Credits each calendar year for qualifying purchases such as seat upgrades, baggage fees, in-flight services and airline lounge fees.",
+        "annualValue": 100,
+        "period": "calendar-year"
       },
       {
         "id": 70,
         "cardId": 22,
         "name": "$100 TSA PreCheck / Global Entry Credit",
-        "description": "Statement credit for TSA PreCheck or Global Entry application fee",
-        "annualValue": 25
+        "description": "Up to $100 in Airport Security Statement Credits toward TSA PreCheck or Global Entry application fees, every four years.",
+        "annualValue": 25,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 71,
         "cardId": 22,
         "name": "No Foreign Transaction Fees",
         "description": "No fees on international purchases",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 72,
         "cardId": 22,
         "name": "Preferred Rewards Bonus",
-        "description": "Up to 75% rewards bonus for Preferred Rewards members",
-        "annualValue": 100
+        "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1839,7 +2129,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -1862,7 +2152,7 @@ export const BUILTIN_CARDS = [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
       "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
       "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
-      "Preferred Rewards members earn 25-75% more than the rates shown."
+      "BofA Rewards members (the program replaced Preferred Rewards in May 2026) earn a 10%-75% bonus on these rates, depending on tier."
     ],
     "cashbackCategories": [
       {
@@ -1893,14 +2183,14 @@ export const BUILTIN_CARDS = [
         "cardId": 23,
         "name": "Choice Category Flexibility",
         "description": "6% cash back in a choice category during the first year for eligible new accounts, then 3%; category choices include gas/EV charging, online shopping, dining, travel, drug stores, and home improvement/furnishings.",
-        "annualValue": 120
+        "annualValue": null
       },
       {
         "id": 74,
         "cardId": 23,
         "name": "Purchase Protection",
         "description": "Coverage for new purchases against damage or theft",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1908,7 +2198,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
-    "lastReviewedAt": "2026-08-07",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -1946,7 +2236,8 @@ export const BUILTIN_CARDS = [
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
       "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Cap or timing language appears in the official earning categories: Two Chosen Categories (up to $2,000/quarter each); One Everyday Category; Other."
+      "The 5% rate applies to the first $2,000 in combined net purchases each quarter across both chosen categories; categories must be chosen every quarter, otherwise purchases earn 1%.",
+      "The 2% everyday category excludes discount stores/supercenters and wholesale clubs."
     ],
     "cashbackCategories": [
       {
@@ -1969,6 +2260,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9156,
+        "cardId": 24,
+        "category": "Prepaid air, hotel and car reservations in the U.S. Bank Travel Center",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -1984,7 +2282,7 @@ export const BUILTIN_CARDS = [
         "cardId": 24,
         "name": "ExtendPay",
         "description": "Pay large purchases over time in fixed monthly installments",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -1992,7 +2290,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -2046,7 +2344,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "U.S. Bank Rewards Points value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "Gas/EV 4X and grocery 2X exclude discount stores/supercenters and wholesale clubs, which earn 1X."
     ],
     "cashbackCategories": [
       {
@@ -2066,7 +2365,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 308,
         "cardId": 25,
-        "category": "Gas and EV charging",
+        "category": "Gas and EV charging (up to $1,000/quarter)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -2105,14 +2404,16 @@ export const BUILTIN_CARDS = [
         "cardId": 25,
         "name": "No Annual Fee",
         "description": "U.S. Bank now lists the Altitude Connect annual fee as $0.",
-        "annualValue": 95
+        "annualValue": null
       },
       {
         "id": 290,
         "cardId": 25,
         "name": "Global Entry / TSA PreCheck Credit",
         "description": "Statement credit for eligible application fee.",
-        "annualValue": 100
+        "annualValue": 25,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 291,
@@ -2126,7 +2427,7 @@ export const BUILTIN_CARDS = [
         "cardId": 25,
         "name": "No Foreign Transaction Fees",
         "description": "No foreign transaction fees on international purchases.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -2134,7 +2435,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/altitude-connect-visa-signature-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/altitude-connect-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2177,7 +2478,7 @@ export const BUILTIN_CARDS = [
         "id": 81,
         "cardId": 26,
         "name": "Cell Phone Protection",
-        "description": "Up to $1,000 protection when you pay your bill with the card",
+        "description": "Up to $800 reimbursement if your cell phone is stolen or damaged when you pay your monthly wireless bill with the card; limitations apply.",
         "annualValue": 100
       }
     ],
@@ -2186,7 +2487,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-unlimited-visa-credit-card.html",
     "imageSourceUrl": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-unlimited-visa-credit-card.html",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2251,7 +2552,7 @@ export const BUILTIN_CARDS = [
         "cardId": 27,
         "name": "Priority Boarding",
         "description": "Priority boarding on United-operated flights",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 84,
@@ -2261,18 +2562,76 @@ export const BUILTIN_CARDS = [
         "annualValue": 118
       },
       {
-        "id": 85,
-        "cardId": 27,
-        "name": "$100 Global Entry / TSA PreCheck Credit",
-        "description": "Statement credit every 4 years",
-        "annualValue": 25
-      },
-      {
         "id": 86,
         "cardId": 27,
         "name": "25% Back on In-Flight Purchases",
         "description": "On food, beverages, and Wi-Fi on United-operated flights",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 717,
+        "cardId": 27,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 718,
+        "cardId": 27,
+        "name": "United Hotels Credit",
+        "description": "$50 back on each of the first two prepaid United Hotels stays per account anniversary year (up to $100).",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 719,
+        "cardId": 27,
+        "name": "Rideshare Credit",
+        "description": "Up to $5 back each month on rideshare purchases, up to $60 per calendar year. Yearly opt-in required.",
+        "annualValue": 60,
+        "period": "monthly"
+      },
+      {
+        "id": 720,
+        "cardId": 27,
+        "name": "Avis/Budget Travel Credit",
+        "description": "$25 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $50).",
+        "annualValue": 50,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 721,
+        "cardId": 27,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 722,
+        "cardId": 27,
+        "name": "JSX Credit",
+        "description": "Up to $100 back each account anniversary year on flights booked directly with JSX.",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 723,
+        "cardId": 27,
+        "name": "$100 United Travel Credit (after $10,000 spend)",
+        "description": "$100 in United TravelBank cash after $10,000 in card purchases each calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 724,
+        "cardId": 27,
+        "name": "10,000-Mile Award Flight Discount (after $20,000 spend)",
+        "description": "A 10,000-mile discount on an eligible United award flight after $20,000 in card purchases each calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -2280,7 +2639,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united/united-explorer",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/united/united-explorer",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2351,8 +2710,9 @@ export const BUILTIN_CARDS = [
         "id": 87,
         "cardId": 28,
         "name": "$200 United Travel Credit",
-        "description": "Annual statement credit for United purchases",
-        "annualValue": 200
+        "description": "$200 in United TravelBank cash after account opening and on each account anniversary, for a future United- or United Express-operated flight.",
+        "annualValue": 200,
+        "period": "cardmember-year"
       },
       {
         "id": 88,
@@ -2362,26 +2722,84 @@ export const BUILTIN_CARDS = [
         "annualValue": 240
       },
       {
-        "id": 89,
-        "cardId": 28,
-        "name": "5,000-Mile Anniversary Award Flight Credit",
-        "description": "When redeeming miles on United flights",
-        "annualValue": 75
-      },
-      {
         "id": 90,
         "cardId": 28,
         "name": "Priority Boarding & Lounge Passes",
-        "description": "2 United Club one-time passes per year",
-        "annualValue": 118
+        "description": "Group 2 priority boarding on United-operated flights for the primary cardmember and companions on the same reservation (Chase values it at $48 per person per roundtrip). The Quest card does not include United Club one-time passes.",
+        "annualValue": null
+      },
+      {
+        "id": 725,
+        "cardId": 28,
+        "name": "10,000-Mile Anniversary Award Flight Discount",
+        "description": "A 10,000-mile discount toward an eligible United award flight on each account anniversary, plus a second 10,000-mile discount after $20,000 in card purchases in a calendar year.",
+        "annualValue": 120,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 726,
+        "cardId": 28,
+        "name": "Renowned Hotels and Resorts Credit",
+        "description": "Up to $150 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+        "annualValue": 150,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 727,
+        "cardId": 28,
+        "name": "Rideshare Credit",
+        "description": "Up to $8 back each month January-November and $12 in December on rideshare purchases (up to $100 per calendar year). Yearly opt-in required.",
+        "annualValue": 100,
+        "period": "monthly"
+      },
+      {
+        "id": 728,
+        "cardId": 28,
+        "name": "Avis/Budget Travel Credit",
+        "description": "$40 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $80).",
+        "annualValue": 80,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 729,
+        "cardId": 28,
+        "name": "Instacart Credit",
+        "description": "One $10 and one $5 Instacart credit each month (up to $180 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+        "annualValue": 180,
+        "period": "monthly"
+      },
+      {
+        "id": 730,
+        "cardId": 28,
+        "name": "JSX Credit",
+        "description": "Up to $150 back each account anniversary year on flights booked directly with JSX.",
+        "annualValue": 150,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 731,
+        "cardId": 28,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 732,
+        "cardId": 28,
+        "name": "1,000 Card Bonus PQP",
+        "description": "1,000 Premier qualifying points each year, posted within 8 weeks of February 1 starting the calendar year after account opening.",
+        "annualValue": null,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united/united-quest",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2401,7 +2819,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.3,
     "rewardValuationDescription": "Southwest Rapid Rewards value varies by redemption; this app uses an estimated 1.30 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 2x gas-station and grocery-store rate covers the first $5,000 in combined purchases per account anniversary year, then 1x; this app resets that cap each calendar year."
     ],
     "cashbackCategories": [
       {
@@ -2412,39 +2831,25 @@ export const BUILTIN_CARDS = [
         "isDefault": false
       },
       {
-        "id": 98,
-        "cardId": 29,
-        "category": "Streaming",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9107,
-        "cardId": 29,
-        "category": "Local Transit and Rideshare",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9108,
-        "cardId": 29,
-        "category": "Internet, Cable, and Phone Services",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9109,
-        "cardId": 29,
-        "category": "Rapid Rewards Hotels and Rental Cars",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
         "id": 99,
         "cardId": 29,
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9124,
+        "cardId": 29,
+        "category": "Gas Stations and Grocery Stores (first $5,000/year combined)",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9125,
+        "cardId": 29,
+        "category": "Lyft (through 12/31/2027)",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -2453,29 +2858,61 @@ export const BUILTIN_CARDS = [
         "cardId": 29,
         "name": "3,000 Anniversary Points",
         "description": "Bonus points each cardmember anniversary",
-        "annualValue": 40
-      },
-      {
-        "id": 92,
-        "cardId": 29,
-        "name": "2 EarlyBird Check-In",
-        "description": "Two EarlyBird Check-Ins per year",
-        "annualValue": 50
+        "annualValue": 40,
+        "period": "cardmember-year"
       },
       {
         "id": 93,
         "cardId": 29,
         "name": "25% Back on In-Flight Purchases",
         "description": "On in-flight Wi-Fi, drinks, and messaging",
-        "annualValue": 20
+        "annualValue": null
+      },
+      {
+        "id": 733,
+        "cardId": 29,
+        "name": "Free First Checked Bag",
+        "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+        "annualValue": null
+      },
+      {
+        "id": 734,
+        "cardId": 29,
+        "name": "10% Flight Discount Promo Code",
+        "description": "A 10% promo code each cardmember anniversary (excludes Basic fares).",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 735,
+        "cardId": 29,
+        "name": "Standard Seat Selection and Group 5 Boarding",
+        "description": "Select a Standard seat within 48 hours of departure when available; the cardmember and up to 8 companions on the reservation board in Group 5.",
+        "annualValue": null
+      },
+      {
+        "id": 736,
+        "cardId": 29,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 737,
+        "cardId": 29,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest/plus",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2506,44 +2943,9 @@ export const BUILTIN_CARDS = [
         "isDefault": false
       },
       {
-        "id": 101,
-        "cardId": 30,
-        "category": "Hotels",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 102,
-        "cardId": 30,
-        "category": "Rental Cars",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 103,
-        "cardId": 30,
-        "category": "Streaming",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
         "id": 9110,
         "cardId": 30,
         "category": "Gas and Restaurants",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9111,
-        "cardId": 30,
-        "category": "Local Transit and Rideshare",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9112,
-        "cardId": 30,
-        "category": "Internet, Cable, and Phone Services",
         "rate": 0.02,
         "isDefault": false
       },
@@ -2553,44 +2955,76 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9126,
+        "cardId": 30,
+        "category": "Lyft (through 12/31/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
-      {
-        "id": 94,
-        "cardId": 30,
-        "name": "$75 Southwest Travel Credit",
-        "description": "Annual statement credit toward Southwest purchases",
-        "annualValue": 75
-      },
       {
         "id": 95,
         "cardId": 30,
         "name": "7,500 Anniversary Points",
         "description": "Bonus points each year",
-        "annualValue": 100
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
-        "id": 96,
+        "id": 738,
         "cardId": 30,
-        "name": "4 Upgraded Boardings per Year",
-        "description": "When available, upgrade to A1-A15 boarding position",
-        "annualValue": 120
+        "name": "25% Back on In-Flight Purchases",
+        "description": "25% back as a statement credit on inflight purchases.",
+        "annualValue": null
       },
       {
-        "id": 97,
+        "id": 739,
         "cardId": 30,
-        "name": "20% Back on In-Flight Purchases",
-        "description": "Drinks, messaging, and Wi-Fi",
-        "annualValue": 20
+        "name": "Free First Checked Bag",
+        "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+        "annualValue": null
+      },
+      {
+        "id": 740,
+        "cardId": 30,
+        "name": "Preferred Seat, Extra Legroom Upgrades and Group 5 Boarding",
+        "description": "Select a Preferred seat at booking and get unlimited upgrades to an Extra Legroom seat within 48 hours of departure when available; the cardmember and up to 8 companions board in Group 5.",
+        "annualValue": null
+      },
+      {
+        "id": 741,
+        "cardId": 30,
+        "name": "2,500 Tier Qualifying Points per $5,000 Spent",
+        "description": "2,500 A-List tier qualifying points for each $5,000 in purchases each year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 742,
+        "cardId": 30,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 743,
+        "cardId": 30,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest/priority",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2644,25 +3078,19 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 98,
-        "cardId": 31,
-        "name": "Free First Checked Bag",
-        "description": "Free first checked bag on Delta flights for you and up to 8 companions",
-        "annualValue": 240
-      },
-      {
         "id": 99,
         "cardId": 31,
         "name": "$200 Delta Flight Credit",
         "description": "After spending $10,000 in a calendar year",
-        "annualValue": 200
+        "annualValue": 200,
+        "period": "calendar-year"
       },
       {
         "id": 100,
         "cardId": 31,
         "name": "Priority Boarding",
         "description": "Main Cabin 1 priority boarding",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 101,
@@ -2670,6 +3098,29 @@ export const BUILTIN_CARDS = [
         "name": "20% Back on In-Flight Purchases",
         "description": "Statement credit on Delta in-flight purchases",
         "annualValue": 30
+      },
+      {
+        "id": 881,
+        "cardId": 31,
+        "name": "Free First and Second Checked Bag",
+        "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; the Basic Card Member's second checked bag is also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": 240
+      },
+      {
+        "id": 882,
+        "cardId": 31,
+        "name": "$120 Rideshare Credit",
+        "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers, available after the first card renewal; enrollment required.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 883,
+        "cardId": 31,
+        "name": "$100 Delta Stays Credit",
+        "description": "Up to $100 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 100,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -2677,7 +3128,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-gold-american-express-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-gold-american-express-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2741,36 +3192,56 @@ export const BUILTIN_CARDS = [
         "id": 102,
         "cardId": 32,
         "name": "Companion Certificate",
-        "description": "Annual round-trip Main Cabin companion certificate (taxes/fees apply)",
-        "annualValue": 400
-      },
-      {
-        "id": 103,
-        "cardId": 32,
-        "name": "Free First Checked Bag",
-        "description": "On Delta flights for you and up to 8 companions",
-        "annualValue": 240
+        "description": "Each year after card renewal, a round-trip Delta Main companion certificate within the U.S. and to Mexico, the Caribbean or Central America; also redeemable toward the eligible flight portion of a Delta Vacations package. Government taxes and fees of $22-$250 apply.",
+        "annualValue": 400,
+        "period": "cardmember-year"
       },
       {
         "id": 104,
         "cardId": 32,
         "name": "$120 Resy Credit",
         "description": "Up to $10/month at U.S. Resy restaurants",
-        "annualValue": 120
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
         "id": 105,
         "cardId": 32,
         "name": "$120 Rideshare Credit",
         "description": "Up to $10/month for U.S. rideshare",
-        "annualValue": 120
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
-        "id": 106,
+        "id": 884,
         "cardId": 32,
-        "name": "MQM Boost",
-        "description": "10,000 MQMs after $25K spend, again at $50K",
-        "annualValue": 150
+        "name": "Free First and Second Checked Bag",
+        "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": 240
+      },
+      {
+        "id": 885,
+        "cardId": 32,
+        "name": "MQD Headstart and MQD Boost",
+        "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $20 of eligible purchases on the card in a calendar year (MQD Boost).",
+        "annualValue": null
+      },
+      {
+        "id": 886,
+        "cardId": 32,
+        "name": "$150 Delta Stays Credit",
+        "description": "Up to $150 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 150,
+        "period": "calendar-year"
+      },
+      {
+        "id": 887,
+        "cardId": 32,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
@@ -2778,7 +3249,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-platinum-american-express-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-platinum-american-express-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2822,42 +3293,69 @@ export const BUILTIN_CARDS = [
         "cardId": 33,
         "name": "Delta Sky Club Access",
         "description": "Complimentary access when flying Delta on the day of travel (15 visits/year)",
-        "annualValue": 650
+        "annualValue": null
       },
       {
         "id": 108,
         "cardId": 33,
         "name": "Centurion Lounge Access",
         "description": "Access when flying Delta-operated flights booked with this card",
-        "annualValue": 300
+        "annualValue": null
       },
       {
         "id": 109,
         "cardId": 33,
         "name": "Companion Certificate (First/Comfort+/Main)",
-        "description": "Annual round-trip companion certificate",
-        "annualValue": 700
+        "description": "Each year after card renewal, a round-trip companion certificate in Delta First, Delta Comfort or Delta Main within the U.S. and to Mexico, the Caribbean or Central America; also redeemable toward the eligible flight portion of a Delta Vacations package. Government taxes and fees of $22-$250 apply.",
+        "annualValue": 700,
+        "period": "cardmember-year"
       },
       {
         "id": 110,
         "cardId": 33,
         "name": "$240 Resy Credit",
         "description": "Up to $20/month at U.S. Resy restaurants",
-        "annualValue": 240
+        "annualValue": 240,
+        "period": "monthly"
       },
       {
         "id": 111,
         "cardId": 33,
         "name": "$120 Rideshare Credit",
         "description": "Up to $10/month for U.S. rideshare",
-        "annualValue": 120
+        "annualValue": 120,
+        "period": "monthly"
       },
       {
-        "id": 112,
+        "id": 888,
         "cardId": 33,
-        "name": "Free First Checked Bag",
-        "description": "On Delta flights",
-        "annualValue": 240
+        "name": "Free First and Second Checked Bag",
+        "description": "First checked bag free on Delta flights worldwide; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": null
+      },
+      {
+        "id": 889,
+        "cardId": 33,
+        "name": "$200 Delta Stays Credit",
+        "description": "Up to $200 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 890,
+        "cardId": 33,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A statement credit every 4 years for a Global Entry application ($120), or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 891,
+        "cardId": 33,
+        "name": "MQD Headstart and MQD Boost",
+        "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $10 of purchases on the card in a calendar year (MQD Boost).",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -2865,7 +3363,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2885,7 +3383,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.3,
     "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Announced 2026-10-27, effective 2027-01-24: annual fee rises from $99 to $150 (first year still waived); adds 3x on AAdvantage Hotels and Cars bookings and 2x at gas and EV charging stations, select streaming and eligible Rides and Rails purchases; flight discount rises to $150; adds an up-to-$120 Global Entry/TSA PreCheck credit every 4 years and up to $100 a year in inflight credits. The catalog keeps today's terms until then."
     ],
     "cashbackCategories": [
       {
@@ -2930,21 +3429,30 @@ export const BUILTIN_CARDS = [
         "cardId": 34,
         "name": "Preferred Boarding",
         "description": "Group 5 preferred boarding on AA flights",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 115,
         "cardId": 34,
         "name": "25% Back on In-Flight Purchases",
         "description": "On AA in-flight food and beverages",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 116,
         "cardId": 34,
         "name": "$125 American Airlines Flight Discount",
-        "description": "After $20,000 in spend in cardmember year",
-        "annualValue": 125
+        "description": "$125 American Airlines flight discount after $20,000 in purchases in a cardmembership year and card renewal.",
+        "annualValue": 125,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 826,
+        "cardId": 34,
+        "name": "Turo Credit",
+        "description": "Up to $30 back per eligible completed Turo trip paid with the card (card linked to the Turo account), up to $180 per calendar year.",
+        "annualValue": 180,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -2952,7 +3460,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-platinum-select-world-elite-mastercard",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-platinum-select-world-elite-mastercard",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -2972,27 +3480,22 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.4,
     "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 2x bucket is Bank of America's 'gas, EV charging station, cable, streaming services and local transit (including rideshare)' category. The label says 'pay TV' for cable so the app does not also pay 2x on wireless phone bills (Phone and Internet), which the issuer does not name. Groceries earn 1x.",
+      "Cardholders with an eligible Bank of America account earn a 10% bonus on points from card purchases; it is not included in the rates shown."
     ],
     "cashbackCategories": [
       {
         "id": 120,
         "cardId": 35,
-        "category": "Alaska Airlines Purchases",
+        "category": "Alaska Airlines and Hawaiian Airlines purchases",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 121,
         "cardId": 35,
-        "category": "Gas",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 122,
-        "cardId": 35,
-        "category": "Groceries",
+        "category": "Gas, EV charging, pay TV, streaming and local transit including rideshare",
         "rate": 0.02,
         "isDefault": false
       },
@@ -3009,21 +3512,22 @@ export const BUILTIN_CARDS = [
         "id": 117,
         "cardId": 35,
         "name": "Annual Companion Fare",
-        "description": "$99 fare ($23 in taxes/fees) when traveling with you on Alaska",
-        "annualValue": 350
+        "description": "$99 Companion Fare (plus taxes and fees from $23) each account anniversary, issued after spending $6,000 or more on purchases in the prior anniversary year. Valid on Alaska and Hawaiian Airlines flights.",
+        "annualValue": 350,
+        "period": "cardmember-year"
       },
       {
         "id": 118,
         "cardId": 35,
         "name": "Free First Checked Bag",
-        "description": "For you and up to 6 companions on the same reservation",
-        "annualValue": 180
+        "description": "Free checked bag and preferred boarding for you and up to 6 guests on the same reservation when the Alaska or Hawaiian Airlines flight is paid with the card.",
+        "annualValue": null
       },
       {
         "id": 119,
         "cardId": 35,
         "name": "20% Back on In-Flight Purchases",
-        "description": "Statement credit on Alaska in-flight purchases",
+        "description": "20% back as a statement credit on Alaska and Hawaiian Airlines in-flight purchases paid with the card.",
         "annualValue": 20
       },
       {
@@ -3031,7 +3535,14 @@ export const BUILTIN_CARDS = [
         "cardId": 35,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 841,
+        "cardId": 35,
+        "name": "Alaska Lounge+ Membership Discount",
+        "description": "$100 off an annual Alaska Lounge+ membership purchased with the card.",
+        "annualValue": 100
       }
     ],
     "inWallet": false,
@@ -3039,7 +3550,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/alaska-airlines-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/alaska-airlines-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3105,14 +3616,15 @@ export const BUILTIN_CARDS = [
         "cardId": 36,
         "name": "Annual Free Night Award",
         "description": "Each cardmember anniversary, valued up to 35,000 points",
-        "annualValue": 350
+        "annualValue": 350,
+        "period": "cardmember-year"
       },
       {
         "id": 122,
         "cardId": 36,
         "name": "Automatic Silver Elite Status",
         "description": "Bonvoy Silver Elite each year",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 123,
@@ -3126,7 +3638,23 @@ export const BUILTIN_CARDS = [
         "cardId": 36,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 744,
+        "cardId": 36,
+        "name": "Airline Statement Credit",
+        "description": "Limited-time: $50 back after $250 in purchases directly with airlines in each of two windows (up to $100). Existing cardmembers (by 1/7/2026, one-time activation): Jan-Jun and Jul-Dec 2026. New cardmembers applying 6/4/2026-12/31/2026: 6/4-12/31/2026 and 1/1-6/30/2027.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 745,
+        "cardId": 36,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar quarter through 12/31/2027.",
+        "annualValue": 40,
+        "period": "quarterly"
       }
     ],
     "inWallet": false,
@@ -3134,7 +3662,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3206,14 +3734,15 @@ export const BUILTIN_CARDS = [
         "cardId": 37,
         "name": "Free Night at Category 1-4 Hyatt",
         "description": "Awarded each cardmember anniversary",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "cardmember-year"
       },
       {
         "id": 126,
         "cardId": 37,
         "name": "Automatic Discoverist Status",
         "description": "Hyatt Discoverist status each year",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 127,
@@ -3226,9 +3755,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/world-of-hyatt",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/world-of-hyatt-credit-card",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/world-of-hyatt",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3236,7 +3765,7 @@ export const BUILTIN_CARDS = [
     "name": "IHG One Rewards Premier",
     "issuer": "Chase / IHG",
     "network": "Mastercard",
-    "annualFee": 99,
+    "annualFee": 150,
     "signupBonus": "Up to 185,000 bonus points, subject to issuer terms",
     "signupBonusValue": 925,
     "color": "linear-gradient(135deg, #c0392b, #7d2018)",
@@ -3249,7 +3778,9 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "IHG One Rewards value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate."
+      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+      "5x on all travel applies only to purchases posted through 12/31/2026; from 1/1/2027 only airline tickets bought directly from the airline and car rental agencies earn 5x and other travel earns 3x.",
+      "Chase's 10/1/2026 refresh set the annual fee at $150 (was $99); existing cardmembers move to the new fee in 2027 and were notified in October 2026 of the effective date of each benefit change."
     ],
     "cashbackCategories": [
       {
@@ -3262,7 +3793,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 136,
         "cardId": 38,
-        "category": "Travel",
+        "category": "Travel (through 12/31/2026)",
         "rate": 0.05,
         "isDefault": false
       },
@@ -3286,6 +3817,27 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.03,
         "isDefault": true
+      },
+      {
+        "id": 9127,
+        "cardId": 38,
+        "category": "Flights Booked Directly with Airlines",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9128,
+        "cardId": 38,
+        "category": "Car Rentals",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9129,
+        "cardId": 38,
+        "category": "Grocery Stores",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -3293,44 +3845,96 @@ export const BUILTIN_CARDS = [
         "id": 128,
         "cardId": 38,
         "name": "Anniversary Free Night",
-        "description": "Free night at any IHG hotel up to 40,000 points",
-        "annualValue": 200
-      },
-      {
-        "id": 129,
-        "cardId": 38,
-        "name": "Automatic Platinum Elite Status",
-        "description": "IHG One Rewards Platinum Elite each year",
-        "annualValue": 120
+        "description": "A Free Night after each card anniversary at an IHG hotel with a redemption cap of 50,000 points; points can be added for pricier nights.",
+        "annualValue": 250,
+        "period": "cardmember-year"
       },
       {
         "id": 130,
         "cardId": 38,
         "name": "4th Night Free",
         "description": "When redeeming points for an award stay of 4+ nights",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 131,
         "cardId": 38,
         "name": "$50 United TravelBank Cash",
-        "description": "After spending $7K each year",
-        "annualValue": 50
+        "description": "After registering the card with a MileagePlus account: $25 in United TravelBank cash for January-June and another $25 for July-December, up to $50 each calendar year. No spend requirement.",
+        "annualValue": 50,
+        "period": "semiannual"
       },
       {
-        "id": 132,
+        "id": 746,
         "cardId": 38,
-        "name": "$100 Global Entry / TSA PreCheck Credit",
-        "description": "Every 4 years",
-        "annualValue": 25
+        "name": "Automatic Gold Elite Status",
+        "description": "Automatic IHG One Rewards Gold Elite status; Platinum Elite after $15,000 and Diamond Elite after $40,000 in purchases in a calendar year.",
+        "annualValue": null
+      },
+      {
+        "id": 747,
+        "cardId": 38,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 748,
+        "cardId": 38,
+        "name": "Food and Beverage Rewards",
+        "description": "A $25 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $100 a year).",
+        "annualValue": 100,
+        "period": "quarterly"
+      },
+      {
+        "id": 749,
+        "cardId": 38,
+        "name": "Airline Statement Credit",
+        "description": "$100 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 750,
+        "cardId": 38,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 751,
+        "cardId": 38,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 per calendar year) while an Instacart+ member (3 months complimentary); ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 752,
+        "cardId": 38,
+        "name": "15 Elite Night Credits",
+        "description": "15 Elite Night Credits at account opening and each January, plus 2 more for every $5,000 spent and 5 more after $15,000 in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 753,
+        "cardId": 38,
+        "name": "15,000 Bonus Points After $15,000 Annual Spend",
+        "description": "15,000 bonus points after $15,000 in purchases each calendar year.",
+        "annualValue": 75,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.ihg.com/onerewards/content/us/en/creditcard",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier",
     "imageSourceUrl": "https://www.ihg.com/onerewards/content/us/en/creditcard",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3388,21 +3992,15 @@ export const BUILTIN_CARDS = [
         "cardId": 39,
         "name": "Annual Free Night (85K points)",
         "description": "Each cardmember anniversary, up to 85,000 Bonvoy points",
-        "annualValue": 750
+        "annualValue": 750,
+        "period": "cardmember-year"
       },
       {
         "id": 134,
         "cardId": 39,
         "name": "Automatic Platinum Elite Status",
         "description": "Bonvoy Platinum Elite each year",
-        "annualValue": 300
-      },
-      {
-        "id": 135,
-        "cardId": 39,
-        "name": "$300 Marriott Bonvoy Dining Credit",
-        "description": "Up to $25/month at participating Marriott restaurants",
-        "annualValue": 300
+        "annualValue": null
       },
       {
         "id": 136,
@@ -3419,11 +4017,29 @@ export const BUILTIN_CARDS = [
         "annualValue": 429
       },
       {
-        "id": 138,
+        "id": 892,
         "cardId": 39,
-        "name": "$100 Global Entry / TSA PreCheck Credit",
-        "description": "Every 4 years",
-        "annualValue": 25
+        "name": "$300 Brilliant Dining Credit",
+        "description": "Up to $25 in statement credits each month (up to $300 per calendar year) for eligible purchases at restaurants worldwide.",
+        "annualValue": 300,
+        "period": "monthly"
+      },
+      {
+        "id": 893,
+        "cardId": 39,
+        "name": "25 Elite Night Credits",
+        "description": "25 Elite Night Credits each calendar year toward the next level of Marriott Bonvoy Elite status.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 894,
+        "cardId": 39,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A $120 statement credit for a Global Entry application every 4 years, or up to $85 toward a five-year TSA PreCheck membership through an official enrollment provider.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
@@ -3431,7 +4047,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-brilliant/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-brilliant/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3488,6 +4104,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.03,
         "isDefault": true
+      },
+      {
+        "id": 9165,
+        "cardId": 40,
+        "category": "U.S. Online Retail",
+        "rate": 0.04,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -3496,28 +4119,37 @@ export const BUILTIN_CARDS = [
         "cardId": 40,
         "name": "Free Night Reward",
         "description": "After spending $15K in a calendar year",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "calendar-year"
       },
       {
         "id": 140,
         "cardId": 40,
         "name": "Automatic Hilton Honors Gold Status",
         "description": "Bonus points and complimentary breakfast at many properties",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 141,
         "cardId": 40,
         "name": "Path to Diamond Status",
         "description": "Spend $40K to earn Diamond status for the year",
-        "annualValue": 150
+        "annualValue": null
       },
       {
-        "id": 142,
+        "id": 895,
         "cardId": 40,
-        "name": "10 Priority Pass Lounge Visits",
-        "description": "Per year for cardmember and one guest",
-        "annualValue": 100
+        "name": "$200 Hilton Credit",
+        "description": "Up to $50 in statement credits each quarter (up to $200 per year) on purchases made directly with a property in the Hilton portfolio.",
+        "annualValue": 200,
+        "period": "quarterly"
+      },
+      {
+        "id": 896,
+        "cardId": 40,
+        "name": "National Car Rental Emerald Club Executive Status",
+        "description": "Complimentary National Car Rental Emerald Club Executive status, including Executive Area access in the U.S. and Canada; enrollment required.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -3525,7 +4157,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3590,42 +4222,68 @@ export const BUILTIN_CARDS = [
         "cardId": 41,
         "name": "Annual Free Night Reward",
         "description": "Use at virtually any Hilton property",
-        "annualValue": 1000
+        "annualValue": 1000,
+        "period": "cardmember-year"
       },
       {
         "id": 144,
         "cardId": 41,
         "name": "Automatic Hilton Honors Diamond Status",
         "description": "Top-tier elite status with breakfast, room upgrades, lounge access",
-        "annualValue": 500
+        "annualValue": null
       },
       {
         "id": 145,
         "cardId": 41,
         "name": "$400 Hilton Resort Credit",
         "description": "$200 semi-annually at participating Hilton resorts",
-        "annualValue": 400
+        "annualValue": 400,
+        "period": "semiannual"
       },
       {
         "id": 146,
         "cardId": 41,
         "name": "$200 Flight Credit",
         "description": "$50 quarterly toward eligible flight purchases",
-        "annualValue": 200
+        "annualValue": 200,
+        "period": "quarterly"
       },
       {
-        "id": 147,
+        "id": 897,
         "cardId": 41,
-        "name": "$199 CLEAR Plus Credit",
-        "description": "Annual statement credit for CLEAR Plus",
-        "annualValue": 199
+        "name": "$219 CLEAR Plus Credit",
+        "description": "Up to $219 in statement credits per calendar year for an annual CLEAR+ membership paid with the card.",
+        "annualValue": 219,
+        "period": "calendar-year"
       },
       {
-        "id": 148,
+        "id": 898,
         "cardId": 41,
-        "name": "Priority Pass Lounge Access",
-        "description": "Unlimited visits to 1,400+ lounges worldwide",
-        "annualValue": 429
+        "name": "Bonus Free Night Rewards at Spend Thresholds",
+        "description": "Each calendar year, a Hilton Free Night Reward after $30,000 in purchases on the card and another after an additional $30,000.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 899,
+        "cardId": 41,
+        "name": "National Car Rental Emerald Club Executive Status",
+        "description": "Complimentary National Car Rental Emerald Club Executive status, including Executive Area access in the U.S. and Canada; enrollment required.",
+        "annualValue": null
+      },
+      {
+        "id": 900,
+        "cardId": 41,
+        "name": "$100 Waldorf Astoria & Conrad Property Credit",
+        "description": "Up to $100 credit for qualifying charges at Waldorf Astoria and Conrad properties on a two-night minimum stay booked with the card at HiltonHonorsAspireCard.com using the Aspire Card Benefit rate.",
+        "annualValue": 100
+      },
+      {
+        "id": 901,
+        "cardId": 41,
+        "name": "Cell Phone Protection",
+        "description": "Reimbursement to repair or replace a damaged or stolen phone, up to $800 per claim and 2 approved claims per 12 months with a $50 deductible, when the prior month's wireless bill was paid with the card.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -3633,7 +4291,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3653,28 +4311,29 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 0.9,
     "rewardValuationDescription": "Wyndham Rewards value varies by redemption; this app uses an estimated 0.90 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "4X dining and grocery exclude Target and Walmart; Vacation Club purchases also earn 4X (down payments earn 1X)."
     ],
     "cashbackCategories": [
       {
         "id": 154,
         "cardId": 42,
-        "category": "Wyndham Hotels & Gas",
-        "rate": 0.08,
+        "category": "Hotels by Wyndham",
+        "rate": 0.06,
         "isDefault": false
       },
       {
         "id": 155,
         "cardId": 42,
         "category": "Dining",
-        "rate": 0.05,
+        "rate": 0.04,
         "isDefault": false
       },
       {
         "id": 156,
         "cardId": 42,
         "category": "Groceries",
-        "rate": 0.05,
+        "rate": 0.04,
         "isDefault": false
       },
       {
@@ -3683,22 +4342,22 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9162,
+        "cardId": 42,
+        "category": "Travel incl. gas, EV charging, airfare, car rentals, rideshare, tolls and trains",
+        "rate": 0.04,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
-        "id": 149,
-        "cardId": 42,
-        "name": "7,500 Anniversary Bonus Points",
-        "description": "Bonus points each cardmember year",
-        "annualValue": 75
-      },
-      {
         "id": 150,
         "cardId": 42,
         "name": "Automatic Wyndham Diamond Status",
-        "description": "Top-tier hotel elite status",
-        "annualValue": 150
+        "description": "Wyndham Rewards Diamond member level for the first year, then Platinum.",
+        "annualValue": null
       },
       {
         "id": 151,
@@ -3712,15 +4371,46 @@ export const BUILTIN_CARDS = [
         "cardId": 42,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 856,
+        "cardId": 42,
+        "name": "15,000 Anniversary Bonus Points",
+        "description": "15,000 bonus points each account anniversary year after the annual fee is paid.",
+        "annualValue": 135,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 857,
+        "cardId": 42,
+        "name": "Meal Delivery Credit",
+        "description": "Up to $25 in statement credits every 6 months on eligible meal delivery purchases, up to $50 per calendar year.",
+        "annualValue": 50,
+        "period": "semiannual"
+      },
+      {
+        "id": 858,
+        "cardId": 42,
+        "name": "Annual Free Night Award",
+        "description": "15,000 Wyndham Rewards points (marketed as a free night) after five qualifying nights at Hotels by Wyndham paid with the card; capped at 15,000 points per calendar year.",
+        "annualValue": 135,
+        "period": "calendar-year"
+      },
+      {
+        "id": 859,
+        "cardId": 42,
+        "name": "National Car Rental Emerald Club Executive Status",
+        "description": "Complimentary Emerald Club Executive status with National Car Rental.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://cards.barclaycardus.com/banking/cards/wyndham-rewards-earner-plus-card/",
+    "sourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-plus/",
     "imageSourceUrl": "https://www.uscreditcardguide.com/barclaycard-wyndham-credit-card/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3733,7 +4423,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #1f2937, #4b5563)",
     "logoUrl": "https://logo.clearbit.com/apple.com",
-    "cardImageUrl": "/card-images/43-apple-card.png",
+    "cardImageUrl": "/card-images/43-apple-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "Apple Daily Cash",
     "rewardUnitName": "Daily Cash",
@@ -3741,7 +4431,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Apple Card earns 3% Daily Cash on purchases from Apple and select Apple Pay merchants, 2% on other Apple Pay purchases, and 1% with the titanium card or card number.",
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Issuer transition: on 2026-01-07 Apple and JPMorgan Chase announced that Chase will become the Apple Card issuer in approximately 24 months, subject to regulatory approvals. Until it closes, Goldman Sachs Bank USA remains the issuer; Apple says Daily Cash and the no-fee terms continue during the transition."
     ],
     "cashbackCategories": [
       {
@@ -3828,21 +4519,21 @@ export const BUILTIN_CARDS = [
         "cardId": 43,
         "name": "Daily Cash",
         "description": "Cash back is deposited daily directly to your Apple Cash account",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 154,
         "cardId": 43,
         "name": "No Annual Fee",
         "description": "No annual fee, no late fees, no foreign transaction fees",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 155,
         "cardId": 43,
         "name": "Financial Health Tools",
         "description": "Built-in tools to track spending, set goals, and understand interest charges",
-        "annualValue": 20
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -3850,7 +4541,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.apple.com/apple-card/",
     "imageSourceUrl": "https://commons.wikimedia.org/wiki/File%3AApple_Card.png",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3871,21 +4562,14 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Eligible Gas, including Costco gas (first $7,000/yr combined with EV charging); Eligible EV Charging (first $7,000/yr combined with eligible gas); Restaurants; Travel; Costco; Other.",
-      "Gas and EV charging caps are combined annually in the issuer terms; Costco rewards are generally distributed as an annual reward certificate."
+      "Gas bought at Costco earns 5%; other eligible gas and EV charging earn 4%; both share a $7,000 combined annual cap, then 1%. The bonus row uses 4% because a logged gas purchase does not say whether it was Costco fuel.",
+      "Cash back is paid once a year as a Costco credit card reward certificate after the February billing statement closes."
     ],
     "cashbackCategories": [
       {
         "id": 161,
         "cardId": 44,
-        "category": "Eligible Gas, including Costco gas (first $7,000/yr combined with EV charging)",
-        "rate": 0.05,
-        "isDefault": false
-      },
-      {
-        "id": 162,
-        "cardId": 44,
-        "category": "Eligible EV Charging (first $7,000/yr combined with eligible gas)",
+        "category": "Eligible gas and EV charging (first $7,000/yr combined)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -3931,21 +4615,21 @@ export const BUILTIN_CARDS = [
         "cardId": 44,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 158,
         "cardId": 44,
         "name": "Damage and Theft Protection",
         "description": "Coverage on new purchases for 120 days",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 159,
         "cardId": 44,
         "name": "Worldwide Car Rental Insurance",
         "description": "Secondary coverage when you rent with the card",
-        "annualValue": 60
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -3953,7 +4637,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/costco-anywhere-visa-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-costco-anywhere-visa-credit-card",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -3974,7 +4658,7 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "The Wells Fargo-issued Bilt Mastercard was discontinued on 2026-02-07.",
-      "Bilt Card 2.0 (Blue / Silver / Gold / Platinum tiers, issued by Column N.A. and serviced by Cardless) is a separate product with a different fee and earning structure. It is not yet in this catalog.",
+      "Its successors are the Bilt Blue ($0), Bilt Obsidian ($95) and Bilt Palladium ($495) Mastercards, issued by Column N.A. and serviced by Cardless Inc. They are separate products with different fees and earning structures.",
       "The rates below describe the retired Wells Fargo product and should not be used for planning."
     ],
     "cashbackCategories": [
@@ -4013,7 +4697,7 @@ export const BUILTIN_CARDS = [
         "cardId": 45,
         "name": "Pay Rent Without Fees",
         "description": "Earn points on rent payments at no transaction cost (up to 100k pts/yr)",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 161,
@@ -4034,15 +4718,15 @@ export const BUILTIN_CARDS = [
         "cardId": 45,
         "name": "Trip Delay & Cancellation Protection",
         "description": "Coverage on travel booked with the card",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://newsroom.biltrewards.com/meetbiltcard2.0",
+    "sourceUrl": "https://www.bilt.com/card",
     "imageSourceUrl": "https://www.uscreditcardguide.com/bilt-mastercard-credit-card/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "availability": "discontinued",
     "availabilityChangedAt": "2026-02-07"
@@ -4057,14 +4741,16 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #b8860b, #ffd700)",
     "logoUrl": "https://logo.clearbit.com/robinhood.com",
-    "cardImageUrl": "/card-images/robinhood-gold-card.png",
+    "cardImageUrl": "/card-images/robinhood-gold-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "Robinhood Cash Back",
     "rewardUnitName": "Cash Back",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Foreign transaction fee: accounts onboarded on or after 2026-07-01 pay 3% of each transaction made in a foreign currency. Robinhood says cardholders onboarded before that date are not affected for now.",
+      "No separate card annual fee, but an active Robinhood Gold membership is required, and cash back is redeemed through a Robinhood brokerage account."
     ],
     "cashbackCategories": [
       {
@@ -4081,21 +4767,21 @@ export const BUILTIN_CARDS = [
         "cardId": 46,
         "name": "No Card Annual Fee",
         "description": "No separate annual fee for the card; Robinhood Gold membership is required.",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 294,
         "cardId": 46,
         "name": "Visa Signature Benefits",
         "description": "Includes eligible Visa Signature travel and purchase benefits.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 295,
         "cardId": 46,
         "name": "Family Card Management",
         "description": "Tools for family card sharing and spend management.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -4103,7 +4789,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://robinhood.com/creditcard",
     "imageSourceUrl": "https://robinhood.com/creditcard",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4161,6 +4847,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9130,
+        "cardId": 47,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4191,6 +4884,14 @@ export const BUILTIN_CARDS = [
         "name": "25% Travel Bonus",
         "description": "Points worth 25% more via Chase Travel portal",
         "annualValue": 200
+      },
+      {
+        "id": 754,
+        "cardId": 47,
+        "name": "DashPass Membership",
+        "description": "Complimentary DashPass for at least one year when activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month while enrolled.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -4198,7 +4899,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/business-preferred",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/business-preferred",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4256,6 +4957,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9131,
+        "cardId": 48,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4264,7 +4972,7 @@ export const BUILTIN_CARDS = [
         "cardId": 48,
         "name": "Free Employee Cards",
         "description": "Add employee cards at no extra cost with spending limits",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 173,
@@ -4278,7 +4986,15 @@ export const BUILTIN_CARDS = [
         "cardId": 48,
         "name": "Extended Warranty",
         "description": "Adds an extra year to U.S. manufacturer warranties of 3 years or less",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 755,
+        "cardId": 48,
+        "name": "Instacart Credit",
+        "description": "Complimentary 3-month Instacart+ membership (then $99/year unless cancelled) and a $20 Instacart credit each month while an Instacart+ member; benefits end 12/31/2027.",
+        "annualValue": 240,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -4286,7 +5002,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/cash",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/cash",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4315,6 +5031,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.015,
         "isDefault": true
+      },
+      {
+        "id": 9132,
+        "cardId": 49,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4323,7 +5046,7 @@ export const BUILTIN_CARDS = [
         "cardId": 49,
         "name": "Free Employee Cards",
         "description": "Issue employee cards with custom spending limits",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 176,
@@ -4337,7 +5060,15 @@ export const BUILTIN_CARDS = [
         "cardId": 49,
         "name": "Auto Rental Insurance",
         "description": "Primary coverage on business rentals",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 756,
+        "cardId": 49,
+        "name": "Instacart Credit",
+        "description": "Complimentary 3-month Instacart+ membership (then $99/year unless cancelled) and a $20 Instacart credit each month while an Instacart+ member; benefits end 12/31/2027.",
+        "annualValue": 240,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -4345,7 +5076,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/unlimited",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/unlimited",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4399,7 +5130,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 186,
         "cardId": 50,
-        "category": "Travel",
+        "category": "Local Transit and Commuting (including rideshare)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -4409,6 +5140,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9133,
+        "cardId": 50,
+        "category": "Chase Travel",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4424,14 +5162,14 @@ export const BUILTIN_CARDS = [
         "cardId": 50,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
       },
       {
         "id": 180,
         "cardId": 50,
         "name": "Purchase Protection",
         "description": "120 days of damage and theft protection",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -4439,7 +5177,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/amazon-prime-rewards",
     "imageSourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/amazon-prime-rewards",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4504,27 +5242,57 @@ export const BUILTIN_CARDS = [
         "cardId": 51,
         "name": "0% Intro APR for 12 Months",
         "description": "On purchases for the first year",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 183,
         "cardId": 51,
         "name": "Trip Cancellation Insurance",
-        "description": "Coverage when you book with the card",
+        "description": "Trip cancellation/interruption coverage up to $1,500 per covered traveler and $6,000 per trip for prepaid, non-refundable passenger fares.",
         "annualValue": 75
+      },
+      {
+        "id": 757,
+        "cardId": 51,
+        "name": "25% Back on United Inflight and Club Premium Drink Purchases",
+        "description": "25% back as a statement credit on food, beverages and Wi-Fi on United-operated flights and on United Club premium drinks.",
+        "annualValue": null
+      },
+      {
+        "id": 758,
+        "cardId": 51,
+        "name": "Two Checked Bags Annually",
+        "description": "Two first-standard-checked-bag benefits after $10,000 in card purchases in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 759,
+        "cardId": 51,
+        "name": "10% or More Off Award Flights",
+        "description": "Save 10% or more on United flights booked with miles after $10,000 in card purchases in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 760,
+        "cardId": 51,
+        "name": "Purchase Protection",
+        "description": "Covers eligible new purchases for 120 days against damage or theft, up to $500 per item.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united/united-gateway",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 52,
-    "name": "United Club Infinite Card",
+    "name": "United Club Card",
     "issuer": "Chase / United Airlines",
     "network": "Visa",
     "annualFee": 695,
@@ -4583,37 +5351,102 @@ export const BUILTIN_CARDS = [
         "id": 296,
         "cardId": 52,
         "name": "United Club Membership",
-        "description": "United Club membership for the primary cardmember.",
-        "annualValue": 650
+        "description": "United Club membership for the primary cardmember and one guest (Chase: $750+ value per year); All Access membership after Premier Gold status or $50,000 in annual card spend.",
+        "annualValue": 750
       },
       {
         "id": 297,
         "cardId": 52,
         "name": "Free Checked Bags",
         "description": "First and second checked bags free on eligible United-operated flights.",
-        "annualValue": 300
+        "annualValue": null
       },
       {
         "id": 298,
         "cardId": 52,
         "name": "Premier Access Travel Services",
         "description": "Eligible Premier Access check-in, security lane, boarding and baggage handling.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 299,
         "cardId": 52,
         "name": "Global Entry / TSA PreCheck / NEXUS Credit",
-        "description": "Statement credit for eligible application fee.",
-        "annualValue": 120
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 761,
+        "cardId": 52,
+        "name": "Renowned Hotels and Resorts Credit",
+        "description": "Up to $200 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 762,
+        "cardId": 52,
+        "name": "Rideshare Credit",
+        "description": "Up to $12 back each month January-November and $18 in December on rideshare purchases (up to $150 per calendar year). Enrollment required.",
+        "annualValue": 150,
+        "period": "monthly"
+      },
+      {
+        "id": 763,
+        "cardId": 52,
+        "name": "Avis/Budget Travel Credit",
+        "description": "$50 in United TravelBank cash on each of the first two Avis or Budget rentals booked through MileagePlus Travel per account anniversary year (up to $100).",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 764,
+        "cardId": 52,
+        "name": "Instacart Credit",
+        "description": "Two $10 Instacart credits each month while an Instacart+ member (up to $240 per calendar year); ends 12/31/2027.",
+        "annualValue": 240,
+        "period": "monthly"
+      },
+      {
+        "id": 765,
+        "cardId": 52,
+        "name": "JSX Credit",
+        "description": "Up to $200 back each account anniversary year on purchases made directly with JSX.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 766,
+        "cardId": 52,
+        "name": "1,500 Card Bonus PQP",
+        "description": "1,500 Premier qualifying points each year, posted within 8 weeks of February 1 starting the calendar year after account opening.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 767,
+        "cardId": 52,
+        "name": "10,000-Mile Award Flight Discount (per $20,000 spend)",
+        "description": "A 10,000-mile award flight discount for every $20,000 in card purchases, up to two per calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 768,
+        "cardId": 52,
+        "name": "25% Back on United Inflight and Club Premium Drink Purchases",
+        "description": "25% back as a statement credit on food, beverages and Wi-Fi on United-operated flights and on United Club premium drinks.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/united/club-infinite",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/united",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4634,7 +5467,7 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Southwest Rapid Rewards value varies by redemption; this app uses an estimated 1.30 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "The 2x grocery-store and restaurant rate covers the first $8,000 in combined purchases per account anniversary year, then 1x; this app resets that cap each calendar year."
     ],
     "cashbackCategories": [
       {
@@ -4645,46 +5478,25 @@ export const BUILTIN_CARDS = [
         "isDefault": false
       },
       {
-        "id": 197,
-        "cardId": 53,
-        "category": "Hotels Via Southwest",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 198,
-        "cardId": 53,
-        "category": "Local Transit and Rideshare",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9113,
-        "cardId": 53,
-        "category": "Internet, Cable, and Phone Services",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9114,
-        "cardId": 53,
-        "category": "Streaming",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 9115,
-        "cardId": 53,
-        "category": "Rapid Rewards Rental Cars",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
         "id": 199,
         "cardId": 53,
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9134,
+        "cardId": 53,
+        "category": "Grocery Stores and Restaurants (first $8,000/year combined)",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9135,
+        "cardId": 53,
+        "category": "Lyft (through 12/31/2027)",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4693,29 +5505,68 @@ export const BUILTIN_CARDS = [
         "cardId": 53,
         "name": "6,000 Anniversary Points",
         "description": "Bonus points on each cardmember anniversary",
-        "annualValue": 84
-      },
-      {
-        "id": 189,
-        "cardId": 53,
-        "name": "2 EarlyBird Check-Ins per Year",
-        "description": "Free EarlyBird Check-In on select flights",
-        "annualValue": 50
+        "annualValue": 84,
+        "period": "cardmember-year"
       },
       {
         "id": 190,
         "cardId": 53,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 769,
+        "cardId": 53,
+        "name": "Free First Checked Bag",
+        "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+        "annualValue": null
+      },
+      {
+        "id": 770,
+        "cardId": 53,
+        "name": "15% Flight Discount Promo Code",
+        "description": "A 15% promo code each cardmember anniversary (excludes Basic fares).",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 771,
+        "cardId": 53,
+        "name": "Preferred Seat Selection and Group 5 Boarding",
+        "description": "Select a Preferred seat within 48 hours of departure when available; the cardmember and up to 8 companions board in Group 5.",
+        "annualValue": null
+      },
+      {
+        "id": 772,
+        "cardId": 53,
+        "name": "25% Back on In-Flight Purchases",
+        "description": "25% back as a statement credit on inflight purchases.",
+        "annualValue": null
+      },
+      {
+        "id": 773,
+        "cardId": 53,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 774,
+        "cardId": 53,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest/premier",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/southwest",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4773,14 +5624,22 @@ export const BUILTIN_CARDS = [
         "cardId": 54,
         "name": "Marriott Bonvoy Silver Status",
         "description": "Automatic mid-tier elite status",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 193,
         "cardId": 54,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 775,
+        "cardId": 54,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar quarter through 12/31/2027.",
+        "annualValue": 40,
+        "period": "quarterly"
       }
     ],
     "inWallet": false,
@@ -4788,12 +5647,12 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 55,
-    "name": "IHG One Rewards Traveler",
+    "name": "IHG One Rewards Credit Card",
     "issuer": "Chase / IHG",
     "network": "Mastercard",
     "annualFee": 0,
@@ -4809,7 +5668,9 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "IHG One Rewards value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate."
+      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+      "3x on utilities, internet/cable/phone and select streaming applies only to purchases posted through 12/31/2026; from 1/1/2027 they earn 2x.",
+      "Formerly the IHG One Rewards Traveler Credit Card, renamed in Chase's 10/1/2026 refresh; existing cardmembers were notified in October 2026 of each change's effective date."
     ],
     "cashbackCategories": [
       {
@@ -4836,7 +5697,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 9106,
         "cardId": 55,
-        "category": "Monthly Bills",
+        "category": "Utilities, Internet, Cable, Phone and Select Streaming (through 12/31/2026)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -4846,6 +5707,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.02,
         "isDefault": true
+      },
+      {
+        "id": 9136,
+        "cardId": 55,
+        "category": "Grocery Stores",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -4853,30 +5721,62 @@ export const BUILTIN_CARDS = [
         "id": 194,
         "cardId": 55,
         "name": "4th Reward Night Free",
-        "description": "On award stays of 4+ nights",
-        "annualValue": 200
+        "description": "Redeem points for four consecutive nights and the fourth is free. From 2027 it requires $5,000 in purchases in a calendar year (then valid for the rest of that year and the next).",
+        "annualValue": null
       },
       {
         "id": 195,
         "cardId": 55,
         "name": "IHG Silver Elite Status",
-        "description": "Earn higher level with $20k spend",
-        "annualValue": 50
+        "description": "Automatic Silver Elite status; Gold Elite after $15,000 in purchases in a calendar year.",
+        "annualValue": null
       },
       {
         "id": 196,
         "cardId": 55,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 776,
+        "cardId": 55,
+        "name": "5 Elite Night Credits",
+        "description": "5 Elite Night Credits at account opening and each January.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 777,
+        "cardId": 55,
+        "name": "10,000 Bonus Points After $15,000 Annual Spend",
+        "description": "10,000 bonus points after $15,000 in purchases each calendar year.",
+        "annualValue": 50,
+        "period": "calendar-year"
+      },
+      {
+        "id": 778,
+        "cardId": 55,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 779,
+        "cardId": 55,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 a year) while an Instacart+ member (3 months complimentary, then $99/year); ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/one-rewards",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -4897,7 +5797,9 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Membership Rewards redemption value varies by redemption path; this app uses a conservative 1.00 cent per point estimate for annual-fee progress and keeps earned points visible separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Top two 4x categories are selected automatically from eligible business categories each billing cycle and are capped at $150,000 in combined purchases per calendar year before base earning applies."
+      "Top two 4x categories are selected automatically from eligible business categories each billing cycle and are capped at $150,000 in combined purchases per calendar year before base earning applies.",
+      "3X applies only to flights and prepaid hotels booked on AmexTravel.com.",
+      "From 2027-02-17 the 4X advertising category counts only purchases at select merchants (issuer page footnote)."
     ],
     "cashbackCategories": [
       {
@@ -4910,7 +5812,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 208,
         "cardId": 56,
-        "category": "Flights & Hotels",
+        "category": "Flights and prepaid hotels via Amex Travel",
         "rate": 0.03,
         "isDefault": false
       },
@@ -4927,31 +5829,42 @@ export const BUILTIN_CARDS = [
         "id": 197,
         "cardId": 56,
         "name": "$240 Flexible Business Credit",
-        "description": "$20/month at FedEx, Grubhub, Office Supplies, etc.",
-        "annualValue": 240
+        "description": "Up to $20 in statement credits each month (up to $240 per year) on eligible U.S. purchases at Grubhub, U.S. office supply stores and UPS.com shipments; enrollment required. UPS replaced FedEx on 2026-10-01.",
+        "annualValue": 240,
+        "period": "monthly"
       },
       {
         "id": 198,
         "cardId": 56,
         "name": "$155 Walmart+ Credit",
         "description": "Monthly statement credit for Walmart+ membership",
-        "annualValue": 155
+        "annualValue": 155,
+        "period": "monthly"
       },
       {
-        "id": 199,
+        "id": 902,
         "cardId": 56,
-        "name": "25% Airline Bonus",
-        "description": "Up to 250k points back per year for flights via Amex Travel",
-        "annualValue": 200
+        "name": "$300 ChatGPT Business Credit",
+        "description": "Up to $300 in statement credits per calendar year on U.S. purchases of ChatGPT Business subscriptions (subject to auto-renewal).",
+        "annualValue": 300,
+        "period": "calendar-year"
+      },
+      {
+        "id": 903,
+        "cardId": 56,
+        "name": "$150 Squarespace Credit",
+        "description": "Up to $150 back each calendar year on U.S. Squarespace purchases; enrollment required, subscription purchases subject to auto-renewal.",
+        "annualValue": 150,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
+    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card-amex/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card/",
-    "lastReviewedAt": "2026-08-06",
-    "dataConfidence": "needs-review",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
     "categoryChoices": [
       {
         "categoryId": 207,
@@ -4987,23 +5900,24 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Membership Rewards redemption value varies by redemption path; this app uses a conservative 1.00 cent per point estimate for annual-fee progress and keeps earned points visible separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
-      "Large-purchase bonus rates apply only to transactions meeting the listed minimum purchase amount.",
-      "The 1.5x business-category and large-purchase earning is capped by the issuer's annual eligible-purchase limit before base earning applies."
+      "5X applies only to flights and prepaid hotels booked on AmexTravel.com.",
+      "2X covers eligible U.S. construction-material and hardware suppliers, electronic goods retailers, software and cloud providers, shipping providers, and single purchases of $5,000 or more, on up to $2 million of these purchases per calendar year, then 1X.",
+      "From 2027-02-17 the 2X shipping category and the wireless credit apply at select merchants only (issuer page footnote).",
+      "From 2027-01-01 Fine Hotels + Resorts bookings need a two-night minimum stay to count toward the $600 hotel credit."
     ],
     "cashbackCategories": [
       {
         "id": 210,
         "cardId": 57,
-        "category": "Flights & Prepaid Hotels",
+        "category": "Flights and prepaid hotels via Amex Travel",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 211,
         "cardId": 57,
-        "category": "Select Business Categories and Large Purchases $5k+ (up to $2,000,000/yr combined)",
-        "rate": 0.015,
+        "category": "U.S. construction, hardware, electronics, software & cloud, shipping and $5k+ purchases (up to $2,000,000/year combined)",
+        "rate": 0.02,
         "isDefault": false
       },
       {
@@ -5020,28 +5934,16 @@ export const BUILTIN_CARDS = [
         "cardId": 57,
         "name": "$200 Airline Fee Credit",
         "description": "Annual incidental airline fee credit",
-        "annualValue": 200
-      },
-      {
-        "id": 201,
-        "cardId": 57,
-        "name": "$400 Dell Credit",
-        "description": "Up to $400/year in Dell Technologies statement credits",
-        "annualValue": 400
+        "annualValue": 200,
+        "period": "calendar-year"
       },
       {
         "id": 202,
         "cardId": 57,
         "name": "$360 Indeed Credit",
         "description": "Up to $90/quarter for Indeed posts",
-        "annualValue": 360
-      },
-      {
-        "id": 203,
-        "cardId": 57,
-        "name": "$150 Adobe Credit",
-        "description": "Annual Adobe statement credit",
-        "annualValue": 150
+        "annualValue": 360,
+        "period": "quarterly"
       },
       {
         "id": 204,
@@ -5056,14 +5958,87 @@ export const BUILTIN_CARDS = [
         "name": "35% Airline Bonus",
         "description": "Up to 1M points/year on Pay With Points flights",
         "annualValue": 350
+      },
+      {
+        "id": 904,
+        "cardId": 57,
+        "name": "$150 Dell Technologies Credit",
+        "description": "Up to $150 in statement credits per calendar year on U.S. purchases made directly with Dell Technologies, plus an additional $1,000 statement credit after $5,000 or more of those purchases in the same calendar year (up to $1,150 in total).",
+        "annualValue": 150,
+        "period": "calendar-year"
+      },
+      {
+        "id": 905,
+        "cardId": 57,
+        "name": "$250 Adobe Credit",
+        "description": "A $250 statement credit per calendar year after spending $600 or more on eligible U.S. Adobe purchases.",
+        "annualValue": 250,
+        "period": "calendar-year"
+      },
+      {
+        "id": 906,
+        "cardId": 57,
+        "name": "$600 Hotel Credit",
+        "description": "Up to $300 in statement credits semi-annually (up to $600 per calendar year) on prepaid Fine Hotels + Resorts or The Hotel Collection bookings through American Express Travel. The Hotel Collection requires a two-night minimum stay; from January 1, 2027, Fine Hotels + Resorts bookings also need two nights to qualify.",
+        "annualValue": 600,
+        "period": "semiannual"
+      },
+      {
+        "id": 907,
+        "cardId": 57,
+        "name": "$200 Hilton Credit",
+        "description": "Up to $50 in statement credits each quarter (up to $200 per calendar year) on eligible purchases made directly with a property in the Hilton portfolio; enrollment required.",
+        "annualValue": 200,
+        "period": "quarterly"
+      },
+      {
+        "id": 908,
+        "cardId": 57,
+        "name": "$219 CLEAR Plus Credit",
+        "description": "Up to $219 in statement credits per calendar year for an auto-renewing CLEAR+ membership (excluding taxes and fees).",
+        "annualValue": 219,
+        "period": "calendar-year"
+      },
+      {
+        "id": 909,
+        "cardId": 57,
+        "name": "$120 Wireless Credit",
+        "description": "Up to $10 in statement credits each month on wireless telephone service purchased directly from a U.S. wireless provider. From February 17, 2027, select merchants only.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 910,
+        "cardId": 57,
+        "name": "$300 ChatGPT Business Credit",
+        "description": "Up to $300 in statement credits per calendar year on U.S. purchases of ChatGPT Business (subject to auto-renewal).",
+        "annualValue": 300,
+        "period": "calendar-year"
+      },
+      {
+        "id": 911,
+        "cardId": 57,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 912,
+        "cardId": 57,
+        "name": "ZO Membership from Tishman Speyer",
+        "description": "Complimentary ZO membership (added 2026-10-22): access to ZO Clubhouse locations in select U.S. cities with 4 guest passes per week, 4 Studio day passes per month, and up to $500 in statement credits per calendar year toward ZO event space bookings and/or a Dining Club membership.",
+        "annualValue": 500,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/business-platinum-charge-card/",
+    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-platinum-credit-card-amex/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/business-platinum-charge-card/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -5083,7 +6058,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 0.7,
     "rewardValuationDescription": "Marriott Bonvoy value varies by redemption; this app uses an estimated 0.70 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "4X at restaurants worldwide and U.S. supermarkets applies to the first $15,000 of combined purchases per calendar year, then 2X."
     ],
     "cashbackCategories": [
       {
@@ -5096,14 +6072,14 @@ export const BUILTIN_CARDS = [
       {
         "id": 214,
         "cardId": 58,
-        "category": "Restaurants",
+        "category": "Restaurants worldwide (up to $15,000/year combined)",
         "rate": 0.04,
         "isDefault": false
       },
       {
         "id": 215,
         "cardId": 58,
-        "category": "Groceries",
+        "category": "U.S. supermarkets (up to $15,000/year combined)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -5121,7 +6097,7 @@ export const BUILTIN_CARDS = [
         "cardId": 58,
         "name": "Marriott Gold Elite Status",
         "description": "Mid-tier hotel elite status",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 207,
@@ -5135,7 +6111,8 @@ export const BUILTIN_CARDS = [
         "cardId": 58,
         "name": "1 Free Night (50k pts)",
         "description": "After spending $15,000 in a calendar year",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -5143,7 +6120,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-bevy/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-bevy/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -5208,7 +6185,7 @@ export const BUILTIN_CARDS = [
         "cardId": 59,
         "name": "Hilton Honors Silver Status",
         "description": "Automatic mid-tier hotel status",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 210,
@@ -5278,7 +6255,7 @@ export const BUILTIN_CARDS = [
         "id": 321,
         "cardId": 60,
         "category": "Restaurants",
-        "rate": 0.03,
+        "rate": 0.02,
         "isDefault": false
       },
       {
@@ -5294,22 +6271,22 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9153,
+        "cardId": 60,
+        "category": "Citi Travel hotels, car rentals, and attractions",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
-      {
-        "id": 300,
-        "cardId": 60,
-        "name": "Round Up Rewards",
-        "description": "Rewards can round up to the nearest 10 points on every purchase where applicable.",
-        "annualValue": 25
-      },
       {
         "id": 301,
         "cardId": 60,
         "name": "No Annual Fee",
         "description": "No annual fee for the current Citi Strata Card.",
-        "annualValue": 95
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -5317,7 +6294,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-strata-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-strata-credit-card",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -5390,7 +6367,7 @@ export const BUILTIN_CARDS = [
         "cardId": 61,
         "name": "25% Inflight Savings",
         "description": "On food and beverages on American flights",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -5406,7 +6383,7 @@ export const BUILTIN_CARDS = [
     "name": "Citi / AAdvantage Executive World Legend Mastercard",
     "issuer": "Citi / American Airlines",
     "network": "Mastercard",
-    "annualFee": 595,
+    "annualFee": 695,
     "signupBonus": "70,000 miles after $7,000 in 3 months",
     "signupBonusValue": 1050,
     "color": "linear-gradient(135deg, #1a1a1a, #4d4d4d)",
@@ -5419,7 +6396,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Annual fee rises from $595 to $695 for new applicants on 2026-08-23. Existing cardmembers are notified in Aug/Sep 2026; the catalog still carries $595 because that is today's fee.",
+      "Annual fee is $695 for new cardmembers from 2026-08-23 (was $595); Citi's announcement does not give the date existing cardmembers move to the new fee.",
+      "After $150,000 in purchases in a calendar year, eligible American Airlines purchases earn 5 miles per $1 (instead of 4) for the rest of that year.",
       "Rebranded from World Elite to World Legend Mastercard effective 2026-08-23."
     ],
     "cashbackCategories": [
@@ -5436,6 +6414,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9154,
+        "cardId": 62,
+        "category": "AAdvantage Hotels and AAdvantage Cars bookings",
+        "rate": 0.12,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -5443,8 +6428,8 @@ export const BUILTIN_CARDS = [
         "id": 217,
         "cardId": 62,
         "name": "Admirals Club Membership",
-        "description": "Full access for cardholder + immediate family",
-        "annualValue": 850
+        "description": "Admirals Club membership for the primary cardmember, with access for up to 2 guests or immediate family members; Citi values it at up to $1,400 a year.",
+        "annualValue": null
       },
       {
         "id": 218,
@@ -5458,22 +6443,86 @@ export const BUILTIN_CARDS = [
         "cardId": 62,
         "name": "Global Entry / TSA PreCheck",
         "description": "Up to $120 credit every 4 years",
-        "annualValue": 30
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 220,
         "cardId": 62,
         "name": "Priority Boarding & Check-In",
         "description": "Group 4 boarding on American flights",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 827,
+        "cardId": 62,
+        "name": "Lyft Credit",
+        "description": "$15 back after 3 eligible Lyft rides in a calendar month, up to $180 a year.",
+        "annualValue": 180,
+        "period": "monthly"
+      },
+      {
+        "id": 828,
+        "cardId": 62,
+        "name": "Avis / Budget Car Rental Credit",
+        "description": "Up to $120 in statement credits per calendar year on eligible prepaid Avis or Budget rentals booked directly on avis.com or budget.com.",
+        "annualValue": 120,
+        "period": "calendar-year"
+      },
+      {
+        "id": 829,
+        "cardId": 62,
+        "name": "American Airlines Vacations Credit",
+        "description": "Up to $250 back January-June and up to $250 back July-December on eligible packages or experiences booked at aavacations.com.",
+        "annualValue": 500,
+        "period": "semiannual"
+      },
+      {
+        "id": 830,
+        "cardId": 62,
+        "name": "Inflight and Admirals Club Purchase Credit",
+        "description": "Up to $100 in statement credits per calendar year on eligible American Airlines inflight and Admirals Club purchases.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 831,
+        "cardId": 62,
+        "name": "inKind Dining Credit",
+        "description": "Up to $100 January-June and up to $100 July-December at inKind restaurants, used by paying with the card through the inKind app.",
+        "annualValue": 200,
+        "period": "semiannual"
+      },
+      {
+        "id": 832,
+        "cardId": 62,
+        "name": "Omni Hotels Champion Status",
+        "description": "Complimentary Omni Select Guest Champion status for the primary cardmember (enrollment required).",
+        "annualValue": null
+      },
+      {
+        "id": 833,
+        "cardId": 62,
+        "name": "Omni Hotels Annual Free Night",
+        "description": "Once per calendar year, an Omni Free Night Award after a qualifying stay of 2+ consecutive nights booked directly on omnihotels.com (Champion enrollment required).",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 834,
+        "cardId": 62,
+        "name": "Avis President's Club Status",
+        "description": "Complimentary Avis President's Club status for enrolled primary cardmembers, available through 2028-08-31.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-world-elite-mastercard",
+    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -5538,21 +6587,43 @@ export const BUILTIN_CARDS = [
         "cardId": 63,
         "name": "5,000 Anniversary Points",
         "description": "Each cardmember year",
-        "annualValue": 65
+        "annualValue": 65,
+        "period": "cardmember-year"
       },
       {
         "id": 223,
         "cardId": 63,
         "name": "Mosaic Status with $50k Spend",
         "description": "Earn Mosaic for the rest of the year",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 224,
         "cardId": 63,
         "name": "10% Points Rebate",
         "description": "On every award flight redemption",
+        "annualValue": null
+      },
+      {
+        "id": 860,
+        "cardId": 63,
+        "name": "JetBlue Vacations Statement Credit",
+        "description": "$100 statement credit after purchasing a JetBlue Vacations package of $100 or more with the card; limit one statement credit per year.",
         "annualValue": 100
+      },
+      {
+        "id": 861,
+        "cardId": 63,
+        "name": "50% Inflight Savings",
+        "description": "50% savings on eligible inflight purchases on JetBlue-operated flights.",
+        "annualValue": null
+      },
+      {
+        "id": 862,
+        "cardId": 63,
+        "name": "No Foreign Transaction Fees",
+        "description": "Foreign transaction fee: 0%.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -5560,7 +6631,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://cards.barclaycardus.com/banking/cards/jetblue-plus-card/",
     "imageSourceUrl": "https://www.uscreditcardguide.com/barclaycard-jetblue-plus-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -5574,14 +6645,15 @@ export const BUILTIN_CARDS = [
     "color": "linear-gradient(135deg, #6d2077, #c8102e)",
     "logoUrl": "https://logo.clearbit.com/hawaiianairlines.com",
     "cardImageUrl": "/card-images/64-hawaiian-airlines-world-elite-mastercard.png",
-    "rewardType": "miles",
-    "rewardProgram": "HawaiianMiles",
-    "rewardUnitName": "Miles",
-    "rewardUnitValueCents": 1,
-    "rewardValuationDescription": "HawaiianMiles value varies by itinerary and redemption path; this app uses an estimated 1.00 cents per mile for annual-fee progress while displaying earned miles separately.",
+    "rewardType": "points",
+    "rewardProgram": "Atmos Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.4,
+    "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program.",
-      "Earning and redemption now run through Atmos Rewards; the rates below describe the legacy HawaiianMiles structure and need re-verification."
+      "Barclays removed its own application page for this card on 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program (balances converted 1:1); secondary sources (2026) report a Barclays-issued variant still offered through Bank of Hawaii. Existing accounts earn Atmos Rewards points.",
+      "Alaska Airlines and Bank of America have said they are working toward Bank of America issuing all Atmos Rewards co-branded cards; no conversion date for Barclays Hawaiian accounts has been announced.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
     ],
     "cashbackCategories": [
       {
@@ -5625,30 +6697,32 @@ export const BUILTIN_CARDS = [
         "id": 225,
         "cardId": 64,
         "name": "Free First Checked Bag",
-        "description": "For cardholder on Hawaiian Airlines flights",
-        "annualValue": 120
+        "description": "Two free checked bags for the primary cardmember on eligible Hawaiian Airlines flights booked with the card.",
+        "annualValue": null
       },
       {
         "id": 226,
         "cardId": 64,
         "name": "$100 Companion Discount",
-        "description": "Annual discount on roundtrip Hawaii flights",
-        "annualValue": 100
+        "description": "$100 companion discount for roundtrip travel between Hawaii and North America on Hawaiian Airlines, each account anniversary.",
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
         "id": 227,
         "cardId": 64,
         "name": "50% Off One-Way Companion Ticket",
-        "description": "Inter-island companion discount",
-        "annualValue": 75
+        "description": "One-time 50%-off companion discount for roundtrip coach travel between Hawaii and North America on Hawaiian Airlines.",
+        "annualValue": 75,
+        "period": "one-time"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://cards.barclaycardus.com/",
+    "sourceUrl": "https://yourmileagemayvary.com/2026/10/01/hawaiian-airlines-card-atmos-rewards/",
     "imageSourceUrl": "https://cards.barclaycardus.com/banking/credit-card/hawaiian-airlines/child/hcl-control/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "availability": "closed-to-new-applicants",
     "availabilityChangedAt": "2025-10-01"
@@ -5702,14 +6776,14 @@ export const BUILTIN_CARDS = [
         "cardId": 65,
         "name": "Preferred Boarding",
         "description": "Group 5 boarding on American flights",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 230,
         "cardId": 65,
         "name": "25% Inflight Savings",
         "description": "On food and beverages and Wi-Fi on American flights",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -5727,7 +6801,7 @@ export const BUILTIN_CARDS = [
     "name": "Aeroplan Card",
     "issuer": "Chase / Air Canada",
     "network": "Visa",
-    "annualFee": 95,
+    "annualFee": 195,
     "signupBonus": "75,000 Aeroplan points after $4,000 in 3 months",
     "signupBonusValue": 1100,
     "color": "linear-gradient(135deg, #c8102e, #1a1a1a)",
@@ -5739,7 +6813,9 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.4,
     "rewardValuationDescription": "Aeroplan value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Dining and grocery stores earn 3x on purchases through 12/31/2026 and 2x from 1/1/2027.",
+      "The card earns 3x on Air Canada purchases; Chase's 'up to 5x' adds 2x that Air Canada awards Aeroplan 25K members on eligible flights, which this app does not count."
     ],
     "cashbackCategories": [
       {
@@ -5752,14 +6828,14 @@ export const BUILTIN_CARDS = [
       {
         "id": 242,
         "cardId": 66,
-        "category": "Dining",
+        "category": "Dining (3x through 12/31/2026, then 2x)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 243,
         "cardId": 66,
-        "category": "Groceries",
+        "category": "Grocery Stores (3x through 12/31/2026, then 2x)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -5769,6 +6845,20 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9137,
+        "cardId": 66,
+        "category": "Travel",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9138,
+        "cardId": 66,
+        "category": "Gas Stations",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -5783,15 +6873,47 @@ export const BUILTIN_CARDS = [
         "id": 232,
         "cardId": 66,
         "name": "25K Aeroplan Status",
-        "description": "Pathway to Aeroplan elite status with spend",
-        "annualValue": 200
+        "description": "Automatic Aeroplan 25K status with no spending requirement: priority check-in, Zone 2 boarding, 5 eUpgrade credits a year and Star Alliance recognition.",
+        "annualValue": null
       },
       {
         "id": 233,
         "cardId": 66,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
+      },
+      {
+        "id": 780,
+        "cardId": 66,
+        "name": "Air Canada Statement Credit",
+        "description": "Up to $50 in statement credits January-June and up to $50 July-December on purchases made directly with Air Canada.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 781,
+        "cardId": 66,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 782,
+        "cardId": 66,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 783,
+        "cardId": 66,
+        "name": "15% Off Air Canada Flight Redemptions",
+        "description": "Save 15% on eligible Air Canada flight rewards booked with Aeroplan points.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -5799,7 +6921,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan",
     "imageSourceUrl": "https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -5819,13 +6941,17 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "U.S. Bank Rewards Points value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since 2024-11-11. Existing cardholders keep the card.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Since 2025-12-15 the 3X mobile-wallet rate applies only to the first $5,000 of mobile wallet purchases each billing cycle, then 1X; the app approximates the billing cycle as a calendar month.",
+      "Since 2025-12-15 prepaid hotels and car rentals booked in the U.S. Bank Travel Center earn 10X and prepaid flights 5X; travel booked directly with airlines, hotels, car rentals, taxis, trains and cruise lines still earns 3X.",
+      "Points are worth 1 cent each toward travel since 2025-12-15 (previously 1.5 cents)."
     ],
     "cashbackCategories": [
       {
         "id": 245,
         "cardId": 67,
-        "category": "Mobile Wallet",
+        "category": "Mobile wallet purchases (first $5,000/month)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -5842,15 +6968,30 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9157,
+        "cardId": 67,
+        "category": "Prepaid hotels and car rentals in the U.S. Bank Travel Center",
+        "rate": 0.1,
+        "isDefault": false
+      },
+      {
+        "id": 9158,
+        "cardId": 67,
+        "category": "Prepaid flights in the U.S. Bank Travel Center",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
         "id": 234,
         "cardId": 67,
-        "name": "$325 Travel & Dining Credit",
-        "description": "Annual statement credit on travel and restaurant purchases",
-        "annualValue": 325
+        "name": "$325 Travel Center Credit",
+        "description": "Up to $325 in statement credits each cardmember year, now only for travel booked through the U.S. Bank Travel Center. Since 2025-12-15 general travel and dining purchases no longer qualify.",
+        "annualValue": 325,
+        "period": "cardmember-year"
       },
       {
         "id": 235,
@@ -5864,7 +7005,9 @@ export const BUILTIN_CARDS = [
         "cardId": 67,
         "name": "Global Entry / TSA PreCheck",
         "description": "Up to $100 credit every 4 years",
-        "annualValue": 25
+        "annualValue": 25,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 237,
@@ -5877,9 +7020,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/credit-cards.html",
+    "sourceUrl": "https://rewards.usbank.com/benefits/card/AltitudeReserveBenefits/faqs",
     "imageSourceUrl": "https://www.cardsandpoints.com/us-bank-altitude-reserve/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "availability": "closed-to-new-applicants",
     "availabilityChangedAt": "2024-11-11"
@@ -5901,13 +7044,14 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "U.S. Bank Rewards Points value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Grocery and gas/EV charging 2X exclude discount stores/supercenters and wholesale clubs, which earn 1X."
     ],
     "cashbackCategories": [
       {
         "id": 248,
         "cardId": 68,
-        "category": "Dining",
+        "category": "Dining, takeout and restaurant delivery (up to $2,000/quarter)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -5928,7 +7072,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 251,
         "cardId": 68,
-        "category": "Gas",
+        "category": "Gas and EV charging",
         "rate": 0.02,
         "isDefault": false
       },
@@ -5945,22 +7089,17 @@ export const BUILTIN_CARDS = [
         "id": 238,
         "cardId": 68,
         "name": "$15 Streaming Credit",
-        "description": "Annual statement credit for streaming services",
-        "annualValue": 15
+        "description": "Automatic $15 statement credit per 12-month period after 11 consecutive calendar months of eligible streaming service purchases.",
+        "annualValue": 15,
+        "period": "cardmember-year"
       },
       {
-        "id": 239,
+        "id": 852,
         "cardId": 68,
-        "name": "0% Intro APR for 12 Months",
-        "description": "On purchases for the first year",
-        "annualValue": 100
-      },
-      {
-        "id": 240,
-        "cardId": 68,
-        "name": "Cell Phone Protection",
-        "description": "Up to $600 per claim with bill payment",
-        "annualValue": 75
+        "name": "0% Intro APR for 15 Billing Cycles",
+        "description": "0% intro APR on purchases and balance transfers for the first 15 billing cycles, then a variable APR.",
+        "annualValue": null,
+        "period": "one-time"
       }
     ],
     "inWallet": false,
@@ -5968,13 +7107,13 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/altitude-go-visa-signature-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/altitude-go-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 69,
     "name": "Discover it Chrome",
-    "issuer": "Discover",
+    "issuer": "Capital One / Discover",
     "network": "Discover",
     "annualFee": 0,
     "signupBonus": "Cashback Match — all cash back doubled in year 1",
@@ -6021,7 +7160,8 @@ export const BUILTIN_CARDS = [
         "cardId": 69,
         "name": "Cashback Match",
         "description": "All rewards doubled at end of first year",
-        "annualValue": 200
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 242,
@@ -6043,13 +7183,13 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/cash-back/chrome/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/cash-back/chrome.html",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 70,
     "name": "Discover it Student Cash Back",
-    "issuer": "Discover",
+    "issuer": "Capital One / Discover",
     "network": "Discover",
     "annualFee": 0,
     "signupBonus": "Cashback Match — all cash back doubled in year 1",
@@ -6089,14 +7229,8 @@ export const BUILTIN_CARDS = [
         "cardId": 70,
         "name": "Cashback Match",
         "description": "All cash back doubled at end of first year",
-        "annualValue": 150
-      },
-      {
-        "id": 245,
-        "cardId": 70,
-        "name": "Good Grades Reward",
-        "description": "$20 statement credit per year for GPA 3.0+",
-        "annualValue": 20
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 246,
@@ -6111,7 +7245,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/student-credit-card/it-card/",
     "imageSourceUrl": "https://wallethub.com/d/discover-it-for-students-credit-card-802c",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "categoryChoices": [
       {
@@ -6122,16 +7256,16 @@ export const BUILTIN_CARDS = [
         "options": [
           "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
           "Q2 2026: Restaurants and home improvement stores",
-          "Q3 2026: Gas stations, transportation and drug stores",
-          "Q4 2026: not yet announced"
+          "Q3 2026: Gas stations, transportation (transit) and drugstores",
+          "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
         ]
       }
     ]
   },
   {
     "id": 71,
-    "name": "Discover it Secured",
-    "issuer": "Discover",
+    "name": "Discover it Secured Cash Back",
+    "issuer": "Capital One / Discover",
     "network": "Discover",
     "annualFee": 0,
     "signupBonus": "Cashback Match — all cash back doubled in year 1",
@@ -6146,22 +7280,15 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Discover bonus categories and first-year Cashback Match terms are issuer-program specific and may require activation or eligibility.",
-      "Gas and restaurant bonus earning shares a $1,000 quarterly purchase cap before base earning applies."
+      "Rotating categories require current-quarter activation and are subject to the issuer quarterly cap before base earning applies.",
+      "Discover bonus categories and first-year Cashback Match terms are issuer-program specific and may require activation or eligibility."
     ],
     "cashbackCategories": [
       {
         "id": 258,
         "cardId": 71,
-        "category": "Gas (up to $1,000/quarter combined)",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 259,
-        "cardId": 71,
-        "category": "Restaurants (up to $1,000/quarter combined)",
-        "rate": 0.02,
+        "category": "Rotating Categories (up to $1,500/quarter)",
+        "rate": 0.05,
         "isDefault": false
       },
       {
@@ -6177,15 +7304,15 @@ export const BUILTIN_CARDS = [
         "id": 247,
         "cardId": 71,
         "name": "Build Credit Securely",
-        "description": "Refundable security deposit becomes credit limit",
+        "description": "Refundable security deposit of $49, $99 or $200 (set by creditworthiness) secures a credit line of at least $200; depositing more raises the line.",
         "annualValue": 50
       },
       {
         "id": 248,
         "cardId": 71,
         "name": "Automatic Account Reviews",
-        "description": "Reviewed for upgrade to unsecured starting at 7 months",
-        "annualValue": 30
+        "description": "Once you establish a positive track record, the deposit is returned and the account becomes an unsecured Discover it Cash Back; Discover no longer publishes a review timeline.",
+        "annualValue": null
       },
       {
         "id": 249,
@@ -6200,8 +7327,22 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.discover.com/credit-cards/secured/",
     "imageSourceUrl": "https://www.discover.com/credit-cards/secured/",
-    "lastReviewedAt": "2026-05-21",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review",
+    "categoryChoices": [
+      {
+        "categoryId": 258,
+        "mode": "rotating-calendar",
+        "picks": 1,
+        "resets": "quarter",
+        "options": [
+          "Q1 2026: Grocery stores, wholesale clubs and select streaming services",
+          "Q2 2026: Restaurants and home improvement stores",
+          "Q3 2026: Gas stations, transportation (transit) and drugstores",
+          "Q4 2026: Restaurants, entertainment and utilities (incl. phone, internet and cable)"
+        ]
+      }
+    ]
   },
   {
     "id": 72,
@@ -6236,8 +7377,9 @@ export const BUILTIN_CARDS = [
         "id": 250,
         "cardId": 72,
         "name": "21-Month 0% Intro APR",
-        "description": "On purchases and balance transfers for 21 months",
-        "annualValue": 300
+        "description": "0% intro APR for 21 months from account opening on purchases and on balance transfers made within the first 120 days.",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 251,
@@ -6259,7 +7401,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.wellsfargo.com/reflect-visa-credit-card/",
     "imageSourceUrl": "https://creditcards.wellsfargo.com/reflect-visa-credit-card/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6331,37 +7473,47 @@ export const BUILTIN_CARDS = [
         "id": 302,
         "cardId": 73,
         "name": "Anniversary Bonus",
-        "description": "30,000 Choice Privileges points each account anniversary year when requirements are met.",
-        "annualValue": 180
+        "description": "30,000 Choice Privileges points every account anniversary while the account is open, current and not in default.",
+        "annualValue": 180,
+        "period": "cardmember-year"
       },
       {
         "id": 303,
         "cardId": 73,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Statement credit up to $120 for eligible trusted traveler program application fee.",
-        "annualValue": 120
+        "description": "One statement credit up to $120 every four years toward a Global Entry or TSA PreCheck application or renewal fee.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 304,
         "cardId": 73,
         "name": "No Foreign Transaction Fee",
         "description": "No foreign currency conversion/foreign transaction fee.",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 305,
         "cardId": 73,
         "name": "Cell Phone Protection",
         "description": "Eligible cell phone protection when the monthly bill is paid with the card.",
-        "annualValue": 100
+        "annualValue": null
+      },
+      {
+        "id": 847,
+        "cardId": 73,
+        "name": "Automatic Platinum Elite Status + Elite Qualifying Nights",
+        "description": "Choice Privileges Platinum Elite status (25% bonus points on qualifying Choice stays), plus 10 Elite Qualifying Nights within 14 days of account opening and 10 more each January 1 while the account is open.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.wellsfargo.com/credit-cards/choice-select/terms/?FPID=0123CBIXP10000&app_source=WELLS_FARGO_COM",
+    "sourceUrl": "https://creditcards.wellsfargo.com/choice-hotels-privileges-select-mastercard/",
     "imageSourceUrl": "https://www.cardsandpoints.com/tsa-precheck-credits/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6419,8 +7571,9 @@ export const BUILTIN_CARDS = [
         "id": 256,
         "cardId": 74,
         "name": "0% Intro APR for 15 Months",
-        "description": "On purchases and balance transfers",
-        "annualValue": 150
+        "description": "0% intro APR for the first 15 months after account opening on balances transferred within the first 90 days. No intro APR on purchases.",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 257,
@@ -6435,7 +7588,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-rewards-visa-credit-card.html",
     "imageSourceUrl": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-rewards-visa-credit-card.html",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6448,7 +7601,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 150,
     "color": "linear-gradient(135deg, #008a3e, #45b07a)",
     "logoUrl": "https://logo.clearbit.com/td.com",
-    "cardImageUrl": "/card-images/75-td-double-up-credit-card.png",
+    "cardImageUrl": "/card-images/75-td-double-up-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "TD Cash Rewards",
     "rewardUnitName": "Cash Back",
@@ -6471,15 +7624,16 @@ export const BUILTIN_CARDS = [
         "id": 258,
         "cardId": 75,
         "name": "2% Cash Back Everywhere",
-        "description": "Flat 2% back when redeemed into a TD account",
-        "annualValue": 200
+        "description": "Unlimited 2% Cash Back on all eligible purchases, with no rotating categories, caps or limits.",
+        "annualValue": null
       },
       {
         "id": 259,
         "cardId": 75,
         "name": "0% Intro APR for 15 Billing Cycles",
-        "description": "On balance transfers",
-        "annualValue": 150
+        "description": "0% intro APR on balance transfers for the first 15 billing cycles when transferred within 90 days of account opening.",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 260,
@@ -6494,7 +7648,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/double-up",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/double-up",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6507,7 +7661,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #cc0000, #ff1f1f)",
     "logoUrl": "https://logo.clearbit.com/target.com",
-    "cardImageUrl": "/card-images/target-circle-credit-card.png",
+    "cardImageUrl": "/card-images/target-circle-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "Target Circle discount",
     "rewardUnitName": "Discount",
@@ -6545,14 +7699,14 @@ export const BUILTIN_CARDS = [
         "cardId": 76,
         "name": "Free Shipping at Target.com",
         "description": "Most items ship free",
-        "annualValue": 60
+        "annualValue": null
       },
       {
         "id": 263,
         "cardId": 76,
         "name": "Extra 30 Days for Returns",
         "description": "Beyond Target's normal return window",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6626,14 +7780,14 @@ export const BUILTIN_CARDS = [
         "cardId": 77,
         "name": "Special Financing on Big Purchases",
         "description": "Available on qualifying Walmart purchases",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 265,
         "cardId": 77,
         "name": "No Foreign Transaction Fees",
         "description": "On purchases made abroad",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6677,7 +7831,7 @@ export const BUILTIN_CARDS = [
         "id": 279,
         "cardId": 78,
         "category": "Other",
-        "rate": 0.02,
+        "rate": 0.015,
         "isDefault": true
       }
     ],
@@ -6694,14 +7848,14 @@ export const BUILTIN_CARDS = [
         "cardId": 78,
         "name": "No Rewards Caps",
         "description": "Earn unlimited cash back",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 268,
         "cardId": 78,
         "name": "Cash Back to PayPal Balance",
         "description": "Redeem rewards directly to your PayPal account",
-        "annualValue": 30
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6709,7 +7863,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://pep.paypal.com/us/digital-wallet/manage-money/paypal-cashback-mastercard",
     "imageSourceUrl": "https://www.uscreditcardguide.com/paypal-cashback-credit-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6753,21 +7907,21 @@ export const BUILTIN_CARDS = [
         "cardId": 79,
         "name": "Travel Insurance",
         "description": "Includes several travel insurance coverages when requirements are met.",
-        "annualValue": 250
+        "annualValue": null
       },
       {
         "id": 307,
         "cardId": 79,
         "name": "Mobile Device Insurance",
         "description": "Coverage for eligible mobile devices when requirements are met.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 308,
         "cardId": 79,
         "name": "Visa Infinite Benefits",
         "description": "Access to eligible Visa Infinite dining, hotel and travel benefits.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6775,7 +7929,7 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html",
     "imageSourceUrl": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -6795,27 +7949,23 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.4,
     "rewardValuationDescription": "Aeroplan value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "1.5 points per $1 on gas, EV charging, groceries and purchases made directly with Air Canada (including Air Canada Vacations) applies to a combined $80,000 of those purchases per year; after that they earn 1 point per $1.",
+      "Hyatt: primary cardholders earn 1.5 Aeroplan points per $1 CAD at participating Hyatt hotels and resorts from 2026-07-15 to 2029-07-15, on up to $80,000 of Hyatt spend per year (a separate cap); these points replace the base rate. The extra 1 World of Hyatt point per $1 (after linking accounts) is not modelled.",
+      "The annual fee is rebated every year with a TD All-Inclusive Banking Plan."
     ],
     "cashbackCategories": [
       {
         "id": 332,
         "cardId": 80,
-        "category": "Air Canada",
+        "category": "Air Canada and Air Canada Vacations, bought direct (up to $80,000/year combined with gas, EV charging and groceries)",
         "rate": 0.015,
         "isDefault": false
       },
       {
         "id": 333,
         "cardId": 80,
-        "category": "Groceries",
-        "rate": 0.015,
-        "isDefault": false
-      },
-      {
-        "id": 334,
-        "cardId": 80,
-        "category": "Gas",
+        "category": "Gas, EV charging and groceries (up to $80,000/year combined)",
         "rate": 0.015,
         "isDefault": false
       },
@@ -6825,6 +7975,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9196,
+        "cardId": 80,
+        "category": "Hyatt hotels and resorts (up to $80,000/year)",
+        "rate": 0.015,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -6833,21 +7990,23 @@ export const BUILTIN_CARDS = [
         "cardId": 80,
         "name": "First Checked Bag",
         "description": "Free first checked bag on eligible Air Canada itineraries.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 310,
         "cardId": 80,
         "name": "NEXUS Credit",
-        "description": "Up to $100 NEXUS application fee rebate every 48 months.",
-        "annualValue": 100
+        "description": "Statement credit of up to $100 CAD toward a NEXUS application fee once every 48 months for each eligible cardholder (primary and additional).",
+        "annualValue": 25,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 311,
         "cardId": 80,
         "name": "Travel Insurance",
         "description": "Includes eligible travel medical, trip interruption/cancellation and baggage coverages.",
-        "annualValue": 250
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6855,12 +8014,12 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-card",
     "imageSourceUrl": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-card",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 81,
-    "name": "Scotiabank Passport Visa Infinite",
+    "name": "Scotiabank Passport Visa Infinite +",
     "issuer": "Scotiabank",
     "network": "Visa",
     "annualFee": 150,
@@ -6875,35 +8034,26 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Scene+ Rewards value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "3 Scene+ points per $1 at Sobeys-family grocers (Sobeys, Safeway, IGA, Foodland and participating Co-ops, FreshCo, Chalo! FreshCo, Thrifty Foods, Rachelle Béry, Les Marchés, Voilà); 2 points per $1 at other grocery stores and on dining, entertainment and daily transit including rideshare; 1 point per $1 otherwise.",
+      "The 3x and 2x rates together apply to the first $50,000 of purchases each calendar year (January 1 to December 31); after that everything earns 1 point per $1. The app tracks the Sobeys row and the 2x row against the cap separately.",
+      "Hotels and car rentals booked through Scene+ Travel (powered by Expedia) earn an extra 3 points per $1 on top of the 1-point base (4 in total).",
+      "An annual bonus starting at 10,000 Scene+ points is paid once $40,000 of eligible purchases is made in an account year (not modelled).",
+      "No foreign transaction fees. The $150 fee is rebated with a Scotiabank Ultimate Package; Preferred Package holders get a $40 rebate after $15,000 of qualifying purchases."
     ],
     "cashbackCategories": [
       {
         "id": 336,
         "cardId": 81,
-        "category": "Groceries",
+        "category": "Sobeys, Safeway, IGA, Foodland, FreshCo, Thrifty Foods and other Sobeys-family stores (up to $50,000/year combined)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 337,
         "cardId": 81,
-        "category": "Dining",
-        "rate": 0.03,
-        "isDefault": false
-      },
-      {
-        "id": 338,
-        "cardId": 81,
-        "category": "Entertainment",
-        "rate": 0.03,
-        "isDefault": false
-      },
-      {
-        "id": 339,
-        "cardId": 81,
-        "category": "Daily transit",
-        "rate": 0.03,
+        "category": "Other groceries, dining, entertainment, transit and rideshare (up to $50,000/year combined)",
+        "rate": 0.02,
         "isDefault": false
       },
       {
@@ -6912,6 +8062,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9197,
+        "cardId": 81,
+        "category": "Hotels and car rentals booked through Scene+ Travel (Expedia)",
+        "rate": 0.04,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -6920,21 +8077,22 @@ export const BUILTIN_CARDS = [
         "cardId": 81,
         "name": "No Foreign Transaction Fees",
         "description": "No foreign transaction fees on purchases in foreign currencies.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 313,
         "cardId": 81,
         "name": "Airport Lounge Visits",
-        "description": "Six complimentary airport lounge visits per year through Visa Airport Companion.",
-        "annualValue": 250
+        "description": "Six complimentary lounge visits per membership year through the Visa Airport Companion Program (DragonPass), usable by the cardholder or accompanying guests; extra visits cost US$32.",
+        "annualValue": 250,
+        "period": "cardmember-year"
       },
       {
         "id": 314,
         "cardId": 81,
         "name": "Travel Insurance",
         "description": "Includes eligible emergency medical and trip coverage.",
-        "annualValue": 250
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -6942,7 +8100,7 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-card.html",
     "imageSourceUrl": "https://smarter.loans/credit-cards/scotiabank-passport-visa-infinite-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7014,14 +8172,14 @@ export const BUILTIN_CARDS = [
         "cardId": 82,
         "name": "Visa Infinite Benefits",
         "description": "Eligible Visa Infinite travel, dining and hotel benefits.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 317,
         "cardId": 82,
         "name": "Travel Insurance",
         "description": "Travel and purchase insurance coverages when requirements are met.",
-        "annualValue": 200
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -7042,7 +8200,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 600,
     "color": "linear-gradient(135deg, #3b0d2f, #8a1f62)",
     "logoUrl": "https://logo.clearbit.com/cibc.com",
-    "cardImageUrl": "/card-images/83-cibc-aventura-visa-infinite.png",
+    "cardImageUrl": "/card-images/83-cibc-aventura-visa-infinite.webp",
     "rewardType": "points",
     "rewardProgram": "CIBC Aventura Rewards",
     "rewardUnitName": "Aventura Points",
@@ -7050,34 +8208,22 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "CIBC Aventura Rewards value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "1.5 points per $1 on gas, EV charging (MCC 5552), grocery and drugstore purchases applies only until $80,000 of net card purchases of any kind is reached in the year; the limit resets after the December statement. The app approximates this by capping the bonus categories themselves at $80,000.",
+      "2 points per $1 applies only to travel bought through the CIBC Rewards Centre (CIBC by Expedia); other travel earns 1 point per $1."
     ],
     "cashbackCategories": [
       {
         "id": 346,
         "cardId": 83,
-        "category": "Travel via CIBC Rewards Centre",
+        "category": "Travel booked through CIBC Rewards Centre (CIBC by Expedia)",
         "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 347,
-        "cardId": 83,
-        "category": "Gas",
-        "rate": 0.015,
         "isDefault": false
       },
       {
         "id": 348,
         "cardId": 83,
-        "category": "Groceries",
-        "rate": 0.015,
-        "isDefault": false
-      },
-      {
-        "id": 349,
-        "cardId": 83,
-        "category": "Drugstores",
+        "category": "Gas, EV charging, groceries and drugstores (up to $80,000/year combined)",
         "rate": 0.015,
         "isDefault": false
       },
@@ -7094,22 +8240,34 @@ export const BUILTIN_CARDS = [
         "id": 318,
         "cardId": 83,
         "name": "Airport Lounge Visits",
-        "description": "Four complimentary Visa Airport Companion lounge visits.",
-        "annualValue": 200
+        "description": "Four complimentary Visa Airport Companion (DragonPass) lounge visits per membership year for the primary cardholder and guests; CIBC values them at up to $285 a year.",
+        "annualValue": 285,
+        "period": "cardmember-year"
       },
       {
         "id": 319,
         "cardId": 83,
         "name": "NEXUS Rebate",
-        "description": "NEXUS application fee rebate when requirements are met.",
-        "annualValue": 160
+        "description": "Statement credit for one NEXUS application fee every four years (CIBC values it at $160; the credit is capped at $200).",
+        "annualValue": 40,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 320,
         "cardId": 83,
         "name": "Annual Fee Rebate Offer",
-        "description": "First-year annual fee rebate may be available as part of the current offer.",
-        "annualValue": 139
+        "description": "One-time first-year annual fee rebate under the current offer: $139 for the primary cardholder and $50 each for up to three authorized users.",
+        "annualValue": 139,
+        "period": "one-time"
+      },
+      {
+        "id": 976,
+        "cardId": 83,
+        "name": "Skip+ Membership",
+        "description": "Free Skip+ membership ($0 delivery fees and discounted service fees on eligible orders) plus a $10 monthly voucher while an eligible CIBC card is linked to your Skip account. CIBC values the first year at $110.",
+        "annualValue": 110,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -7117,7 +8275,7 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
     "imageSourceUrl": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7137,13 +8295,17 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Membership Rewards redemption value varies by redemption path; this app uses a conservative 1.00 cent per point estimate for annual-fee progress and keeps earned points visible separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "5 points per $1 at restaurants, coffee shops, bars, stand-alone grocery stores and food or grocery delivery in Canada applies to a combined $2,500 of net purchases per calendar month (resets on the 1st); after that these earn 1 point per $1.",
+      "3 points per $1 on eligible streaming subscriptions in Canada (select providers listed at americanexpress.ca/streaming); 2 points per $1 at stand-alone gas stations and on local commuter transit, taxis and ride sharing in Canada.",
+      "1 bonus point per $1 on hotel and car rental bookings made through American Express Travel Online (The Hotel Collection excluded).",
+      "The fee is $15.99 a month ($191.88 a year) outside Quebec; Quebec residents pay $191.88 annually. Foreign-currency purchases carry a 2.5% conversion charge."
     ],
     "cashbackCategories": [
       {
         "id": 351,
         "cardId": 84,
-        "category": "Eats and drinks in Canada",
+        "category": "Eats and drinks in Canada, including groceries and food delivery (up to $2,500/month combined)",
         "rate": 0.05,
         "isDefault": false
       },
@@ -7167,29 +8329,30 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9198,
+        "cardId": 84,
+        "category": "Hotels and car rentals booked through American Express Travel Online",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
-        "id": 321,
-        "cardId": 84,
-        "name": "High Food Earn Rate",
-        "description": "5 Membership Rewards points per $1 on eligible eats and drinks in Canada up to the monthly cap.",
-        "annualValue": 300
-      },
-      {
         "id": 322,
         "cardId": 84,
         "name": "No Supplementary Card Fee",
-        "description": "No annual fee for supplementary cards.",
-        "annualValue": 50
+        "description": "No annual fee for additional Cobalt cards.",
+        "annualValue": null
       },
       {
-        "id": 323,
+        "id": 977,
         "cardId": 84,
-        "name": "Flexible Membership Rewards",
-        "description": "Redeem Membership Rewards points for travel, statement credits and eligible partners.",
-        "annualValue": 150
+        "name": "Instacart Statement Credits",
+        "description": "Up to $5 back each month (maximum $60 in a 12-month period) on Instacart orders of $10 or more in Canada; enrolment required; offer runs until 2027-12-31.",
+        "annualValue": 60,
+        "period": "monthly"
       }
     ],
     "inWallet": false,
@@ -7197,7 +8360,7 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
     "imageSourceUrl": "https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7217,20 +8380,24 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Since 2026-08-04 the accelerated rates apply only to the first $61,000 spent on the account in each annual period (reset on the account-opening or product-switch anniversary); after that everything earns the 1.5% base until the reset. The app caps the bonus rows at a combined $61,000 per calendar year, which is looser than the real limit because the real limit counts all card spend.",
+      "From 2026-11-18, eligible Rogers purchases earn 5% for every cardholder, within the same annual limit: Rogers, Fido, Shaw and Comwave bill payments (not in-store), online Rogers and Fido purchases, TSC, direct Sportsnet+, CityTV+ and Discovery+ subscriptions, and the Jays Shop at Rogers Centre. The 1.5x redemption bonus on Rogers purchases ends; last redemptions 2026-11-17.",
+      "2% on non-U.S.-dollar purchases requires at least one eligible Rogers, Fido, Shaw or Comwave service; without one the rate is 1.5%.",
+      "From 2027-01-12 the five annual Roam Like Home days are replaced by a $75 annual roaming credit (reimbursement request required)."
     ],
     "cashbackCategories": [
       {
         "id": 355,
         "cardId": 85,
-        "category": "U.S. dollar purchases",
+        "category": "U.S. dollar purchases (up to $61,000/year combined)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 356,
         "cardId": 85,
-        "category": "Non-U.S. purchases with eligible Rogers service",
+        "category": "Non-U.S. purchases with eligible Rogers service (up to $61,000/year combined)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -7240,37 +8407,30 @@ export const BUILTIN_CARDS = [
         "category": "Other non-U.S. purchases",
         "rate": 0.015,
         "isDefault": true
+      },
+      {
+        "id": 9199,
+        "cardId": 85,
+        "category": "Eligible Rogers purchases: Rogers, Fido, Shaw and Comwave account payments, rogers.com, fido.ca and TSC (up to $61,000/year combined)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
-        "id": 324,
-        "cardId": 85,
-        "name": "Rogers Redemption Bonus",
-        "description": "Get 1.5x more value when redeeming cash back toward eligible Rogers, Fido or Shaw purchases.",
-        "annualValue": 100
-      },
-      {
         "id": 325,
         "cardId": 85,
         "name": "Roam Like Home Days",
-        "description": "Five Roam Like Home days at no cost each year for eligible Rogers mobile plans.",
+        "description": "Five Roam Like Home days at no cost each year for eligible Rogers mobile plans (Rogers values them at up to $90). Replaced on 2027-01-12 by a $75 annual roaming credit.",
         "annualValue": 90
-      },
-      {
-        "id": 326,
-        "cardId": 85,
-        "name": "No Annual Fee",
-        "description": "No annual fee for the Rogers Red World Elite Mastercard.",
-        "annualValue": 120
       }
     ],
     "inWallet": false,
     "market": "Canada",
     "currency": "CAD",
-    "sourceUrl": "https://www.rogersbank.com/en/rogers_red_worldelite_mastercard_details/",
+    "sourceUrl": "https://www.rogersbank.com/en/help_centre_answers/upcoming_account_changes",
     "imageSourceUrl": "https://www.rogersbank.com/en/rogers_worldelite_mastercard_details",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7283,48 +8443,51 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 245,
     "color": "linear-gradient(135deg, #143c70, #d71920)",
     "logoUrl": "https://logo.clearbit.com/mbna.ca",
-    "cardImageUrl": "/card-images/86-mbna-rewards-world-elite-mastercard.png",
+    "cardImageUrl": "/card-images/86-mbna-rewards-world-elite-mastercard.webp",
     "rewardType": "points",
     "rewardProgram": "MBNA Rewards",
     "rewardUnitName": "MBNA Rewards Points",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "MBNA Rewards value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "5 points per $1 on eligible restaurant, grocery, digital media, membership and household utility purchases until $50,000 is spent in that category in the calendar year; each category has its own $50,000 limit, then 1 point per $1.",
+      "MBNA's 'digital media' category is shown here as streaming, music, e-books, games and apps; MBNA classifies it by merchant code.",
+      "Birthday bonus: each year, 10% of the points earned in the 12 months before the primary cardholder's birthday month, up to 15,000 points."
     ],
     "cashbackCategories": [
       {
         "id": 358,
         "cardId": 86,
-        "category": "Restaurants",
+        "category": "Restaurants (up to $50,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 359,
         "cardId": 86,
-        "category": "Groceries",
+        "category": "Groceries (up to $50,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 360,
         "cardId": 86,
-        "category": "Digital media",
+        "category": "Streaming, music, e-books, games and apps (up to $50,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 361,
         "cardId": 86,
-        "category": "Memberships",
+        "category": "Memberships (up to $50,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 362,
         "cardId": 86,
-        "category": "Household utilities",
+        "category": "Household utilities (up to $50,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
@@ -7342,7 +8505,8 @@ export const BUILTIN_CARDS = [
         "cardId": 86,
         "name": "Birthday Bonus Points",
         "description": "Annual birthday bonus equal to 10% of points earned in the prior 12 months, up to 15,000 points.",
-        "annualValue": 100
+        "annualValue": null,
+        "period": "calendar-year"
       },
       {
         "id": 328,
@@ -7356,7 +8520,7 @@ export const BUILTIN_CARDS = [
         "cardId": 86,
         "name": "Mobile Device Insurance",
         "description": "Eligible mobile device insurance when requirements are met.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -7364,7 +8528,7 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.mbna.ca/en/credit-cards/rewards/mbna-rewards-world-elite-mastercard",
     "imageSourceUrl": "https://www.mbna.ca/en/credit-cards/rewards/mbna-rewards-world-elite-mastercard",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7377,34 +8541,37 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 350,
     "color": "linear-gradient(135deg, #111827, #d71920)",
     "logoUrl": "https://logo.clearbit.com/nbc.ca",
-    "cardImageUrl": "/card-images/87-national-bank-world-elite-mastercard.png",
+    "cardImageUrl": "/card-images/87-national-bank-world-elite-mastercard.webp",
     "rewardType": "points",
     "rewardProgram": "A la carte Rewards",
     "rewardUnitName": "Points",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "A la carte Rewards value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "5 points per $1 on groceries and restaurants applies until $2,500 of gross purchases of any kind is charged to the account in the month; after that groceries and restaurants earn 2 points per $1. The app caps the two categories at a combined $2,500 a month and then falls back to 1 point, so it is approximate in both directions.",
+      "2 points per $1 on gas and EV charging, on recurring bill payments automatically charged by the merchant, and on travel booked through the À la carte Travel agency on the À la carte Rewards site.",
+      "Travel expense refund: up to $150 per calendar year for airport parking, baggage fees, seat selection, airport lounge access and airline ticket upgrades charged to the card (primary cardholder; claim within 60 days)."
     ],
     "cashbackCategories": [
       {
         "id": 364,
         "cardId": 87,
-        "category": "Groceries",
+        "category": "Groceries (up to $2,500/month combined)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 365,
         "cardId": 87,
-        "category": "Restaurants",
+        "category": "Restaurants (up to $2,500/month combined)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 366,
         "cardId": 87,
-        "category": "Gas",
+        "category": "Gas and EV charging",
         "rate": 0.02,
         "isDefault": false
       },
@@ -7421,6 +8588,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9200,
+        "cardId": 87,
+        "category": "Travel booked online through the À la carte Travel agency",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -7428,22 +8602,23 @@ export const BUILTIN_CARDS = [
         "id": 330,
         "cardId": 87,
         "name": "Travel Expense Reimbursement",
-        "description": "Up to $150 annual travel expense reimbursement for eligible expenses.",
-        "annualValue": 150
+        "description": "Refund of up to $150 between January 1 and December 31 each year for airport parking, baggage fees, seat selection, airport lounge access and airline ticket upgrades charged to the card.",
+        "annualValue": 150,
+        "period": "calendar-year"
       },
       {
         "id": 331,
         "cardId": 87,
         "name": "Airport Lounge Access",
-        "description": "World Elite lounge access benefits through Mastercard Travel Pass / DragonPass where eligible.",
-        "annualValue": 200
+        "description": "Free, unlimited access to the National Bank Lounge at Montréal-Trudeau (YUL) with one guest and two children aged 12 or under; the lounge is temporarily relocated during renovations from 2026-10-05.",
+        "annualValue": null
       },
       {
         "id": 332,
         "cardId": 87,
         "name": "Travel Insurance",
         "description": "Comprehensive travel insurance benefits when requirements are met.",
-        "annualValue": 300
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -7451,12 +8626,12 @@ export const BUILTIN_CARDS = [
     "currency": "CAD",
     "sourceUrl": "https://www.nbc.ca/personal/mastercard-credit-cards/world-elite.html",
     "imageSourceUrl": "https://www.nbc.ca/personal/mastercard-credit-cards/world-elite.html",
-    "lastReviewedAt": "2026-05-17",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 88,
-    "name": "American Express Green Card",
+    "name": "American Express Classic Green Card",
     "issuer": "American Express",
     "network": "Amex",
     "annualFee": 150,
@@ -7464,7 +8639,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #244234, #7fb28b)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/88-american-express-green-card.avif",
+    "cardImageUrl": "/card-images/88-american-express-green-card.webp",
     "rewardType": "points",
     "rewardProgram": "American Express Membership Rewards",
     "rewardUnitName": "Membership Rewards Points",
@@ -7472,7 +8647,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Membership Rewards redemption value varies by redemption path; this app uses a conservative 1.00 cent per point estimate for annual-fee progress and keeps earned points visible separately.",
     "rewardRuleNotes": [
       "Closed to new applicants since 2026-07-23, when American Express removed the product page. Existing cardholders keep the card.",
-      "Availability confirmed from secondary reporting only — American Express has published no statement."
+      "Renamed from American Express Green Card to American Express Classic Green Card on 2026-08-20; cardholder notices said the fee, rewards and benefits did not change.",
+      "Earn rates have not been re-verified against a live product page since 2026-07-23."
     ],
     "cashbackCategories": [
       {
@@ -7509,23 +8685,24 @@ export const BUILTIN_CARDS = [
         "id": 333,
         "cardId": 88,
         "name": "CLEAR Plus Credit",
-        "description": "Up to $209 in annual statement credits for an eligible CLEAR Plus membership.",
-        "annualValue": 209
+        "description": "Up to $219 in statement credits per calendar year for an annual CLEAR+ membership paid with the card.",
+        "annualValue": 219,
+        "period": "calendar-year"
       },
       {
         "id": 334,
         "cardId": 88,
         "name": "Broad Travel Rewards",
         "description": "Earns elevated Membership Rewards points across travel, transit, and restaurants.",
-        "annualValue": 120
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.doctorofcredit.com/american-express-removes-green-card-from-website/",
+    "sourceUrl": "https://www.americanexpress.com/en-us/company/legal/cardmember-agreements/",
     "imageSourceUrl": "https://www.americanexpress.com/en-us/account/get-started/green/uncover-your-benefits",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "availability": "closed-to-new-applicants",
     "availabilityChangedAt": "2026-07-23"
@@ -7540,7 +8717,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0b4f8a, #5ec8e5)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/89-american-express-blue-business-cash.avif",
+    "cardImageUrl": "/card-images/89-american-express-blue-business-cash.webp",
     "rewardType": "cashback",
     "rewardProgram": "American Express Cash Back",
     "rewardUnitName": "Cash Back",
@@ -7600,7 +8777,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f172a, #4593d3)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/90-american-express-blue-business-plus.avif",
+    "cardImageUrl": "/card-images/90-american-express-blue-business-plus.webp",
     "rewardType": "points",
     "rewardProgram": "American Express Membership Rewards",
     "rewardUnitName": "Membership Rewards Points",
@@ -7676,6 +8853,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.015,
         "isDefault": true
+      },
+      {
+        "id": 9139,
+        "cardId": 91,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -7699,7 +8883,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/rise",
     "imageSourceUrl": "https://creditcards.chase.com/cash-back-credit-cards/freedom/rise",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7736,7 +8920,7 @@ export const BUILTIN_CARDS = [
         "cardId": 92,
         "name": "Intro APR Focus",
         "description": "Designed for low intro APR purchases and balance transfers rather than rewards.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 342,
@@ -7795,6 +8979,13 @@ export const BUILTIN_CARDS = [
         "category": "Lyft through 9/30/2027",
         "rate": 0.05,
         "isDefault": false
+      },
+      {
+        "id": 9140,
+        "cardId": 93,
+        "category": "Chase Travel",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -7803,14 +8994,21 @@ export const BUILTIN_CARDS = [
         "cardId": 93,
         "name": "High Base Business Rewards",
         "description": "Strong uncapped cash back on business purchases, with a higher rate for purchases of $5,000 or more.",
-        "annualValue": 300
+        "annualValue": null
       },
       {
         "id": 344,
         "cardId": 93,
         "name": "Pay in Full with Flex Option",
         "description": "Pay in Full card with Flex for Business APR access on eligible balances.",
-        "annualValue": 100
+        "annualValue": null
+      },
+      {
+        "id": 784,
+        "cardId": 93,
+        "name": "Cell Phone Protection",
+        "description": "Up to $1,000 per claim against covered theft or damage for phones on a monthly bill paid with the card; up to 3 claims per 12 months with a $100 deductible.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -7818,7 +9016,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/premier",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/ink/premier",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7900,11 +9098,60 @@ export const BUILTIN_CARDS = [
         "annualValue": 160
       },
       {
-        "id": 347,
+        "id": 785,
         "cardId": 94,
-        "name": "Partner Credits",
-        "description": "Issuer advertises over $600 in annual partner credits across United travel, hotels, rideshare, car rental, Instacart, JSX, and FareLock.",
-        "annualValue": 600
+        "name": "$125 United Travel Credit",
+        "description": "$125 in United TravelBank cash after 5 United flight purchases of $100 or more in a calendar year.",
+        "annualValue": 125,
+        "period": "calendar-year"
+      },
+      {
+        "id": 786,
+        "cardId": 94,
+        "name": "United Hotels Credit",
+        "description": "$50 back on each of the first two prepaid United Hotels stays per account anniversary year (up to $100).",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 787,
+        "cardId": 94,
+        "name": "Rideshare Credit",
+        "description": "Up to $8 back each month January-November and $12 in December on rideshare purchases (up to $100 per calendar year). Yearly opt-in required.",
+        "annualValue": 100,
+        "period": "monthly"
+      },
+      {
+        "id": 788,
+        "cardId": 94,
+        "name": "Avis/Budget Travel Credit",
+        "description": "$25 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $50).",
+        "annualValue": 50,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 789,
+        "cardId": 94,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 790,
+        "cardId": 94,
+        "name": "JSX Credit",
+        "description": "Up to $100 back each account anniversary year on flights booked directly with JSX.",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 791,
+        "cardId": 94,
+        "name": "FareLock Credit",
+        "description": "Up to $25 back each account anniversary year on United FareLock purchases.",
+        "annualValue": 25,
+        "period": "cardmember-year"
       }
     ],
     "inWallet": false,
@@ -7912,7 +9159,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/united/united-business-card",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/united/united-business-card",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -7970,31 +9217,40 @@ export const BUILTIN_CARDS = [
         "id": 348,
         "cardId": 95,
         "name": "Hyatt Statement Credits",
-        "description": "Up to $100 in Hyatt statement credits each anniversary year when requirements are met.",
-        "annualValue": 100
+        "description": "$50 statement credit per qualifying Hyatt purchase of $50 or more, up to 2 times each account anniversary year ($100 total).",
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
         "id": 349,
         "cardId": 95,
         "name": "Discoverist Status",
         "description": "Complimentary World of Hyatt Discoverist status for the primary cardmember and eligible employee cards.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 350,
         "cardId": 95,
         "name": "No Foreign Transaction Fees",
         "description": "No foreign transaction fees on purchases.",
-        "annualValue": 50
+        "annualValue": null
+      },
+      {
+        "id": 792,
+        "cardId": 95,
+        "name": "Tier-Qualifying Night Credits",
+        "description": "5 World of Hyatt tier-qualifying night credits for every $10,000 in purchases each calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt-business",
+    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
-    "lastReviewedAt": "2026-08-06",
-    "dataConfidence": "needs-review",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
     "categoryChoices": [
       {
         "categoryId": 389,
@@ -8076,7 +9332,7 @@ export const BUILTIN_CARDS = [
         "cardId": 96,
         "name": "Seat and Upgrade Benefits",
         "description": "Complimentary Preferred seat selection and Extra Legroom upgrades when available.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 352,
@@ -8086,11 +9342,28 @@ export const BUILTIN_CARDS = [
         "annualValue": 180
       },
       {
-        "id": 353,
+        "id": 793,
         "cardId": 96,
-        "name": "Business Travel Perks",
-        "description": "Includes Southwest-focused business card benefits such as in-flight savings and anniversary value.",
-        "annualValue": 150
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 794,
+        "cardId": 96,
+        "name": "9,000 Anniversary Points",
+        "description": "9,000 bonus points each account anniversary year.",
+        "annualValue": 117,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 795,
+        "cardId": 96,
+        "name": "25% Back on In-Flight Purchases",
+        "description": "25% back as a statement credit on inflight purchases.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8098,7 +9371,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/southwest/performance-business",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/southwest/performance-business",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8157,14 +9430,30 @@ export const BUILTIN_CARDS = [
         "cardId": 97,
         "name": "Southwest Travel Benefits",
         "description": "Free first checked bag, selected seat benefits when available, and boarding benefit.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 355,
         "cardId": 97,
         "name": "6,000 Anniversary Points",
         "description": "6,000 bonus points each year after the cardmember anniversary.",
-        "annualValue": 78
+        "annualValue": 78,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 796,
+        "cardId": 97,
+        "name": "15% Flight Discount Promo Code",
+        "description": "A 15% promo code each cardmember anniversary (excludes Basic fares).",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 797,
+        "cardId": 97,
+        "name": "25% Back on In-Flight Purchases",
+        "description": "25% back as a statement credit on inflight purchases.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8172,7 +9461,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/southwest/premier-business",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/southwest/premier-business",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8185,7 +9474,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 200,
     "color": "linear-gradient(135deg, #0f766e, #7c3aed)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/98-capital-one-ventureone-rewards.avif",
+    "cardImageUrl": "/card-images/98-capital-one-ventureone-rewards.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -8193,14 +9482,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Travel hotels and rental cars; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 401,
         "cardId": 98,
-        "category": "Capital One Travel hotels and rental cars",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -8210,6 +9498,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.0125,
         "isDefault": true
+      },
+      {
+        "id": 9155,
+        "cardId": 98,
+        "category": "Capital One Entertainment purchases (online ticketing platform)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -8225,7 +9520,7 @@ export const BUILTIN_CARDS = [
         "cardId": 98,
         "name": "Capital One Travel Tools",
         "description": "Access to travel booking tools such as price prediction, price drop protection, and price match where eligible.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8233,7 +9528,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/credit-cards/ventureone/",
     "imageSourceUrl": "https://www.capitalone.com/credit-cards/ventureone/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8246,7 +9541,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 1500,
     "color": "linear-gradient(135deg, #0f172a, #1d4ed8)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/99-capital-one-venture-business.avif",
+    "cardImageUrl": "/card-images/99-capital-one-venture-business.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -8254,14 +9549,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Business Travel hotels and rental cars; Other; Business purchases.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 403,
         "cardId": 99,
-        "category": "Capital One Business Travel hotels and rental cars",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -8282,18 +9576,29 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 358,
-        "cardId": 99,
-        "name": "Available Annual Credits",
-        "description": "Issuer advertises available annual credits for eligible travel and business purchases.",
-        "annualValue": 100
-      },
-      {
         "id": 359,
         "cardId": 99,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Statement credit up to $120 for an eligible trusted traveler application fee.",
-        "annualValue": 120
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 835,
+        "cardId": 99,
+        "name": "$50 Annual Capital One Business Travel Credit",
+        "description": "Up to $50 each account year for bookings through Capital One Business Travel; expires on the next account-open anniversary.",
+        "annualValue": 50,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 836,
+        "cardId": 99,
+        "name": "$50 Annual Advertising/Software Statement Credit",
+        "description": "Up to $50 statement credit each account year for purchases at qualifying advertising or software merchants; unused credit expires on the account-open anniversary.",
+        "annualValue": 50,
+        "period": "cardmember-year"
       }
     ],
     "inWallet": false,
@@ -8301,7 +9606,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/venture-business/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/venture-business/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8314,7 +9619,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 1500,
     "color": "linear-gradient(135deg, #0c0f1f, #475569)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/100-capital-one-venture-x-business.avif",
+    "cardImageUrl": "/card-images/100-capital-one-venture-x-business.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -8353,22 +9658,40 @@ export const BUILTIN_CARDS = [
         "id": 360,
         "cardId": 100,
         "name": "$300 Business Travel Credit",
-        "description": "Annual credit for bookings through Capital One Business Travel.",
-        "annualValue": 300
+        "description": "Up to $300 each account year for bookings through Capital One Business Travel; expires the day before the next account-open anniversary.",
+        "annualValue": 300,
+        "period": "cardmember-year"
       },
       {
         "id": 361,
         "cardId": 100,
         "name": "Airport Lounge Access",
-        "description": "Access to Capital One Lounges/Landing and partner lounge networks where eligible.",
-        "annualValue": 450
+        "description": "Capital One Lounge and Landing access plus Priority Pass (enrollment required) for the primary cardholder. Additional cardholders need paid lounge access ($125/year each, up to 4). Complimentary guests (2 per Lounge visit, 1 per Landing visit) only on accounts spending $75,000+ a year.",
+        "annualValue": null
       },
       {
         "id": 362,
         "cardId": 100,
         "name": "10,000 Anniversary Miles",
         "description": "10,000 bonus miles every year starting on the first anniversary.",
-        "annualValue": 100
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 837,
+        "cardId": 100,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 838,
+        "cardId": 100,
+        "name": "Premier Collection Experience Credit",
+        "description": "Up to $100 experience credit per booking on Premier Collection hotels and vacation rentals booked through Capital One Business Travel, plus daily breakfast for two, Wi-Fi, and upgrades / early check-in / late checkout when available.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8376,7 +9699,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/venture-x-business/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/venture-x-business/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8413,14 +9736,14 @@ export const BUILTIN_CARDS = [
         "cardId": 101,
         "name": "No Late Fees",
         "description": "Issuer positions the card around no late fees and no penalty rate.",
-        "annualValue": 50
+        "annualValue": null
       },
       {
         "id": 364,
         "cardId": 101,
         "name": "Low Intro APR",
         "description": "Designed for introductory APR purchases and balance transfers rather than rewards.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8465,14 +9788,14 @@ export const BUILTIN_CARDS = [
         "cardId": 102,
         "name": "Low Intro APR",
         "description": "Focused on low introductory APR purchases and balance transfers.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 366,
         "cardId": 102,
         "name": "FICO Score and ID Protection",
         "description": "Includes free FICO Score access and Mastercard ID Theft Protection.",
-        "annualValue": 40
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8545,22 +9868,25 @@ export const BUILTIN_CARDS = [
         "id": 367,
         "cardId": 103,
         "name": "$300 Annual Hotel Benefit",
-        "description": "Annual hotel benefit for eligible two-night or longer Citi Travel hotel bookings.",
-        "annualValue": 300
+        "description": "Up to $300 off one hotel stay of 2+ nights booked through Citi Travel, once each calendar year.",
+        "annualValue": 300,
+        "period": "calendar-year"
       },
       {
         "id": 368,
         "cardId": 103,
         "name": "$200 Splurge Credit",
-        "description": "Annual statement credits for selected eligible lifestyle brands.",
-        "annualValue": 200
+        "description": "Up to $200 in statement credits each calendar year on up to 2 of: 1stDibs, American Airlines, Best Buy, Future Personal Training and Live Nation (exclusions apply).",
+        "annualValue": 200,
+        "period": "calendar-year"
       },
       {
         "id": 369,
         "cardId": 103,
         "name": "$200 Blacklane Credit",
-        "description": "Annual Blacklane credits split across the first and second half of the year.",
-        "annualValue": 200
+        "description": "Up to $100 in Blacklane credits for January-June and up to $100 for July-December.",
+        "annualValue": 200,
+        "period": "semiannual"
       },
       {
         "id": 370,
@@ -8568,6 +9894,15 @@ export const BUILTIN_CARDS = [
         "name": "Airport Lounge Access",
         "description": "Priority Pass Select plus annual Admirals Club pass access where eligible.",
         "annualValue": 650
+      },
+      {
+        "id": 839,
+        "cardId": 103,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
@@ -8575,7 +9910,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-strata-elite-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citi-strata-elite-credit-card",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8618,15 +9953,16 @@ export const BUILTIN_CARDS = [
         "id": 371,
         "cardId": 104,
         "name": "Preferred Rewards Boost",
-        "description": "Eligible Bank of America Preferred Rewards members can earn higher effective cash back.",
-        "annualValue": 100
+        "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026.",
+        "annualValue": null
       },
       {
         "id": 372,
         "cardId": 104,
         "name": "Low Intro APR",
-        "description": "Introductory APR offer on purchases and eligible balance transfers.",
-        "annualValue": 75
+        "description": "0% intro APR for the first 15 billing cycles on purchases and on balance transfers made within 60 days of account opening.",
+        "annualValue": null,
+        "period": "one-time"
       }
     ],
     "inWallet": false,
@@ -8634,7 +9970,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/unlimited-cash-back-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/unlimited-cash-back-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8670,15 +10006,16 @@ export const BUILTIN_CARDS = [
         "id": 373,
         "cardId": 105,
         "name": "Long Intro APR",
-        "description": "Introductory APR offer for purchases and eligible balance transfers.",
-        "annualValue": 100
+        "description": "0% intro APR for the first 21 billing cycles on purchases and on balance transfers made within 60 days of account opening.",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 374,
         "cardId": 105,
         "name": "No Penalty APR",
         "description": "Paying late will not automatically raise the purchase APR.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8686,7 +10023,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/bankamericard-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/bankamericard-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8736,29 +10073,40 @@ export const BUILTIN_CARDS = [
         "id": 375,
         "cardId": 106,
         "name": "$300 Airline Incidental Credit",
-        "description": "Annual statement credits for qualifying airline incidental purchases.",
-        "annualValue": 300
+        "description": "Up to $300 in Airline Incidental Statement Credits each calendar year for qualifying purchases such as seat upgrades, baggage fees, airline lounge fees and in-flight services.",
+        "annualValue": 300,
+        "period": "calendar-year"
       },
       {
         "id": 376,
         "cardId": 106,
         "name": "$150 Lifestyle Credit",
-        "description": "Annual statement credits for eligible lifestyle convenience purchases.",
-        "annualValue": 150
+        "description": "Up to $150 in statement credits each calendar year for lifestyle conveniences: video streaming, food delivery, fitness subscriptions and rideshare.",
+        "annualValue": 150,
+        "period": "calendar-year"
       },
       {
         "id": 377,
         "cardId": 106,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Statement credit up to $120 every four years for an eligible trusted traveler application fee.",
-        "annualValue": 120
+        "description": "Up to $120 in statement credits toward Global Entry or TSA PreCheck application fees, every four years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 378,
         "cardId": 106,
         "name": "20% Airfare Points Savings",
         "description": "Redeem points for airfare through Bank of America travel channels with 20% savings where eligible.",
-        "annualValue": 150
+        "annualValue": null
+      },
+      {
+        "id": 842,
+        "cardId": 106,
+        "name": "Priority Pass Select Membership",
+        "description": "Up to 4 complimentary Priority Pass Select memberships for airport lounge access.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8766,7 +10114,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-elite-credit-card/",
     "imageSourceUrl": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-elite-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8827,7 +10175,7 @@ export const BUILTIN_CARDS = [
         "cardId": 107,
         "name": "Monthly Choice Category",
         "description": "Choice category can be changed once each calendar month.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8908,15 +10256,16 @@ export const BUILTIN_CARDS = [
         "id": 381,
         "cardId": 108,
         "name": "$50 Airline Statement Credit",
-        "description": "Annual statement credit for eligible airfare purchases.",
-        "annualValue": 50
+        "description": "One $50 statement credit each year for the first airline purchase of at least $50; after year one the 12-month credit period begins the first day of the month after the annual fee is assessed.",
+        "annualValue": 50,
+        "period": "cardmember-year"
       },
       {
         "id": 382,
         "cardId": 108,
         "name": "Travel Protections",
         "description": "Includes travel and purchase protection benefits described in the card guide to benefits.",
-        "annualValue": 150
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -8924,7 +10273,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/",
     "imageSourceUrl": "https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -8968,7 +10317,7 @@ export const BUILTIN_CARDS = [
         "cardId": 109,
         "name": "Cell Phone Protection",
         "description": "Eligible cell phone protection when the monthly phone bill is paid with the card.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 384,
@@ -9058,22 +10407,36 @@ export const BUILTIN_CARDS = [
         "cardId": 110,
         "name": "Cell Phone Protection",
         "description": "Eligible cell phone protection when the monthly phone bill is paid with the card.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 387,
         "cardId": 110,
         "name": "Choice Hotel Rewards",
         "description": "Earns Choice Privileges points for hotel stays and everyday categories.",
-        "annualValue": 80
+        "annualValue": null
+      },
+      {
+        "id": 848,
+        "cardId": 110,
+        "name": "Gold Elite Status + Elite Qualifying Nights",
+        "description": "10 Elite Qualifying Nights each calendar year (within 14 days of account opening, then every January 1), guaranteeing Choice Privileges Gold Elite status and its 10% bonus on qualifying stays.",
+        "annualValue": null
+      },
+      {
+        "id": 849,
+        "cardId": 110,
+        "name": "No Foreign Transaction Fee",
+        "description": "No foreign currency conversion or foreign transaction fee.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.wellsfargo.com/credit-cards/choice/terms/",
+    "sourceUrl": "https://creditcards.wellsfargo.com/choice-hotel-privileges-mastercard/",
     "imageSourceUrl": "https://creditcards.wellsfargo.com/choice-privileges-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9094,13 +10457,14 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
+      "The 4% row is the top Smartly tier ($100,000+ qualifying balance); lower tiers earn 2.5% ($10,000-$49,999) or 3% ($50,000-$99,999). Boosted rates apply to the first $10,000 in eligible net purchases each billing cycle (approximated as a calendar month); everything else earns 2%."
     ],
     "cashbackCategories": [
       {
         "id": 436,
         "cardId": 111,
-        "category": "Relationship-tier purchases",
+        "category": "Smartly Earning Bonus tier, up to 4% total (first $10,000/month)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -9118,7 +10482,7 @@ export const BUILTIN_CARDS = [
         "cardId": 111,
         "name": "Relationship Bonus Tiers",
         "description": "Eligible U.S. Bank Smartly relationship balances can increase cash back on the first eligible spend per billing cycle.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 389,
@@ -9133,7 +10497,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/bank-smartly-visa-signature-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/bank-smartly-visa-signature-credit-card.html",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9192,21 +10556,21 @@ export const BUILTIN_CARDS = [
         "cardId": 112,
         "name": "Quarterly Retailer Choice",
         "description": "Choose two eligible retailers each quarter for elevated cash back on capped spend.",
-        "annualValue": 180
+        "annualValue": null
       },
       {
         "id": 391,
         "cardId": 112,
         "name": "Travel Center Bonus",
         "description": "Elevated cash back on eligible prepaid hotel and car reservations booked in the Rewards Center.",
-        "annualValue": 60
+        "annualValue": null
       },
       {
         "id": 392,
         "cardId": 112,
         "name": "Intro First-Year Fee",
         "description": "Low annual fee structure with first-year intro treatment per issuer terms.",
-        "annualValue": 95
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -9230,13 +10594,14 @@ export const BUILTIN_CARDS = [
     "color": "linear-gradient(135deg, #1f2937, #64748b)",
     "logoUrl": "https://logo.clearbit.com/usbank.com",
     "cardImageUrl": "/card-images/113-u-s-bank-shield-visa.png",
-    "rewardType": null,
-    "rewardProgram": "No ongoing purchase rewards",
-    "rewardUnitName": null,
-    "rewardUnitValueCents": null,
-    "rewardValuationDescription": "This card is modeled as having no ongoing purchase rewards in the current official-product data.",
+    "rewardType": "cashback",
+    "rewardProgram": "U.S. Bank Cash Rewards",
+    "rewardUnitName": "Cash Back",
+    "rewardUnitValueCents": 1,
+    "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "No ongoing rewards are modeled for purchases; use the card for financing/fee features rather than reward optimization."
+      "Only prepaid air, hotel and car reservations booked directly in the U.S. Bank Travel Center earn rewards (4% cash back); all other purchases earn nothing.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
     ],
     "cashbackCategories": [
       {
@@ -9245,6 +10610,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0,
         "isDefault": true
+      },
+      {
+        "id": 9159,
+        "cardId": 113,
+        "category": "Prepaid air, hotel and car reservations in the U.S. Bank Travel Center",
+        "rate": 0.04,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -9252,15 +10624,31 @@ export const BUILTIN_CARDS = [
         "id": 393,
         "cardId": 113,
         "name": "Long Intro APR",
-        "description": "Issuer markets the card for a long introductory APR period on purchases and balance transfers.",
-        "annualValue": 120
+        "description": "0% intro APR on purchases for the first 21 billing cycles; balance transfers made within 60 days of account opening also qualify (5% balance transfer fee, $5 minimum).",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 394,
         "cardId": 113,
         "name": "No Annual Fee Protection Card",
         "description": "No annual fee card with a protection-oriented benefit package.",
-        "annualValue": 50
+        "annualValue": null
+      },
+      {
+        "id": 853,
+        "cardId": 113,
+        "name": "$20 Annual Statement Credit",
+        "description": "Automatic $20 statement credit per 12-month period after 11 consecutive calendar months of purchases, with the account in good standing.",
+        "annualValue": 20,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 854,
+        "cardId": 113,
+        "name": "Cell Phone Protection",
+        "description": "Up to $600 reimbursement if your cell phone is stolen or damaged when you pay your monthly cellular bill with the card; terms and exclusions in the Guide to Benefits.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -9268,7 +10656,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/credit-cards/shield-visa-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/credit-cards/visa-platinum-credit-card.html",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9289,7 +10677,8 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "Gas and EV charging transactions over $200 earn 1%, and discount stores/supercenters and wholesale clubs are excluded from the 3% gas/EV category."
     ],
     "cashbackCategories": [
       {
@@ -9327,7 +10716,7 @@ export const BUILTIN_CARDS = [
         "cardId": 114,
         "name": "Business Category Cash Back",
         "description": "Elevated cash back across common small-business operating categories.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 396,
@@ -9335,6 +10724,14 @@ export const BUILTIN_CARDS = [
         "name": "No Annual Fee",
         "description": "No annual fee and free employee cards.",
         "annualValue": 0
+      },
+      {
+        "id": 855,
+        "cardId": 114,
+        "name": "$100 Annual Software Subscription Credit",
+        "description": "Automatic $100 statement credit per 12-month period after 11 consecutive months of eligible software service purchases made directly with a software provider (e.g. QuickBooks, FreshBooks).",
+        "annualValue": 100,
+        "period": "cardmember-year"
       }
     ],
     "inWallet": false,
@@ -9342,7 +10739,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-triple-cash-back-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-triple-cash-back-credit-card.html",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9351,8 +10748,8 @@ export const BUILTIN_CARDS = [
     "issuer": "U.S. Bank",
     "network": "Visa",
     "annualFee": 95,
-    "signupBonus": "Up to $600 in rewards after $6,000 spend in 120 days",
-    "signupBonusValue": 600,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #0f3b70)",
     "logoUrl": "https://logo.clearbit.com/usbank.com",
     "cardImageUrl": "/card-images/115-u-s-bank-business-leverage-visa-signature.png",
@@ -9362,9 +10759,9 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
+      "Closed to new applicants since approximately 2026-10-11, when U.S. Bank removed the product page. Existing cardholders keep the card and its earning structure.",
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
       "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
-      "Cap or timing language appears in the official earning categories: Travel Center hotels and rental cars; Top two monthly business categories; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
@@ -9396,23 +10793,23 @@ export const BUILTIN_CARDS = [
         "cardId": 115,
         "name": "Automatic Top Categories",
         "description": "Earns elevated points in the top two eligible categories each month automatically.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 398,
         "cardId": 115,
         "name": "No Foreign Transaction Fees",
         "description": "No foreign transaction fees on eligible international inventory, supply, or travel expenses.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-visa-signature-card.html",
+    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html",
     "imageSourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html",
-    "lastReviewedAt": "2026-08-06",
-    "dataConfidence": "official",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review",
     "categoryChoices": [
       {
         "categoryId": 448,
@@ -9441,7 +10838,9 @@ export const BUILTIN_CARDS = [
           "Utility companies"
         ]
       }
-    ]
+    ],
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-10-11"
   },
   {
     "id": 116,
@@ -9453,7 +10852,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 250,
     "color": "linear-gradient(135deg, #0b3b60, #22c55e)",
     "logoUrl": "https://logo.clearbit.com/navyfederal.org",
-    "cardImageUrl": "/card-images/116-navy-federal-cashrewards-plus.avif",
+    "cardImageUrl": "/card-images/116-navy-federal-cashrewards-plus.webp",
     "rewardType": "cashback",
     "rewardProgram": "Navy Federal Cash Back",
     "rewardUnitName": "Cash Back",
@@ -9477,14 +10876,15 @@ export const BUILTIN_CARDS = [
         "cardId": 116,
         "name": "No Annual or Foreign Transaction Fees",
         "description": "No annual fee, balance transfer fee, foreign transaction fee, or cash advance fee per issuer disclosures.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 400,
         "cardId": 116,
         "name": "Balance Transfer Promo",
-        "description": "Promotional balance transfer APR offer may apply to new accounts during the public offer period.",
-        "annualValue": 100
+        "description": "1.99% intro APR for 12 months from account opening on balances transferred from non-Navy Federal cards within 60 days of opening (applications submitted by 2027-01-03); no balance transfer fee. Transferred balances do not earn rewards.",
+        "annualValue": null,
+        "period": "one-time"
       }
     ],
     "inWallet": false,
@@ -9492,7 +10892,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/cash-rewards.html",
     "imageSourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/cash-rewards.html",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9557,7 +10957,7 @@ export const BUILTIN_CARDS = [
         "cardId": 117,
         "name": "Everyday Category Coverage",
         "description": "Broad elevated rewards across dining, supermarkets, gas, and transit.",
-        "annualValue": 180
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -9574,17 +10974,18 @@ export const BUILTIN_CARDS = [
     "issuer": "Navy Federal Credit Union",
     "network": "Visa",
     "annualFee": 49,
-    "signupBonus": "35,000 bonus points after $3,500 spend in 90 days",
-    "signupBonusValue": 350,
+    "signupBonus": null,
+    "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #0ea5e9)",
     "logoUrl": "https://logo.clearbit.com/navyfederal.org",
-    "cardImageUrl": "/card-images/118-navy-federal-visa-signature-flagship-rewards.avif",
+    "cardImageUrl": "/card-images/118-navy-federal-visa-signature-flagship-rewards.webp",
     "rewardType": "points",
     "rewardProgram": "Navy Federal Rewards Points",
     "rewardUnitName": "Points",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Navy Federal Rewards Points value varies by redemption; this app uses an estimated 1.00 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
+      "Closed to new applicants since 2026-09-10, when Navy Federal launched the Flagship Premier Visa Signature ($95 annual fee; 4X travel, 3X dining, 1X other) in its place. Existing Flagship Rewards cardholders can keep the card or switch to Flagship Premier without a new application.",
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
     ],
     "cashbackCategories": [
@@ -9615,17 +11016,21 @@ export const BUILTIN_CARDS = [
         "id": 404,
         "cardId": 118,
         "name": "Global Entry / TSA PreCheck Credit",
-        "description": "Statement credit up to $120 for eligible trusted traveler application fees.",
-        "annualValue": 120
+        "description": "Up to $120 in statement credits toward Global Entry or TSA PreCheck application fees, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/flagship-visa-signature.html",
+    "sourceUrl": "https://www.navyfederal.org/about/press-releases/2026-press-releases/Flagship-Premier-Launch.html",
     "imageSourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/flagship-visa-signature.html",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-09-10"
   },
   {
     "id": 119,
@@ -9637,7 +11042,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f3b60, #facc15)",
     "logoUrl": "https://logo.clearbit.com/navyfederal.org",
-    "cardImageUrl": "/card-images/119-navy-federal-go-rewards.avif",
+    "cardImageUrl": "/card-images/119-navy-federal-go-rewards.webp",
     "rewardType": "points",
     "rewardProgram": "Navy Federal Rewards Points",
     "rewardUnitName": "Points",
@@ -9674,8 +11079,9 @@ export const BUILTIN_CARDS = [
         "id": 405,
         "cardId": 119,
         "name": "Low Intro APR Offer",
-        "description": "Public offer centers on a low introductory purchase APR period.",
-        "annualValue": 60
+        "description": "0.99% intro APR on purchases for 6 months from account opening (applications submitted by 2027-01-03), then the standard variable APR.",
+        "annualValue": null,
+        "period": "one-time"
       },
       {
         "id": 406,
@@ -9690,7 +11096,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/go-rewards.html",
     "imageSourceUrl": "https://www.navyfederal.org/loans-cards/credit-cards/go-rewards.html",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9703,20 +11109,21 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 180,
     "color": "linear-gradient(135deg, #002f6c, #00a3e0)",
     "logoUrl": "https://logo.clearbit.com/wyndhamhotels.com",
-    "cardImageUrl": "/card-images/120-wyndham-rewards-earner-card.png",
+    "cardImageUrl": "/card-images/120-wyndham-rewards-earner-card.webp",
     "rewardType": "points",
     "rewardProgram": "Wyndham Rewards",
     "rewardUnitName": "Points",
     "rewardUnitValueCents": 0.9,
     "rewardValuationDescription": "Wyndham Rewards value varies by redemption; this app uses an estimated 0.90 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "3X dining and grocery exclude Target and Walmart; Vacation Club purchases also earn 3X (down payments earn 1X)."
     ],
     "cashbackCategories": [
       {
         "id": 460,
         "cardId": 120,
-        "category": "Wyndham hotels and gas",
+        "category": "Hotels by Wyndham",
         "rate": 0.05,
         "isDefault": false
       },
@@ -9724,14 +11131,14 @@ export const BUILTIN_CARDS = [
         "id": 461,
         "cardId": 120,
         "category": "Restaurants",
-        "rate": 0.02,
+        "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 462,
         "cardId": 120,
         "category": "Groceries",
-        "rate": 0.02,
+        "rate": 0.03,
         "isDefault": false
       },
       {
@@ -9740,6 +11147,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9163,
+        "cardId": 120,
+        "category": "Gas and EV charging",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -9754,16 +11168,31 @@ export const BUILTIN_CARDS = [
         "id": 408,
         "cardId": 120,
         "name": "Anniversary Bonus",
-        "description": "Earn anniversary bonus points after meeting annual spend requirements.",
-        "annualValue": 45
+        "description": "7,500 bonus points each account anniversary year after $15,000 in eligible purchases.",
+        "annualValue": 45,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 863,
+        "cardId": 120,
+        "name": "10% Off Award Redemptions",
+        "description": "Redeem 10% fewer Wyndham Rewards points for free nights.",
+        "annualValue": null
+      },
+      {
+        "id": 864,
+        "cardId": 120,
+        "name": "No Foreign Transaction Fees",
+        "description": "Foreign transaction fee: 0%.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://corporate.wyndhamhotels.com/news-releases/barclays-and-wyndham-cater-to-road-trippers-and-road-warriors-with-new-wyndham-rewards-earner-cards-first-small-business-card/",
+    "sourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-card/",
     "imageSourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9776,7 +11205,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 270,
     "color": "linear-gradient(135deg, #111827, #00a3e0)",
     "logoUrl": "https://logo.clearbit.com/wyndhamhotels.com",
-    "cardImageUrl": "/card-images/121-wyndham-rewards-earner-business-card.png",
+    "cardImageUrl": "/card-images/121-wyndham-rewards-earner-business-card.webp",
     "rewardType": "points",
     "rewardProgram": "Wyndham Rewards",
     "rewardUnitName": "Points",
@@ -9789,14 +11218,14 @@ export const BUILTIN_CARDS = [
       {
         "id": 464,
         "cardId": 121,
-        "category": "Wyndham hotels and gas",
+        "category": "Hotels by Wyndham",
         "rate": 0.08,
         "isDefault": false
       },
       {
         "id": 465,
         "cardId": 121,
-        "category": "Marketing, advertising, and utilities",
+        "category": "Gas, EV charging, Vacation Club, marketing, advertising, office supplies and shipping",
         "rate": 0.05,
         "isDefault": false
       },
@@ -9827,8 +11256,46 @@ export const BUILTIN_CARDS = [
         "id": 410,
         "cardId": 121,
         "name": "Anniversary Bonus",
-        "description": "Annual bonus points each account anniversary when requirements are met.",
-        "annualValue": 90
+        "description": "15,000 bonus points each account anniversary year after the annual fee is paid.",
+        "annualValue": 90,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 865,
+        "cardId": 121,
+        "name": "Warehouse Club Membership Credit",
+        "description": "Up to $65 statement credit each calendar year on eligible wholesale club memberships or renewals.",
+        "annualValue": 65,
+        "period": "calendar-year"
+      },
+      {
+        "id": 866,
+        "cardId": 121,
+        "name": "Accounting Software Credit",
+        "description": "Up to $50 statement credit each calendar year after qualifying accounting software purchases.",
+        "annualValue": 50,
+        "period": "calendar-year"
+      },
+      {
+        "id": 867,
+        "cardId": 121,
+        "name": "20% Off Award Redemptions",
+        "description": "Redeem 20% fewer Wyndham Rewards points for free nights.",
+        "annualValue": null
+      },
+      {
+        "id": 868,
+        "cardId": 121,
+        "name": "National Car Rental Emerald Club Executive Status",
+        "description": "Complimentary Emerald Club Executive status with National Car Rental.",
+        "annualValue": null
+      },
+      {
+        "id": 869,
+        "cardId": 121,
+        "name": "No Foreign Transaction Fees",
+        "description": "Foreign transaction fee: 0%.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -9836,7 +11303,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
     "imageSourceUrl": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9850,13 +11317,15 @@ export const BUILTIN_CARDS = [
     "color": "linear-gradient(135deg, #4c1d95, #ec4899)",
     "logoUrl": "https://logo.clearbit.com/hawaiianairlines.com",
     "cardImageUrl": "/card-images/122-hawaiian-airlines-business-mastercard.png",
-    "rewardType": "miles",
-    "rewardProgram": "HawaiianMiles",
-    "rewardUnitName": "Miles",
-    "rewardUnitValueCents": 1,
-    "rewardValuationDescription": "HawaiianMiles value varies by itinerary and redemption path; this app uses an estimated 1.00 cents per mile for annual-fee progress while displaying earned miles separately.",
+    "rewardType": "points",
+    "rewardProgram": "Atmos Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.4,
+    "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program."
+      "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program (balances converted 1:1). Existing accounts earn Atmos Rewards points.",
+      "Alaska Airlines and Bank of America have said they are working toward Bank of America issuing all Atmos Rewards co-branded cards; no conversion date for Barclays Hawaiian accounts has been announced.",
+      "Earn rates and benefits below have not been re-verified since the Atmos transition."
     ],
     "cashbackCategories": [
       {
@@ -9894,22 +11363,23 @@ export const BUILTIN_CARDS = [
         "cardId": 122,
         "name": "Companion Discount",
         "description": "One-time 50%-off companion discount for eligible roundtrip coach travel between Hawaii and North America.",
-        "annualValue": 200
+        "annualValue": 200,
+        "period": "one-time"
       },
       {
         "id": 412,
         "cardId": 122,
         "name": "Anniversary Bonus Miles",
         "description": "Opportunity to earn annual anniversary bonus miles based on spend.",
-        "annualValue": 120
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://cards.barclaycardus.com/",
+    "sourceUrl": "https://frequentmiler.com/hawaiian-airlines-cards-issued-by-barclays-still-available-for-now/",
     "imageSourceUrl": "https://www.hawaiianairlines.com/hawaiianmiles2/credit-card-business",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review",
     "availability": "closed-to-new-applicants",
     "availabilityChangedAt": "2025-10-01"
@@ -9924,7 +11394,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #002663, #38bdf8)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/123-hilton-honors-american-express-business.avif",
+    "cardImageUrl": "/card-images/123-hilton-honors-american-express-business.webp",
     "rewardType": "points",
     "rewardProgram": "Hilton Honors",
     "rewardUnitName": "Points",
@@ -9932,7 +11402,7 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Hilton Honors value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hilton stays; Other eligible purchases before cap."
+      "5X on non-Hilton purchases applies to the first $100,000 of eligible purchases each calendar year, then 3X. The app keeps 5X as the default rate and cannot enforce this cap, so spend past $100,000 is overstated."
     ],
     "cashbackCategories": [
       {
@@ -9955,29 +11425,30 @@ export const BUILTIN_CARDS = [
         "id": 413,
         "cardId": 123,
         "name": "$240 Hilton Credit",
-        "description": "Up to $240 back each year on eligible purchases made directly with properties in the Hilton portfolio.",
-        "annualValue": 240
+        "description": "Up to $60 in statement credits each quarter (up to $240 per year) on purchases made directly with a property in the Hilton portfolio.",
+        "annualValue": 240,
+        "period": "quarterly"
       },
       {
         "id": 414,
         "cardId": 123,
         "name": "Hilton Gold Status",
         "description": "Complimentary Hilton Honors Gold status.",
-        "annualValue": 250
+        "annualValue": null
       },
       {
         "id": 415,
         "cardId": 123,
         "name": "Diamond Status Spend Path",
         "description": "Spend-based path to Hilton Honors Diamond status.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 416,
         "cardId": 123,
         "name": "National Executive Status",
         "description": "Complimentary National Car Rental Emerald Club Executive status after enrollment.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -9985,7 +11456,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/hilton-honors/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/hilton-honors/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -9998,7 +11469,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #1f2937, #b45309)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/124-marriott-bonvoy-business-american-express.avif",
+    "cardImageUrl": "/card-images/124-marriott-bonvoy-business-american-express.webp",
     "rewardType": "points",
     "rewardProgram": "Marriott Bonvoy",
     "rewardUnitName": "Points",
@@ -10036,21 +11507,38 @@ export const BUILTIN_CARDS = [
         "cardId": 124,
         "name": "Marriott Room Rate Discount",
         "description": "Eligible 7% discount on bookings through qualifying Marriott channels under the Amex Business Card Rate.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 418,
         "cardId": 124,
         "name": "Marriott Gold Elite Status",
         "description": "Complimentary Marriott Bonvoy Gold Elite status.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 419,
         "cardId": 124,
         "name": "Free Night Award",
-        "description": "Annual Free Night Award after renewal when requirements are met.",
-        "annualValue": 250
+        "description": "One Free Night Award each year after the card renewal month, valid for one night at a redemption level up to 35,000 Marriott Bonvoy points.",
+        "annualValue": 250,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 913,
+        "cardId": 124,
+        "name": "Second Free Night Award ($60,000 spend)",
+        "description": "An additional Free Night Award (redemption level up to 35,000 points) after $60,000 in purchases on the card in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 914,
+        "cardId": 124,
+        "name": "15 Elite Night Credits",
+        "description": "15 Elite Night Credits each calendar year toward the next level of Marriott Bonvoy Elite status; can be combined with the credits from one eligible Marriott Bonvoy consumer Amex card.",
+        "annualValue": null,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -10058,7 +11546,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/amex-marriott-bonvoy-business-credit-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/amex-marriott-bonvoy-business-credit-card/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10079,7 +11567,9 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Chase Ultimate Rewards can be redeemed for cash at 1 cent per point or for higher travel value depending on card and redemption path; this app uses 1.50 cents per point for Sapphire Reserve annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+      "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+      "From 11/15/2026, 3x on social media and search engine advertising covers the first $1,000,000 per account anniversary year, then 1x; this app resets that cap each calendar year.",
+      "Chase says The Edit credit rises to up to $1,000 a year (two more $250 credits) from 1/1/2027."
     ],
     "cashbackCategories": [
       {
@@ -10099,7 +11589,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 479,
         "cardId": 125,
-        "category": "Social media and search advertising",
+        "category": "Social media and search advertising (up to $1,000,000/year)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -10109,6 +11599,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9141,
+        "cardId": 125,
+        "category": "Lyft (through 9/30/2027)",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -10117,7 +11614,8 @@ export const BUILTIN_CARDS = [
         "cardId": 125,
         "name": "$300 Annual Travel Credit",
         "description": "Annual travel statement credit on eligible purchases.",
-        "annualValue": 300
+        "annualValue": 300,
+        "period": "cardmember-year"
       },
       {
         "id": 421,
@@ -10130,15 +11628,73 @@ export const BUILTIN_CARDS = [
         "id": 422,
         "cardId": 125,
         "name": "The Edit Credits",
-        "description": "Statement credits for eligible stays with The Edit through Chase Travel.",
-        "annualValue": 500
+        "description": "Up to $500 in statement credits each calendar year on prepaid stays of two or more nights booked with The Edit through Chase Travel, at most $250 per transaction (Chase: rising to $1,000 a year from 1/1/2027).",
+        "annualValue": 500,
+        "period": "calendar-year"
       },
       {
-        "id": 423,
+        "id": 798,
         "cardId": 125,
-        "name": "Business Travel Credits",
-        "description": "Additional advertised travel and business credits can exceed $3,000 in annual value when fully used.",
-        "annualValue": 1000
+        "name": "Global Entry, TSA PreCheck or NEXUS Credit",
+        "description": "One statement credit of up to $120 every four years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 799,
+        "cardId": 125,
+        "name": "Google Workspace Credit",
+        "description": "Up to $200 in statement credits each calendar year on purchases made directly with Google Workspace, through 12/31/2027.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 800,
+        "cardId": 125,
+        "name": "ZipRecruiter Credit",
+        "description": "Up to $200 in statement credits January-June and up to $200 July-December on ZipRecruiter purchases, through 12/31/2027.",
+        "annualValue": 400,
+        "period": "semiannual"
+      },
+      {
+        "id": 801,
+        "cardId": 125,
+        "name": "Curated Gift Card Credit",
+        "description": "Up to $50 January-June and up to $50 July-December on gift cards bought at giftcards.com/reservebusiness, through 10/31/2028.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 802,
+        "cardId": 125,
+        "name": "DashPass Membership",
+        "description": "Complimentary DashPass when activated by 12/31/2027, plus up to $25 in DoorDash promos each month ($5 on a restaurant order and two $10 non-restaurant promos) through 12/31/2027.",
+        "annualValue": 300,
+        "period": "monthly"
+      },
+      {
+        "id": 803,
+        "cardId": 125,
+        "name": "Lyft Credit",
+        "description": "$10 in-app Lyft ride credit each calendar month through 9/30/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 804,
+        "cardId": 125,
+        "name": "$250 Select Chase Travel Hotels Credit",
+        "description": "Up to $250 in statement credits in calendar 2026 only on prepaid 2+ night Chase Travel bookings at IHG, Montage, Pendry, Omni, Virgin, Minor and Pan Pacific hotels; ends 12/31/2026.",
+        "annualValue": 250,
+        "period": "one-time"
+      },
+      {
+        "id": 805,
+        "cardId": 125,
+        "name": "IHG One Rewards Platinum Elite Status",
+        "description": "Complimentary IHG One Rewards Platinum Elite status through 12/31/2027 for the authorizing officer after linking an IHG One Rewards account.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10146,7 +11702,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/sapphire/reserve",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/sapphire/reserve",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10183,14 +11739,16 @@ export const BUILTIN_CARDS = [
         "cardId": 126,
         "name": "No Annual or Foreign Transaction Fees",
         "description": "No annual fee and no foreign transaction fee per Fidelity's current card page.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 425,
         "cardId": 126,
         "name": "Global Entry / TSA PreCheck Benefit",
-        "description": "Earn up to $100 in reward points for an eligible Global Entry or TSA PreCheck application fee.",
-        "annualValue": 100
+        "description": "Up to $100 in Reward Points (10,000 points) once every four years when the Global Entry or TSA PreCheck application fee is paid with the card.",
+        "annualValue": 25,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
@@ -10198,7 +11756,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.fidelity.com/spend-save/visa-signature-card",
     "imageSourceUrl": "https://www.fidelity.com/spend-save/visa-signature-card",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10211,7 +11769,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f766e, #14b8a6)",
     "logoUrl": "https://logo.clearbit.com/sofi.com",
-    "cardImageUrl": "/card-images/127-sofi-unlimited-2-percent-credit-card.png",
+    "cardImageUrl": "/card-images/127-sofi-unlimited-2-percent-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "SoFi Rewards",
     "rewardUnitName": "Cash Back",
@@ -10249,7 +11807,7 @@ export const BUILTIN_CARDS = [
         "cardId": 127,
         "name": "No SoFi Foreign Exchange Fee",
         "description": "SoFi states it does not add foreign exchange fees to purchase transactions.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10270,7 +11828,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #115e59, #a7f3d0)",
     "logoUrl": "https://logo.clearbit.com/sofi.com",
-    "cardImageUrl": "/card-images/128-sofi-everyday-cash-rewards-credit-card.png",
+    "cardImageUrl": "/card-images/128-sofi-everyday-cash-rewards-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "SoFi Rewards",
     "rewardUnitName": "Cash Back",
@@ -10315,7 +11873,7 @@ export const BUILTIN_CARDS = [
         "cardId": 128,
         "name": "Everyday Bonus Categories",
         "description": "Elevated rewards for dining and grocery store purchases based on merchant coding.",
-        "annualValue": 120
+        "annualValue": null
       },
       {
         "id": 429,
@@ -10343,7 +11901,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0074de, #38bdf8)",
     "logoUrl": "https://logo.clearbit.com/venmo.com",
-    "cardImageUrl": "/card-images/129-venmo-visa-signature-credit-card.png",
+    "cardImageUrl": "/card-images/129-venmo-visa-signature-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "Venmo Cash Back",
     "rewardUnitName": "Cash Back",
@@ -10382,7 +11940,7 @@ export const BUILTIN_CARDS = [
         "cardId": 129,
         "name": "Automatic Top Categories",
         "description": "Automatically applies 3% to the top eligible spend category and 2% to the next eligible category.",
-        "annualValue": 120
+        "annualValue": null
       },
       {
         "id": 431,
@@ -10441,7 +11999,7 @@ export const BUILTIN_CARDS = [
         "cardId": 130,
         "name": "Simple Flat Cash Back",
         "description": "Flat-rate cashback structure without rotating categories.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10462,7 +12020,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #7f1d1d, #ef4444)",
     "logoUrl": "https://logo.clearbit.com/wellsfargo.com",
-    "cardImageUrl": "/card-images/131-wells-fargo-signify-business-cash.jpg",
+    "cardImageUrl": "/card-images/131-wells-fargo-signify-business-cash.webp",
     "rewardType": "cashback",
     "rewardProgram": "Wells Fargo Cash Rewards",
     "rewardUnitName": "Cash Back",
@@ -10486,7 +12044,7 @@ export const BUILTIN_CARDS = [
         "cardId": 131,
         "name": "Unlimited Business Cash Back",
         "description": "Earn unlimited 2% cash rewards on qualifying business purchases.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 601,
@@ -10514,7 +12072,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f172a, #14b8a6)",
     "logoUrl": "https://logo.clearbit.com/wellsfargo.com",
-    "cardImageUrl": "/card-images/132-wells-fargo-one-key-card.png",
+    "cardImageUrl": "/card-images/132-wells-fargo-one-key-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "OneKeyCash",
     "rewardUnitName": "OneKeyCash",
@@ -10565,23 +12123,23 @@ export const BUILTIN_CARDS = [
         "id": 602,
         "cardId": 132,
         "name": "Automatic One Key Silver",
-        "description": "No-annual-fee One Key cardholders receive automatic Silver tier benefits in the One Key program.",
-        "annualValue": 75
+        "description": "Automatic One Key Silver tier while the card is open (Silver member prices, 15%+ off 10,000+ hotels); Gold tier after $15,000 in net purchases in a calendar year.",
+        "annualValue": null
       },
       {
         "id": 603,
         "cardId": 132,
         "name": "No Foreign Transaction Fees",
         "description": "Issuer materials list no foreign transaction fees.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://newsroom.wf.com/news-releases/news-details/2024/Expedia-Group-Wells-Fargo-and-Mastercard-announce-new-suite-of-One-Key-credit-cards/default.aspx",
+    "sourceUrl": "https://creditcards.wellsfargo.com/one-key-credit-card/",
     "imageSourceUrl": "https://www.wellsfargo.com/credit-cards/agreements/?lang=en",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10590,7 +12148,7 @@ export const BUILTIN_CARDS = [
     "issuer": "Wells Fargo",
     "network": "Mastercard",
     "annualFee": 99,
-    "signupBonus": "See issuer page for current OneKeyCash offer",
+    "signupBonus": null,
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #2563eb)",
     "logoUrl": "https://logo.clearbit.com/wellsfargo.com",
@@ -10601,6 +12159,7 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
+      "Apparently closed to new applicants: by 2026-10-31 Wells Fargo had removed the One Key+ product page and dropped the card from its lineup (it was still offered on 2026-08-06). Wells Fargo has published no statement. Existing cardholders keep the card.",
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
     ],
     "cashbackCategories": [
@@ -10645,24 +12204,43 @@ export const BUILTIN_CARDS = [
         "id": 604,
         "cardId": 133,
         "name": "$100 OneKeyCash Anniversary Bonus",
-        "description": "Earn $100 in OneKeyCash each cardholder anniversary according to issuer launch materials.",
-        "annualValue": 100
+        "description": "$100 in OneKeyCash each cardholder anniversary.",
+        "annualValue": 100,
+        "period": "cardmember-year"
       },
       {
         "id": 605,
         "cardId": 133,
         "name": "Trusted Traveler Credit",
-        "description": "Eligible cardholders can receive a statement credit toward Global Entry or TSA PreCheck.",
-        "annualValue": 25
+        "description": "Up to $120 statement credit toward Global Entry or TSA PreCheck, once every four years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 850,
+        "cardId": 133,
+        "name": "Automatic One Key Gold Tier",
+        "description": "Automatic One Key Gold tier while the card is open; Platinum tier after $30,000 in purchases in a calendar year.",
+        "annualValue": null
+      },
+      {
+        "id": 851,
+        "cardId": 133,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://newsroom.wf.com/news-releases/news-details/2024/Expedia-Group-Wells-Fargo-and-Mastercard-announce-new-suite-of-One-Key-credit-cards/default.aspx",
+    "sourceUrl": "https://creditcards.wellsfargo.com/",
     "imageSourceUrl": "https://www.wellsfargo.com/credit-cards/guide-to-benefits/onekeyplus/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-10-31"
   },
   {
     "id": 134,
@@ -10674,7 +12252,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 2000,
     "color": "linear-gradient(135deg, #7f1d1d, #f59e0b)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/134-capital-one-spark-cash-plus.avif",
+    "cardImageUrl": "/card-images/134-capital-one-spark-cash-plus.webp",
     "rewardType": "cashback",
     "rewardProgram": "Capital One Cash Back",
     "rewardUnitName": "Cash Back",
@@ -10682,14 +12260,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Business Travel; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 503,
         "cardId": 134,
-        "category": "Capital One Business Travel",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -10707,14 +12284,15 @@ export const BUILTIN_CARDS = [
         "cardId": 134,
         "name": "Annual Fee Refund Threshold",
         "description": "Capital One advertises an annual fee refund every year the account spends at least $150,000.",
-        "annualValue": 150
+        "annualValue": 150,
+        "period": "cardmember-year"
       },
       {
         "id": 607,
         "cardId": 134,
         "name": "No Preset Spending Limit",
         "description": "Pay-in-full business card with flexible spend capacity based on account behavior.",
-        "annualValue": 150
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10722,12 +12300,12 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash-plus/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash-plus/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
     "id": 135,
-    "name": "Capital One Spark Cash Select for Business",
+    "name": "Capital One Spark 1.5% Cash Select",
     "issuer": "Capital One",
     "network": "Visa",
     "annualFee": 0,
@@ -10735,7 +12313,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 750,
     "color": "linear-gradient(135deg, #991b1b, #60a5fa)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/135-capital-one-spark-cash-select-for-business.avif",
+    "cardImageUrl": "/card-images/135-capital-one-spark-cash-select-for-business.webp",
     "rewardType": "cashback",
     "rewardProgram": "Capital One Cash Back",
     "rewardUnitName": "Cash Back",
@@ -10743,14 +12321,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Business Travel; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 505,
         "cardId": 135,
-        "category": "Capital One Business Travel",
+        "category": "Hotels and rental cars booked through Capital One Business Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -10775,7 +12352,7 @@ export const BUILTIN_CARDS = [
         "cardId": 135,
         "name": "Free Employee Cards",
         "description": "Capital One advertises free employee cards and business spend controls.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10783,7 +12360,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash-select/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash-select/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10848,7 +12425,7 @@ export const BUILTIN_CARDS = [
         "cardId": 136,
         "name": "Verizon Dollar Redemption",
         "description": "Rewards are earned as Verizon Dollars redeemable toward eligible Verizon purchases or bills.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 611,
@@ -10876,34 +12453,37 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 100,
     "color": "linear-gradient(135deg, #b91c1c, #fbbf24)",
     "logoUrl": "https://logo.clearbit.com/aaa.com",
-    "cardImageUrl": "/card-images/137-aaa-daily-advantage-visa-signature.png",
+    "cardImageUrl": "/card-images/137-aaa-daily-advantage-visa-signature.webp",
     "rewardType": "cashback",
     "rewardProgram": "AAA Cash Back",
     "rewardUnitName": "Cash Back",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "AAA caps cash back at grocery stores, wholesale clubs and gas stations at $500 combined per calendar year; after that those purchases earn 1% for the rest of the calendar year.",
+      "The app models that cap as one shared $10,000 purchase cap per calendar year (the 5% grocery equivalent of $500), so spend at the 3% gas and wholesale-club rates can earn somewhat more before the real cap than shown.",
+      "EV charging, streaming, pharmacy and AAA purchases earn 3% with no stated cap."
     ],
     "cashbackCategories": [
       {
         "id": 512,
         "cardId": 137,
-        "category": "Groceries",
+        "category": "Groceries (up to $10,000/year combined cap)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 513,
         "cardId": 137,
-        "category": "Gas / EV Charging",
+        "category": "Gas stations (up to $10,000/year combined cap)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 514,
         "cardId": 137,
-        "category": "Wholesale Clubs",
+        "category": "Wholesale Clubs (up to $10,000/year combined cap)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -10920,6 +12500,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9164,
+        "cardId": 137,
+        "category": "EV Charging",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -10928,14 +12515,14 @@ export const BUILTIN_CARDS = [
         "cardId": 137,
         "name": "No Annual or Foreign Transaction Fees",
         "description": "AAA advertises no annual fee and no foreign transaction fees for the Daily Advantage card.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 613,
         "cardId": 137,
         "name": "High Grocery Earn Rate",
         "description": "Best suited for grocery-heavy users, subject to published reward terms and caps.",
-        "annualValue": 180
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -10943,7 +12530,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://mwg.aaa.com/credit-card",
     "imageSourceUrl": "https://mwg.aaa.com/credit-card",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -10963,13 +12550,14 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 5% gas and EV charging category is capped at $350 cash back per calendar year ($7,000 of purchases); after that it earns 1% for the rest of the calendar year."
     ],
     "cashbackCategories": [
       {
         "id": 517,
         "cardId": 138,
-        "category": "Gas / EV Charging",
+        "category": "Gas / EV Charging (up to $7,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
@@ -11008,14 +12596,14 @@ export const BUILTIN_CARDS = [
         "cardId": 138,
         "name": "No Annual or Foreign Transaction Fees",
         "description": "AAA advertises no annual fee and no foreign transaction fees for the Travel Advantage card.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 615,
         "cardId": 138,
         "name": "High Gas and EV Earn Rate",
         "description": "Best suited for gas and EV charging spend, subject to published reward terms and caps.",
-        "annualValue": 160
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11023,7 +12611,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://mwg.aaa.com/credit-card",
     "imageSourceUrl": "https://mwg.aaa.com/credit-card",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -11036,7 +12624,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 200,
     "color": "linear-gradient(135deg, #064e3b, #34d399)",
     "logoUrl": "https://logo.clearbit.com/fnbo.com",
-    "cardImageUrl": "/card-images/139-fnbo-evergreen-rewards-visa.png",
+    "cardImageUrl": "/card-images/139-fnbo-evergreen-rewards-visa.webp",
     "rewardType": "cashback",
     "rewardProgram": "FNBO Cash Back",
     "rewardUnitName": "Cash Back",
@@ -11060,7 +12648,7 @@ export const BUILTIN_CARDS = [
         "cardId": 139,
         "name": "Unlimited 2% Cash Back",
         "description": "FNBO advertises unlimited 2% cash back on every purchase.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 617,
@@ -11088,7 +12676,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #155e75, #67e8f9)",
     "logoUrl": "https://logo.clearbit.com/fnbo.com",
-    "cardImageUrl": "/card-images/140-fnbo-getaway.png",
+    "cardImageUrl": "/card-images/140-fnbo-getaway.webp",
     "rewardType": "points",
     "rewardProgram": "FNBO Rewards",
     "rewardUnitName": "Points",
@@ -11140,7 +12728,7 @@ export const BUILTIN_CARDS = [
         "cardId": 140,
         "name": "No Foreign Transaction Fee",
         "description": "Issuer page lists no foreign transaction fee.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11192,7 +12780,7 @@ export const BUILTIN_CARDS = [
         "cardId": 141,
         "name": "Honors Advantage Boost",
         "description": "Eligible Honors Advantage members earn 2% cash back instead of the standard 1.5%.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 621,
@@ -11279,7 +12867,7 @@ export const BUILTIN_CARDS = [
         "cardId": 142,
         "name": "Everyday Bonus Categories",
         "description": "Strong gas, EV charging, supermarket, restaurant, and streaming/cable categories.",
-        "annualValue": 180
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11307,7 +12895,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 0.85,
     "rewardValuationDescription": "PenFed Rewards Points value varies by redemption; this app uses an estimated 0.85 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "From 2026-09-28 the $95 annual fee is charged to every cardholder; PenFed no longer waives it for Honors Advantage members."
     ],
     "cashbackCategories": [
       {
@@ -11353,8 +12942,8 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.penfed.org/content/dam/penfed/general/pdf/creditcardpdfs/Visa/Pathfinder_RWDTC.pdf",
     "imageSourceUrl": "https://www.penfed.org/forms/",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review"
   },
   {
     "id": 144,
@@ -11366,7 +12955,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 200,
     "color": "linear-gradient(135deg, #065f46, #86efac)",
     "logoUrl": "https://logo.clearbit.com/td.com",
-    "cardImageUrl": "/card-images/144-td-cash-credit-card.png",
+    "cardImageUrl": "/card-images/144-td-cash-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "TD Cash Rewards",
     "rewardUnitName": "Cash Back",
@@ -11405,7 +12994,7 @@ export const BUILTIN_CARDS = [
         "cardId": 144,
         "name": "Quarterly Category Choice",
         "description": "Choose 3% and 2% spend categories quarterly from dining, entertainment, gas, grocery stores, and travel.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 627,
@@ -11418,9 +13007,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash",
+    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-card",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-card",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -11485,14 +13074,14 @@ export const BUILTIN_CARDS = [
         "cardId": 145,
         "name": "No Interest Model",
         "description": "TD Clear charges a predictable monthly membership fee instead of purchase interest.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 629,
         "cardId": 145,
         "name": "No Late or Foreign Transaction Fees",
         "description": "TD lists no late payment fee and no foreign transaction fee for TD Clear.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11559,15 +13148,15 @@ export const BUILTIN_CARDS = [
         "cardId": 146,
         "name": "Category Choice",
         "description": "Earn 3% and 2% cash back on chosen spend categories plus 1% on other purchases.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/cash-secured",
+    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/secured-credit-card",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/secured-credit-card/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official",
     "categoryChoices": [
       {
@@ -11632,7 +13221,7 @@ export const BUILTIN_CARDS = [
         "cardId": 147,
         "name": "Unlimited Business Cash Back",
         "description": "TD advertises unlimited 2% cash back for business purchases.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 633,
@@ -11645,9 +13234,9 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/no-annual-fee",
+    "sourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/business",
     "imageSourceUrl": "https://www.td.com/us/en/personal-banking/credit-cards/no-annual-fee",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -11667,7 +13256,8 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.3,
     "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Announced 2026-10-27, effective 2027-01-24: annual fee rises from $99 to $150 (first year waived); adds 3x on AAdvantage Hotels and Cars bookings and 2x on one self-selected category (U.S. shipping, office supply stores or U.S. advertising); adds an up-to-$120 Global Entry/TSA PreCheck credit every 4 years and up to $100 a year in inflight credits. The catalog keeps today's terms until then."
     ],
     "cashbackCategories": [
       {
@@ -11719,7 +13309,15 @@ export const BUILTIN_CARDS = [
         "cardId": 148,
         "name": "Preferred Boarding and Inflight Savings",
         "description": "Preferred boarding plus 25% savings on eligible American Airlines inflight food, beverage, and Wi-Fi purchases.",
-        "annualValue": 75
+        "annualValue": null
+      },
+      {
+        "id": 840,
+        "cardId": 148,
+        "name": "American Airlines Companion Certificate",
+        "description": "After $30,000 in purchases in a cardmembership year and renewal: one round-trip domestic Main Cabin companion ticket for a $99 ticketing fee plus taxes and fees.",
+        "annualValue": null,
+        "period": "cardmember-year"
       }
     ],
     "inWallet": false,
@@ -11727,7 +13325,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-business-credit-card",
     "imageSourceUrl": "https://www.citi.com/credit-cards/citibusiness-aadvantage-platinum-select-credit-card/",
-    "lastReviewedAt": "2026-08-06",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -11740,7 +13338,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #3b0764, #f0abfc)",
     "logoUrl": "https://logo.clearbit.com/breadfinancial.com",
-    "cardImageUrl": "/card-images/149-bread-cashback-american-express.avif",
+    "cardImageUrl": "/card-images/149-bread-cashback-american-express.webp",
     "rewardType": "cashback",
     "rewardProgram": "Bread Cash Back",
     "rewardUnitName": "Cash Back",
@@ -11764,14 +13362,14 @@ export const BUILTIN_CARDS = [
         "cardId": 149,
         "name": "Unlimited 2% Cash Back",
         "description": "American Express network page lists unlimited 2% cash back on every purchase.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 637,
         "cardId": 149,
         "name": "No Annual or Foreign Transaction Fees",
         "description": "Bread Cashback is advertised with no annual fee and no foreign transaction fees.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11792,7 +13390,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #6b7280)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/150-american-express-graphite-business-cash-unlimited.avif",
+    "cardImageUrl": "/card-images/150-american-express-graphite-business-cash-unlimited.webp",
     "rewardType": "cashback",
     "rewardProgram": "American Express Cash Back",
     "rewardUnitName": "Cash Back",
@@ -11817,14 +13415,15 @@ export const BUILTIN_CARDS = [
         "cardId": 150,
         "name": "Unlimited 2% Cash Back",
         "description": "Earn unlimited 2% cash back on eligible purchases.",
-        "annualValue": 300
+        "annualValue": null
       },
       {
         "id": 639,
         "cardId": 150,
         "name": "One AP Statement Credit",
         "description": "Unlock up to $2,400 in American Express One AP statement credits for the following calendar year after meeting the annual eligible-spend threshold.",
-        "annualValue": 400
+        "annualValue": 400,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
@@ -11832,7 +13431,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/graphite-business-cash-unlimited-card/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/graphite-business-cash-unlimited-card/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -11884,7 +13483,7 @@ export const BUILTIN_CARDS = [
         "cardId": 151,
         "name": "Employee Cards",
         "description": "Useful for basic business spend tracking and employee-card controls.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -11905,7 +13504,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #991b1b, #f59e0b)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/152-delta-skymiles-gold-business-american-express.avif",
+    "cardImageUrl": "/card-images/152-delta-skymiles-gold-business-american-express.webp",
     "rewardType": "miles",
     "rewardProgram": "Delta SkyMiles",
     "rewardUnitName": "Miles",
@@ -11913,7 +13512,7 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Delta SkyMiles value varies by itinerary and redemption path; this app uses an estimated 1.10 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate."
+      "2X at U.S. shipping providers and 2X on U.S. advertising in select media each apply to up to $50,000 of purchases per year, then 1X."
     ],
     "cashbackCategories": [
       {
@@ -11926,14 +13525,14 @@ export const BUILTIN_CARDS = [
       {
         "id": 557,
         "cardId": 152,
-        "category": "U.S. shipping",
+        "category": "U.S. shipping (up to $50,000/year)",
         "rate": 0.02,
         "isDefault": false
       },
       {
         "id": 558,
         "cardId": 152,
-        "category": "U.S. advertising",
+        "category": "U.S. advertising (up to $50,000/year)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -11954,26 +13553,43 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 642,
-        "cardId": 152,
-        "name": "First Checked Bag Free",
-        "description": "First checked bag free on eligible Delta flights for the cardholder and eligible companions on the reservation.",
-        "annualValue": 160
-      },
-      {
         "id": 643,
         "cardId": 152,
         "name": "$200 Delta Flight Credit",
         "description": "Earn a Delta flight credit after meeting the annual eligible purchase threshold.",
-        "annualValue": 200
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 915,
+        "cardId": 152,
+        "name": "First and Second Checked Bag Free",
+        "description": "First checked bag free on Delta flights for the cardmember and up to 8 companions on the same reservation; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": 160
+      },
+      {
+        "id": 916,
+        "cardId": 152,
+        "name": "$120 Rideshare Credit",
+        "description": "After the first card renewal, up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers; enrollment required.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 917,
+        "cardId": 152,
+        "name": "$150 Delta Stays Credit",
+        "description": "Up to $150 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 150,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-gold-business-credit-card-amex/",
+    "sourceUrl": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-gold/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-gold-business-credit-card-amex/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -11986,7 +13602,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #475569, #d1d5db)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/153-delta-skymiles-platinum-business-american-express.avif",
+    "cardImageUrl": "/card-images/153-delta-skymiles-platinum-business-american-express.webp",
     "rewardType": "miles",
     "rewardProgram": "Delta SkyMiles",
     "rewardUnitName": "Miles",
@@ -11994,7 +13610,7 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Delta SkyMiles value varies by itinerary and redemption path; this app uses an estimated 1.10 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Large-purchase bonus rates apply only to transactions meeting the listed minimum purchase amount."
+      "1.5X on transit (including rideshare and taxis), U.S. shipping and single purchases of $5,000 or more applies to up to $100,000 of combined purchases per year, then 1X. A large purchase qualifies only when the single transaction is $5,000 or more."
     ],
     "cashbackCategories": [
       {
@@ -12014,14 +13630,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 563,
         "cardId": 153,
-        "category": "U.S. shipping",
-        "rate": 0.015,
-        "isDefault": false
-      },
-      {
-        "id": 564,
-        "cardId": 153,
-        "category": "Large purchases $5k+",
+        "category": "Transit, rideshare, U.S. shipping and $5k+ purchases (up to $100,000/year combined)",
         "rate": 0.015,
         "isDefault": false
       },
@@ -12038,23 +13647,64 @@ export const BUILTIN_CARDS = [
         "id": 644,
         "cardId": 153,
         "name": "Annual Companion Certificate",
-        "description": "Annual companion certificate for eligible domestic, Caribbean, or Central American round-trip flights after renewal.",
-        "annualValue": 250
+        "description": "Each year after card renewal, a round-trip Delta Main companion certificate for domestic, Caribbean or Central American travel. Government taxes and fees of $22-$250 apply.",
+        "annualValue": 250,
+        "period": "cardmember-year"
       },
       {
         "id": 645,
         "cardId": 153,
         "name": "MQD Headstart and Boost",
         "description": "Business card includes Delta Medallion qualification support through MQD Headstart and eligible spend boosts.",
-        "annualValue": 150
+        "annualValue": null
+      },
+      {
+        "id": 918,
+        "cardId": 153,
+        "name": "First and Second Checked Bag Free",
+        "description": "First checked bag free on Delta flights; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": null
+      },
+      {
+        "id": 919,
+        "cardId": 153,
+        "name": "$200 Delta Stays Credit",
+        "description": "Up to $200 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 920,
+        "cardId": 153,
+        "name": "$120 Resy Credit",
+        "description": "Up to $10 in statement credits each month (up to $120 per year) at qualifying U.S. Resy restaurants; enrollment required.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 921,
+        "cardId": 153,
+        "name": "$120 Rideshare Credit",
+        "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 922,
+        "cardId": 153,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A $120 statement credit for a Global Entry application or up to $85 for TSA PreCheck (through an official enrollment provider) every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-platinum-business-credit-card-amex/",
+    "sourceUrl": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-platinum/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-platinum-business-credit-card-amex/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12067,14 +13717,15 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #64748b)",
     "logoUrl": "https://logo.clearbit.com/americanexpress.com",
-    "cardImageUrl": "/card-images/154-delta-skymiles-reserve-business-american-express.avif",
+    "cardImageUrl": "/card-images/154-delta-skymiles-reserve-business-american-express.webp",
     "rewardType": "miles",
     "rewardProgram": "Delta SkyMiles",
     "rewardUnitName": "Miles",
     "rewardUnitValueCents": 1.1,
     "rewardValuationDescription": "Delta SkyMiles value varies by itinerary and redemption path; this app uses an estimated 1.10 cents per mile for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "After $150,000 in purchases on the card in a year, all eligible purchases earn 1.5X for the rest of that year; the app keeps the 1X default."
     ],
     "cashbackCategories": [
       {
@@ -12105,22 +13756,77 @@ export const BUILTIN_CARDS = [
         "cardId": 154,
         "name": "Delta Sky Club Access",
         "description": "Delta Sky Club access when traveling on eligible same-day Delta-marketed or Delta-operated flights, subject to visit limits and program terms.",
-        "annualValue": 500
+        "annualValue": null
       },
       {
         "id": 647,
         "cardId": 154,
         "name": "Annual Companion Certificate",
-        "description": "Annual companion certificate for eligible domestic, Caribbean, or Central American round-trip flights after renewal.",
-        "annualValue": 350
+        "description": "Each year after card renewal, a round-trip companion certificate in Delta First, Delta Comfort or Delta Main for domestic, Caribbean or Central American travel. Government taxes and fees of $22-$250 apply.",
+        "annualValue": 350,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 923,
+        "cardId": 154,
+        "name": "First and Second Checked Bag Free",
+        "description": "First checked bag free on international and domestic Delta flights; second checked bag also free on domestic Delta flights (added 2026-06-04).",
+        "annualValue": null
+      },
+      {
+        "id": 924,
+        "cardId": 154,
+        "name": "$250 Delta Stays Credit",
+        "description": "Up to $250 back per calendar year in statement credits on prepaid hotels or vacation rentals booked through Delta Stays on delta.com.",
+        "annualValue": 250,
+        "period": "calendar-year"
+      },
+      {
+        "id": 925,
+        "cardId": 154,
+        "name": "$240 Resy Credit",
+        "description": "Up to $20 in statement credits each month (up to $240 per year) at qualifying U.S. Resy restaurants; enrollment required.",
+        "annualValue": 240,
+        "period": "monthly"
+      },
+      {
+        "id": 926,
+        "cardId": 154,
+        "name": "$120 Rideshare Credit",
+        "description": "Up to $10 in statement credits each month on eligible U.S. rideshare purchases with select providers.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 927,
+        "cardId": 154,
+        "name": "MQD Headstart and MQD Boost",
+        "description": "$2,500 Medallion Qualification Dollars each Medallion Qualification Year (MQD Headstart), plus $1 MQD for every $10 of purchases on the card in a calendar year (MQD Boost).",
+        "annualValue": null
+      },
+      {
+        "id": 928,
+        "cardId": 154,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "A statement credit every 4 years for a Global Entry application ($120), or up to $85 for a five-year TSA PreCheck membership through an official enrollment provider.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 929,
+        "cardId": 154,
+        "name": "Centurion Lounge Access",
+        "description": "Complimentary access to The Centurion Lounge, Sidecar by The Centurion Lounge and Escape Lounges when flying on a Delta flight purchased with the card.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-reserve-business-credit-card-amex/",
+    "sourceUrl": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-reserve/",
     "imageSourceUrl": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/delta-reserve-business-credit-card-amex/",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12133,7 +13839,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #134e4a, #99f6e4)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/155-capital-one-ventureone-business.avif",
+    "cardImageUrl": "/card-images/155-capital-one-ventureone-business.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -12141,14 +13847,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Capital One miles are modeled at 1 cent per mile for travel purchase cover and travel bookings; transfer-partner value may differ.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Capital One Business Travel hotels and rental cars; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 568,
         "cardId": 155,
-        "category": "Capital One Business Travel hotels and rental cars",
+        "category": "Hotels, vacation rentals and rental cars booked through Capital One Business Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -12156,7 +13861,7 @@ export const BUILTIN_CARDS = [
         "id": 569,
         "cardId": 155,
         "category": "Other",
-        "rate": 0.0125,
+        "rate": 0.015,
         "isDefault": true
       }
     ],
@@ -12173,7 +13878,7 @@ export const BUILTIN_CARDS = [
         "cardId": 155,
         "name": "Free Employee Cards",
         "description": "Supports business spend tracking with free employee cards.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -12181,7 +13886,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/ventureone-business/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/ventureone-business/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12194,7 +13899,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 1500,
     "color": "linear-gradient(135deg, #7f1d1d, #fb7185)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/156-capital-one-spark-2-cash.avif",
+    "cardImageUrl": "/card-images/156-capital-one-spark-2-cash.webp",
     "rewardType": "cashback",
     "rewardProgram": "Capital One Cash Back",
     "rewardUnitName": "Cash Back",
@@ -12202,14 +13907,13 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Hotels and rental cars through Capital One Travel; Other.",
       "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
     ],
     "cashbackCategories": [
       {
         "id": 570,
         "cardId": 156,
-        "category": "Hotels and rental cars through Capital One Travel",
+        "category": "Hotels and rental cars booked through Capital One Business Travel",
         "rate": 0.05,
         "isDefault": false
       },
@@ -12227,14 +13931,14 @@ export const BUILTIN_CARDS = [
         "cardId": 156,
         "name": "Unlimited 2% Business Cash Back",
         "description": "Earns unlimited 2% cash back on every purchase.",
-        "annualValue": 200
+        "annualValue": null
       },
       {
         "id": 651,
         "cardId": 156,
         "name": "Free Employee Cards",
         "description": "Capital One advertises free employee cards and spend management tools.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -12242,7 +13946,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash/",
     "imageSourceUrl": "https://www.capitalone.com/small-business/credit-cards/spark-cash/",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12255,7 +13959,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #172554, #60a5fa)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/157-capital-one-spark-1-classic.avif",
+    "cardImageUrl": "/card-images/157-capital-one-spark-1-classic.webp",
     "rewardType": "cashback",
     "rewardProgram": "Capital One Cash Back",
     "rewardUnitName": "Cash Back",
@@ -12299,10 +14003,10 @@ export const BUILTIN_CARDS = [
   },
   {
     "id": 158,
-    "name": "IHG One Rewards Premier Business",
+    "name": "IHG One Rewards Business Credit Card",
     "issuer": "Chase / IHG",
     "network": "Mastercard",
-    "annualFee": 99,
+    "annualFee": 200,
     "signupBonus": "See issuer page for current IHG business offer",
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #111827, #f59e0b)",
@@ -12315,7 +14019,9 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "IHG One Rewards value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate."
+      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+      "5x on all travel and at office supply stores applies only to purchases posted through 12/31/2026; from 1/1/2027 only airline tickets bought directly and car rental agencies keep 5x, and other travel and office supplies earn 3x.",
+      "Formerly the IHG One Rewards Premier Business Credit Card; Chase's 10/1/2026 refresh set the annual fee at $200 (was $99), with existing cardmembers' fees adjusted in 2027."
     ],
     "cashbackCategories": [
       {
@@ -12335,7 +14041,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 575,
         "cardId": 158,
-        "category": "Travel",
+        "category": "Travel (through 12/31/2026)",
         "rate": 0.05,
         "isDefault": false
       },
@@ -12359,6 +14065,27 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.03,
         "isDefault": true
+      },
+      {
+        "id": 9142,
+        "cardId": 158,
+        "category": "Office Supplies (through 12/31/2026)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9143,
+        "cardId": 158,
+        "category": "Flights Booked Directly with Airlines",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9144,
+        "cardId": 158,
+        "category": "Car Rentals",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -12366,23 +14093,96 @@ export const BUILTIN_CARDS = [
         "id": 654,
         "cardId": 158,
         "name": "Anniversary Free Night",
-        "description": "Annual reward night after each account anniversary, subject to IHG point-cap terms.",
-        "annualValue": 200
+        "description": "A Free Night after each account anniversary at an IHG hotel with a redemption cap of 50,000 points; points can be added for pricier nights.",
+        "annualValue": 250,
+        "period": "cardmember-year"
       },
       {
         "id": 655,
         "cardId": 158,
         "name": "IHG Platinum Elite Status",
         "description": "Automatic IHG One Rewards Platinum Elite status while the account remains open.",
-        "annualValue": 150
+        "annualValue": null
+      },
+      {
+        "id": 806,
+        "cardId": 158,
+        "name": "4th Reward Night Free",
+        "description": "When you redeem points for a consecutive four-night IHG stay, the fourth night is free.",
+        "annualValue": null
+      },
+      {
+        "id": 807,
+        "cardId": 158,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 808,
+        "cardId": 158,
+        "name": "Food and Beverage Rewards",
+        "description": "A $25 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $100 a year).",
+        "annualValue": 100,
+        "period": "quarterly"
+      },
+      {
+        "id": 809,
+        "cardId": 158,
+        "name": "Airline Statement Credit",
+        "description": "$100 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 810,
+        "cardId": 158,
+        "name": "Expensify Credit",
+        "description": "Up to $100 in statement credits on Expensify purchases each calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 811,
+        "cardId": 158,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 812,
+        "cardId": 158,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 per calendar year) while an Instacart+ member (3 months complimentary); ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 813,
+        "cardId": 158,
+        "name": "15 Elite Night Credits",
+        "description": "15 Elite Night Credits each calendar year, plus 2 more for every $5,000 spent.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 814,
+        "cardId": 158,
+        "name": "20,000 Bonus Points After $25,000 Annual Spend",
+        "description": "20,000 bonus points after $25,000 in purchases each calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
       }
     ],
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/ihg/business-premier",
+    "sourceUrl": "https://creditcards.chase.com/business-credit-cards/IHG/business",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/ihg/business-premier",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12409,7 +14209,7 @@ export const BUILTIN_CARDS = [
         "id": 579,
         "cardId": 159,
         "category": "United",
-        "rate": 0.05,
+        "rate": 0.02,
         "isDefault": false
       },
       {
@@ -12420,24 +14220,10 @@ export const BUILTIN_CARDS = [
         "isDefault": false
       },
       {
-        "id": 580,
-        "cardId": 159,
-        "category": "Travel",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 581,
-        "cardId": 159,
-        "category": "Dining",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
         "id": 582,
         "cardId": 159,
         "category": "Other",
-        "rate": 0.01,
+        "rate": 0.015,
         "isDefault": true
       }
     ],
@@ -12446,15 +14232,70 @@ export const BUILTIN_CARDS = [
         "id": 656,
         "cardId": 159,
         "name": "United Club Membership",
-        "description": "Primary cardmember United Club membership while the account is open, subject to United Club terms.",
-        "annualValue": 650
+        "description": "United Club membership for the primary cardmember and one guest (Chase: $750+ value per year); All Access membership after Premier Gold status or $50,000 in annual card spend.",
+        "annualValue": 750
       },
       {
         "id": 657,
         "cardId": 159,
         "name": "Free Checked Bags",
         "description": "First and second checked bags free on eligible United-operated flights when requirements are met.",
-        "annualValue": 320
+        "annualValue": null
+      },
+      {
+        "id": 815,
+        "cardId": 159,
+        "name": "Renowned Hotels and Resorts Credit",
+        "description": "Up to $200 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 816,
+        "cardId": 159,
+        "name": "Rideshare Credit",
+        "description": "Up to $12 back each month January-November and $18 in December on rideshare purchases (up to $150 per calendar year). Yearly opt-in required.",
+        "annualValue": 150,
+        "period": "monthly"
+      },
+      {
+        "id": 817,
+        "cardId": 159,
+        "name": "Avis/Budget Travel Credit",
+        "description": "$50 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $100).",
+        "annualValue": 100,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 818,
+        "cardId": 159,
+        "name": "Instacart Credit",
+        "description": "Two $10 Instacart credits each month (up to $240 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+        "annualValue": 240,
+        "period": "monthly"
+      },
+      {
+        "id": 819,
+        "cardId": 159,
+        "name": "JSX Credit",
+        "description": "Up to $200 back each account anniversary year on flights booked directly with JSX.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 820,
+        "cardId": 159,
+        "name": "FareLock Credit",
+        "description": "Up to $50 back each account anniversary year on United FareLock purchases.",
+        "annualValue": 50,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 821,
+        "cardId": 159,
+        "name": "Premier Access Travel Services",
+        "description": "Priority check-in, security screening, boarding and baggage handling where available.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -12462,7 +14303,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://creditcards.chase.com/business-credit-cards/united/united-club-business",
     "imageSourceUrl": "https://creditcards.chase.com/business-credit-cards/united/united-club-business",
-    "lastReviewedAt": "2026-05-21",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12515,7 +14356,7 @@ export const BUILTIN_CARDS = [
         "cardId": 160,
         "name": "Business Category Choice",
         "description": "Choose one eligible 3% category such as gas and EV charging, office supply stores, travel, TV/telecom/wireless, computer services, or business consulting services.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 659,
@@ -12528,10 +14369,10 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://business.bankofamerica.com/en/small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard",
+    "sourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards",
     "imageSourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards",
-    "lastReviewedAt": "2026-08-07",
-    "dataConfidence": "needs-review",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
     "categoryChoices": [
       {
         "categoryId": 583,
@@ -12583,7 +14424,7 @@ export const BUILTIN_CARDS = [
         "cardId": 161,
         "name": "Flat Business Cash Back",
         "description": "Earn unlimited 1.5% cash back on eligible business purchases.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 661,
@@ -12625,7 +14466,7 @@ export const BUILTIN_CARDS = [
       {
         "id": 587,
         "cardId": 162,
-        "category": "Bank of America Travel Center",
+        "category": "Travel purchases at BofA Travel (formerly Travel Center)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -12650,7 +14491,7 @@ export const BUILTIN_CARDS = [
         "cardId": 162,
         "name": "No Foreign Transaction Fee",
         "description": "Issuer materials list no foreign transaction fee.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -12658,7 +14499,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-travel-rewards",
     "imageSourceUrl": "https://business.bankofamerica.com/en/credit-cards/business-advantage-travel-rewards",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -12678,34 +14519,23 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 2% tier applies automatically to the account's top 3 eligible spend categories outside Amazon each billing cycle, based on the combined spend of all cardmembers and Mastercard category codes; the app approximates the billing cycle as a calendar month.",
+      "5% at Amazon-covered sites applies to the first $150,000 of those purchases each calendar year, and 2% to the first $150,000 spent outside Amazon each calendar year; spend beyond each cap earns 1%.",
+      "Requires an eligible Prime membership; adding or cancelling Prime after account opening changes the account's reward program."
     ],
     "cashbackCategories": [
       {
         "id": 589,
         "cardId": 163,
-        "category": "Amazon Business / Amazon.com / AWS / Whole Foods",
+        "category": "Amazon Business / Amazon.com / AWS / Whole Foods (up to $150,000/year)",
         "rate": 0.05,
         "isDefault": false
       },
       {
         "id": 590,
         "cardId": 163,
-        "category": "Gas / EV Charging",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 591,
-        "cardId": 163,
-        "category": "Restaurants",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 592,
-        "cardId": 163,
-        "category": "Wireless Services",
+        "category": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -12715,6 +14545,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9160,
+        "cardId": 163,
+        "category": "Prepaid travel in the U.S. Bank Travel Center",
+        "rate": 0.05,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -12723,7 +14560,7 @@ export const BUILTIN_CARDS = [
         "cardId": 163,
         "name": "5% Back or 90-Day Terms",
         "description": "Eligible Prime Business users can choose 5% back or 90-day payment terms on eligible Amazon Business, Amazon.com, AWS, and Whole Foods Market purchases.",
-        "annualValue": 250
+        "annualValue": null
       },
       {
         "id": 665,
@@ -12736,10 +14573,35 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.amazon.com/businesscard",
+    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html",
     "imageSourceUrl": "https://www.amazon.com/businesscard",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 590,
+        "mode": "automatic-top-spend",
+        "picks": 3,
+        "resets": "month",
+        "options": [
+          "Accounting and tax services",
+          "Advertising and direct marketing",
+          "Airlines",
+          "Car rentals",
+          "Cell phone service providers",
+          "Computer and software services",
+          "Dining",
+          "Drugstores and pharmacies",
+          "Entertainment",
+          "Gas and EV charging stations",
+          "Grocery stores",
+          "Hotels",
+          "Office supplies",
+          "Postal and shipping services",
+          "Utilities"
+        ]
+      }
+    ]
   },
   {
     "id": 164,
@@ -12758,34 +14620,22 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 2% tier applies automatically to the account's top 3 eligible spend categories outside Amazon each billing cycle, based on the combined spend of all cardmembers and Mastercard category codes; the app approximates the billing cycle as a calendar month.",
+      "3% at Amazon-covered sites applies to the first $150,000 of those purchases each calendar year, and 2% to the first $150,000 spent outside Amazon each calendar year; spend beyond each cap earns 1%."
     ],
     "cashbackCategories": [
       {
         "id": 594,
         "cardId": 164,
-        "category": "Amazon Business / Amazon.com / AWS / Whole Foods",
+        "category": "Amazon Business / Amazon.com / AWS / Whole Foods (up to $150,000/year)",
         "rate": 0.03,
         "isDefault": false
       },
       {
         "id": 595,
         "cardId": 164,
-        "category": "Gas / EV Charging",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 596,
-        "cardId": 164,
-        "category": "Restaurants",
-        "rate": 0.02,
-        "isDefault": false
-      },
-      {
-        "id": 597,
-        "cardId": 164,
-        "category": "Wireless Services",
+        "category": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -12795,6 +14645,13 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9161,
+        "cardId": 164,
+        "category": "Prepaid travel in the U.S. Bank Travel Center",
+        "rate": 0.03,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -12803,7 +14660,7 @@ export const BUILTIN_CARDS = [
         "cardId": 164,
         "name": "3% Back or 60-Day Terms",
         "description": "Eligible non-Prime business cardholders can choose 3% back or 60-day payment terms on eligible Amazon Business, Amazon.com, AWS, and Whole Foods Market purchases.",
-        "annualValue": 150
+        "annualValue": null
       },
       {
         "id": 667,
@@ -12816,10 +14673,35 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.amazon.com/businesscard",
+    "sourceUrl": "https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html",
     "imageSourceUrl": "https://www.amazon.com/businesscard",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
+    "categoryChoices": [
+      {
+        "categoryId": 595,
+        "mode": "automatic-top-spend",
+        "picks": 3,
+        "resets": "month",
+        "options": [
+          "Accounting and tax services",
+          "Advertising and direct marketing",
+          "Airlines",
+          "Car rentals",
+          "Cell phone service providers",
+          "Computer and software services",
+          "Dining",
+          "Drugstores and pharmacies",
+          "Entertainment",
+          "Gas and EV charging stations",
+          "Grocery stores",
+          "Hotels",
+          "Office supplies",
+          "Postal and shipping services",
+          "Utilities"
+        ]
+      }
+    ]
   },
   {
     "id": 165,
@@ -12833,12 +14715,14 @@ export const BUILTIN_CARDS = [
     "logoUrl": "https://logo.clearbit.com/lowes.com",
     "cardImageUrl": "/card-images/165-mylowe-s-pro-rewards-american-express.jpg",
     "rewardType": "cashback",
-    "rewardProgram": "Lowe's Business Rewards",
+    "rewardProgram": "MyLowe's Pro Rewards",
     "rewardUnitName": "Cash Back",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "U.S. dining establishments, office supply stores and wireless telephone service providers earn 2 MyLowe's Rewards points per $1 (Synchrony's special-retailer list as of April 2026); purchases with a foreign merchant code and all other purchases earn 1 point per $1.",
+      "Purchases at Lowe's and Lowes.com also earn MyLowe's Pro Rewards points according to the cardholder's Pro Rewards status; the Lowe's row reflects the card's everyday 5% discount and does not add those points."
     ],
     "cashbackCategories": [
       {
@@ -12852,21 +14736,21 @@ export const BUILTIN_CARDS = [
         "id": 600,
         "cardId": 165,
         "category": "Restaurants",
-        "rate": 0.03,
+        "rate": 0.02,
         "isDefault": false
       },
       {
         "id": 601,
         "cardId": 165,
         "category": "Office supplies",
-        "rate": 0.03,
+        "rate": 0.02,
         "isDefault": false
       },
       {
         "id": 602,
         "cardId": 165,
         "category": "Wireless",
-        "rate": 0.03,
+        "rate": 0.02,
         "isDefault": false
       },
       {
@@ -12883,7 +14767,7 @@ export const BUILTIN_CARDS = [
         "cardId": 165,
         "name": "Lowe's Pro Rewards",
         "description": "Business card for Lowe's Pro purchases, with elevated Lowe's earn and pro-focused purchase tracking.",
-        "annualValue": 180
+        "annualValue": null
       },
       {
         "id": 669,
@@ -12896,10 +14780,10 @@ export const BUILTIN_CARDS = [
     "inWallet": false,
     "market": "US",
     "currency": "USD",
-    "sourceUrl": "https://www.lowes.com/l/Credit/business-credit-center",
+    "sourceUrl": "https://www.synchrony.com/document/mlpra-terms.pdf",
     "imageSourceUrl": "https://www.lowes.com/l/Credit/business-credit-center",
-    "lastReviewedAt": "2026-05-18",
-    "dataConfidence": "official"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "needs-review"
   },
   {
     "id": 166,
@@ -12911,7 +14795,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f172a, #38bdf8)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/166-capital-one-spark-2x-miles.avif",
+    "cardImageUrl": "/card-images/166-capital-one-spark-2x-miles.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -12943,14 +14827,16 @@ export const BUILTIN_CARDS = [
         "cardId": 166,
         "name": "Global Entry / TSA PreCheck Credit",
         "description": "Statement credit up to $120 for an eligible Global Entry or TSA PreCheck application fee.",
-        "annualValue": 120
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
       },
       {
         "id": 671,
         "cardId": 166,
         "name": "Transferable Business Miles",
         "description": "Earns Capital One miles that can be redeemed for travel or transferred to Capital One travel partners.",
-        "annualValue": 150
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -12973,7 +14859,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #1e3a8a, #93c5fd)",
     "logoUrl": "https://logo.clearbit.com/capitalone.com",
-    "cardImageUrl": "/card-images/167-capital-one-spark-1-5x-miles-select.avif",
+    "cardImageUrl": "/card-images/167-capital-one-spark-1-5x-miles-select.webp",
     "rewardType": "miles",
     "rewardProgram": "Capital One Miles",
     "rewardUnitName": "Miles",
@@ -13012,7 +14898,7 @@ export const BUILTIN_CARDS = [
         "cardId": 167,
         "name": "Transferable Miles",
         "description": "Miles can be redeemed for travel or transferred to Capital One travel partners.",
-        "annualValue": 100
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13030,7 +14916,7 @@ export const BUILTIN_CARDS = [
     "name": "Atmos Rewards Visa Signature Business",
     "issuer": "Bank of America / Alaska Airlines",
     "network": "Visa",
-    "annualFee": 70,
+    "annualFee": 95,
     "signupBonus": "80,000 points plus $99 Companion Fare after $5,000 spend in the first 90 days",
     "signupBonusValue": 900,
     "color": "linear-gradient(135deg, #0f766e, #1d4ed8)",
@@ -13042,7 +14928,10 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1.4,
     "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Bank of America charges $70 per company plus $25 per card each year; the $95 shown is the cost of a single-card account.",
+      "Companies with an eligible Bank of America small business account earn a 10% bonus on points from card purchases; it is not included in the rates shown.",
+      "Alaska Airlines announced on 2026-09-29 that Bank of America will refresh this card in late 2026 (planned: 10x on eligible purchases through Atmos Rewards for Business, lounge passes, free same-day confirmed flight changes). Details had not been published as of 2026-10-31; the rates shown are the current structure."
     ],
     "cashbackCategories": [
       {
@@ -13086,15 +14975,37 @@ export const BUILTIN_CARDS = [
         "id": 674,
         "cardId": 168,
         "name": "Annual Companion Fare",
-        "description": "Annual $99 companion fare plus taxes and fees after meeting the eligible anniversary-year spend requirement.",
-        "annualValue": 250
+        "description": "$99 Companion Fare (plus taxes and fees from $23) each account anniversary, issued after spending $6,000 or more on purchases in the prior anniversary year.",
+        "annualValue": 250,
+        "period": "cardmember-year"
       },
       {
         "id": 675,
         "cardId": 168,
         "name": "Free Checked Bag and Preferred Boarding",
         "description": "Free checked bag and preferred boarding benefits when the card is used to purchase eligible Alaska Airlines or Hawaiian Airlines tickets.",
-        "annualValue": 180
+        "annualValue": null
+      },
+      {
+        "id": 843,
+        "cardId": 168,
+        "name": "20% Back on In-Flight Purchases",
+        "description": "20% back on Alaska and Hawaiian Airlines in-flight purchases paid with the card.",
+        "annualValue": null
+      },
+      {
+        "id": 844,
+        "cardId": 168,
+        "name": "Alaska Lounge+ Membership Discount",
+        "description": "$100 off an annual Alaska Lounge+ membership purchased with the card.",
+        "annualValue": 100
+      },
+      {
+        "id": 845,
+        "cardId": 168,
+        "name": "No Foreign Transaction Fees",
+        "description": "No international transaction fees.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13102,7 +15013,7 @@ export const BUILTIN_CARDS = [
     "currency": "USD",
     "sourceUrl": "https://business.bankofamerica.com/en/credit-cards/atmos-rewards",
     "imageSourceUrl": "https://business.bankofamerica.com/en/credit-cards/atmos-rewards",
-    "lastReviewedAt": "2026-05-18",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "official"
   },
   {
@@ -13139,14 +15050,14 @@ export const BUILTIN_CARDS = [
         "cardId": 169,
         "name": "No Annual or Balance Transfer Fee",
         "description": "BECU advertises no annual fee and no balance transfer fee for the Cash Back Visa.",
-        "annualValue": 75
+        "annualValue": null
       },
       {
         "id": 677,
         "cardId": 169,
         "name": "No Foreign Transaction Fees",
         "description": "BECU states there are no foreign transaction fees on the current Cash Back Visa.",
-        "annualValue": 50
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13191,14 +15102,14 @@ export const BUILTIN_CARDS = [
         "cardId": 170,
         "name": "Low APR Focus",
         "description": "BECU positions this as its lowest-rate credit card, with the posted variable APR reviewed on the issuer page.",
-        "annualValue": 100
+        "annualValue": null
       },
       {
         "id": 679,
         "cardId": 170,
         "name": "No Annual, Cash Advance, or Foreign Transaction Fees",
         "description": "BECU advertises no annual fee, no cash advance fees, and no foreign transaction fees.",
-        "annualValue": 75
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13219,27 +15130,31 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #c0162d, #005f73)",
     "logoUrl": "https://logo.clearbit.com/hsbc.com.hk",
-    "cardImageUrl": "/card-images/171-hsbc-red-credit-card.jpg",
+    "cardImageUrl": "/card-images/171-hsbc-red-credit-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "HSBC RewardCash",
     "rewardUnitName": "RewardCash",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "4% RewardCash on the first HK$10,000 of online spending each calendar month, then 0.4%; mobile or contactless payments in physical stores are not online spending.",
+      "8% RewardCash at designated merchants on the first HK$1,250 each calendar month, then 0.4%. Local: Sushiro, TamJai SamGor Mixian, TamJai Yunnan Mixian, Bakehouse, Decathlon, NAMCO, TAITO STATION, Sephora, @cosme, 3COINS. Overseas (list updated 2026-07-15): Suica, OLIVE YOUNG in Korea, Mobile Tmoney, FamilyMart in Japan.",
+      "All other spending earns 0.4% RewardCash (HK$250 = $1 RewardCash).",
+      "Annual fee permanently waived."
     ],
     "cashbackCategories": [
       {
         "id": 615,
         "cardId": 171,
-        "category": "Designated Merchants",
+        "category": "Designated merchants (up to $1,250/month)",
         "rate": 0.08,
         "isDefault": false
       },
       {
         "id": 616,
         "cardId": 171,
-        "category": "Online and Mobile Payment",
+        "category": "Online spending (up to $10,000/month)",
         "rate": 0.04,
         "isDefault": false
       },
@@ -13253,18 +15168,19 @@ export const BUILTIN_CARDS = [
     ],
     "benefits": [
       {
-        "id": 680,
+        "id": 978,
         "cardId": 171,
-        "name": "Perpetual Annual Fee Waiver",
-        "description": "HSBC advertises a perpetual annual fee waiver for the Red Credit Card.",
-        "annualValue": 0
+        "name": "McDonald's Monthly RewardCash",
+        "description": "Up to $30 RewardCash a month via HSBC Reward+ stamps: one stamp per McDonald's transaction of HK$30 or more (one a day, eight a month), redeemed in sets of four for $15 RewardCash. The 2026 promotion runs 2 January to 31 December 2026.",
+        "annualValue": 360,
+        "period": "monthly"
       },
       {
-        "id": 681,
+        "id": 979,
         "cardId": 171,
-        "name": "RewardCash Multipliers",
-        "description": "Elevated RewardCash categories are available on eligible online, mobile payment, and designated merchant spending, subject to caps and terms.",
-        "annualValue": 400
+        "name": "HK Express In-flight Drink",
+        "description": "Complimentary drink (worth up to HK$25) when you use the physical card to buy in-flight food of HK$30 or more on HK Express flights.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13272,8 +15188,8 @@ export const BUILTIN_CARDS = [
     "currency": "HKD",
     "sourceUrl": "https://www.hsbc.com.hk/credit-cards/products/red/",
     "imageSourceUrl": "https://www.hsbc.com.hk/credit-cards/products/red/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 172,
@@ -13285,7 +15201,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #f3f4f6, #0f172a)",
     "logoUrl": "https://logo.clearbit.com/hsbc.com.hk",
-    "cardImageUrl": "/card-images/172-hsbc-visa-signature-card.png",
+    "cardImageUrl": "/card-images/172-hsbc-visa-signature-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "HSBC RewardCash",
     "rewardUnitName": "RewardCash",
@@ -13293,14 +15209,17 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "Red Hot Rewards of Your Choice (2026 programme): register once and allocate the extra 5X RewardCash to Dining, Home, Lifestyle, Shopping or Overseas & Mainland China spending; the allocation cannot be changed for the year. Extra RewardCash applies to the first HK$100,000 of eligible spending in the year (maximum extra $2,000 RewardCash). Registration for 2026 closed on 2026-10-31; HSBC runs the programme by calendar year.",
+      "Visa Signature adds an extra 3X (1.2%) automatically on all five Rewards of Your Choice categories: 9X (3.6%) in the category you allocate to and 4X (1.6%) in the others. Home, Lifestyle and Shopping are designated-merchant lists that the app cannot match automatically.",
+      "All other spending earns 0.4% RewardCash (HK$250 = $1 RewardCash).",
+      "HK$2,000 annual fee, waived for the first two years for new cardholders."
     ],
     "cashbackCategories": [
       {
         "id": 618,
         "cardId": 172,
-        "category": "Rewards of Your Choice Category",
-        "rate": 0.024,
+        "category": "Red Hot Rewards of Your Choice category (up to $100,000/year)",
+        "rate": 0.036,
         "isDefault": false
       },
       {
@@ -13309,6 +15228,20 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.004,
         "isDefault": true
+      },
+      {
+        "id": 9201,
+        "cardId": 172,
+        "category": "Dining in Hong Kong (Visa Signature extra 3X)",
+        "rate": 0.016,
+        "isDefault": false
+      },
+      {
+        "id": 9202,
+        "cardId": 172,
+        "category": "Overseas and Mainland China spending (Visa Signature extra 3X)",
+        "rate": 0.016,
+        "isDefault": false
       }
     ],
     "benefits": [
@@ -13316,15 +15249,8 @@ export const BUILTIN_CARDS = [
         "id": 682,
         "cardId": 172,
         "name": "Visa Signature Privileges",
-        "description": "Visa Signature travel, dining, and lifestyle privileges are advertised with the current card program.",
-        "annualValue": 500
-      },
-      {
-        "id": 683,
-        "cardId": 172,
-        "name": "Intro Annual Fee Waiver",
-        "description": "HSBC advertises a first 2-year annual fee waiver for eligible applicants.",
-        "annualValue": 2000
+        "description": "Visa Signature offers such as 15% off at designated restaurants (Lai Sun Dining, Hyatt Regency Tsim Sha Tsui outlets), Emperor Cinemas ticket offers, 30% off cross-border limousines and a 24/7 Visa concierge; offers change over time.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13332,14 +15258,14 @@ export const BUILTIN_CARDS = [
     "currency": "HKD",
     "sourceUrl": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
     "imageSourceUrl": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
-    "lastReviewedAt": "2026-08-06",
-    "dataConfidence": "needs-review",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
     "categoryChoices": [
       {
         "categoryId": 618,
         "mode": "user-selected",
         "picks": 1,
-        "resets": "unknown",
+        "resets": "year",
         "options": [
           "Dining",
           "Home",
@@ -13360,61 +15286,57 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #004c45, #111827)",
     "logoUrl": "https://logo.clearbit.com/sc.com",
-    "cardImageUrl": "/card-images/173-standard-chartered-cathay-mastercard.png",
+    "cardImageUrl": "/card-images/173-standard-chartered-cathay-mastercard.webp",
     "rewardType": "miles",
     "rewardProgram": "Asia Miles",
     "rewardUnitName": "Asia Miles",
-    "rewardUnitValueCents": 1,
-    "rewardValuationDescription": "Asia Miles value varies by itinerary and redemption path; this app uses an estimated 1.00 cents per mile for annual-fee progress while displaying earned miles separately.",
+    "rewardUnitValueCents": 5,
+    "rewardValuationDescription": "Asia Miles value varies by itinerary and redemption path; this app uses an estimated 5.00 HK cents per mile, the ratio Standard Chartered offers in its own welcome offer (40,000 Asia Miles or a HK$2,000 Cathay Gift Card), for annual-fee progress while displaying earned miles separately.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Rates are Asia Miles per HK$1: HK$4 = 1 mile on dining, hotels booked directly with the hotel, and overseas foreign-currency spending; HK$6 = 1 mile on other spending posted in Hong Kong dollars. The Priority Banking and Priority Private versions earn more on overseas spending (HK$3 and HK$2 per mile).",
+      "Purchases made directly with Cathay and HK Express earn the base HK$6 = 1 mile. The advertised 'up to HK$2 = 1 mile' is a one-off 2,667-mile bonus once HK$8,000 is spent with Cathay and HK Express in the 1 Jul-31 Dec 2026 promotion; the app does not model it.",
+      "Annual fee HK$2,000, waived for the first year."
     ],
     "cashbackCategories": [
       {
-        "id": 620,
-        "cardId": 173,
-        "category": "Cathay and Travel",
-        "rate": 0.03,
-        "isDefault": false
-      },
-      {
         "id": 621,
         "cardId": 173,
-        "category": "Dining and Online",
-        "rate": 0.015,
+        "category": "Dining and hotels",
+        "rate": 0.0025,
         "isDefault": false
       },
       {
         "id": 622,
         "cardId": 173,
         "category": "Other",
-        "rate": 0.01,
+        "rate": 0.001667,
         "isDefault": true
+      },
+      {
+        "id": 9203,
+        "cardId": 173,
+        "category": "Overseas spending in foreign currencies",
+        "rate": 0.0025,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
-        "id": 684,
-        "cardId": 173,
-        "name": "Asia Miles Welcome Offer",
-        "description": "Standard Chartered advertises up to 40,000 Asia Miles for eligible new cardholders, subject to terms.",
-        "annualValue": 3200
-      },
-      {
         "id": 685,
         "cardId": 173,
         "name": "Cathay Membership Benefits",
-        "description": "Cathay-focused benefits include mileage earning and status-point related promotions, subject to eligibility and current campaign terms.",
-        "annualValue": 1000
+        "description": "Earn up to 100 Cathay Status Points for HK$500,000 of eligible spending, credited quarterly.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "Hong Kong",
     "currency": "HKD",
-    "sourceUrl": "https://www.sc.com/hk/credit-cards/cathay/?intcid=cardcategory_Jul21-hk-cxam_en",
+    "sourceUrl": "https://www.sc.com/hk/credit-cards/cathay/",
     "imageSourceUrl": "https://www.sc.com/hk/credit-cards/cathay/?intcid=cardcategory_Jul21-hk-cxam_en",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 174,
@@ -13428,19 +15350,22 @@ export const BUILTIN_CARDS = [
     "logoUrl": "https://logo.clearbit.com/hangseng.com",
     "cardImageUrl": "/card-images/174-hang-seng-mmpower-world-mastercard.png",
     "rewardType": "cashback",
-    "rewardProgram": "Hang Seng Cash Dollars",
-    "rewardUnitName": "Cash Dollars",
+    "rewardProgram": "Hang Seng +FUN Dollars",
+    "rewardUnitName": "+FUN Dollars",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "+FUN Dollars Reward Programme (1 Apr-31 Dec 2026): register once and spend at least HK$3,000 of eligible spending in the calendar month (waived for full-time tertiary students). Qualifying spending earns 8% at Amazon, GU, lululemon, Taobao and Uniqlo; 8% on online entertainment (designated streaming, cinema, ticketing and theme-park merchants) and online fashion; 5% on other online spending; and 4% on foreign-currency spending at physical stores outside Hong Kong. Rates include the 0.4% basic +FUN Dollars.",
+      "Extra +FUN Dollars are capped at $500 per calendar month across all four tiers combined. The app caps the bonus rows at a shared HK$6,579 of monthly spend (where the 8% tier alone reaches the $500 cap), so cardholders who spread spending across tiers may earn somewhat more than shown.",
+      "Everything else, and all spending in a month below HK$3,000, earns the basic 0.4% (HK$250 = $1 +FUN Dollar). Alipay and WeChat Pay transactions, recurring payments and e-wallet top-ups do not qualify.",
+      "Annual fee permanently waived for principal and supplementary cards."
     ],
     "cashbackCategories": [
       {
         "id": 623,
         "cardId": 174,
-        "category": "Selected Spending",
+        "category": "Designated merchants: Amazon, GU, lululemon, Taobao and Uniqlo (up to $6,579/month combined)",
         "rate": 0.08,
         "isDefault": false
       },
@@ -13450,38 +15375,44 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.004,
         "isDefault": true
-      }
-    ],
-    "benefits": [
-      {
-        "id": 686,
-        "cardId": 174,
-        "name": "Perpetual Annual Fee Waiver",
-        "description": "Hang Seng advertises a perpetual annual fee waiver for MMPOWER World Mastercard.",
-        "annualValue": 0
       },
       {
-        "id": 687,
+        "id": 9204,
         "cardId": 174,
-        "name": "+FUN Dollars Offers",
-        "description": "The card currently highlights up to 8% +FUN Dollars on eligible categories and promotional welcome rewards.",
-        "annualValue": 800
+        "category": "Designated streaming services, plus cinema, ticketing, theme-park and fashion merchants paid on the web (up to $6,579/month combined)",
+        "rate": 0.08,
+        "isDefault": false
+      },
+      {
+        "id": 9205,
+        "cardId": 174,
+        "category": "Online retail spending at other merchants (up to $6,579/month combined)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9206,
+        "cardId": 174,
+        "category": "Foreign currency spending at overseas physical stores (up to $6,579/month combined)",
+        "rate": 0.04,
+        "isDefault": false
       }
     ],
+    "benefits": [],
     "inWallet": false,
     "market": "Hong Kong",
     "currency": "HKD",
-    "sourceUrl": "https://www.hangseng.com/personal/cards/products/mmpower-card/",
+    "sourceUrl": "https://www.hangseng.com/en-hk/personal/cards/products/mmpower-card/",
     "imageSourceUrl": "https://www.hangseng.com/personal/cards/products/mmpower-card/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 175,
     "name": "DBS Black World Mastercard",
     "issuer": "DBS Hong Kong",
     "network": "Mastercard",
-    "annualFee": 2000,
+    "annualFee": 3600,
     "signupBonus": "See issuer page for current public offer",
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #020617, #0f766e)",
@@ -13494,47 +15425,42 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "DBS$ are worth HK$1 each as cash rebate. Overseas foreign-currency spending earns DBS$3 per HK$250 (HK$4 = 1 mile, 1.2%); other eligible spending earns DBS$2 per HK$250 (HK$6 = 1 mile, 0.8%); Octopus automatic add-value and instalments earn DBS$1 per HK$250. Miles convert at DBS$48 = 1,000 Asia Miles.",
+      "2026 promotion (register in the DBS Card+ app): in any calendar month with HK$20,000 or more of eligible retail spending, overseas spending earns an extra DBS$3 per HK$250 (6X, HK$2 = 1 mile), capped at DBS$240 a month and DBS$2,880 for the year; not modelled.",
+      "Annual fee HK$3,600, waived for the first year."
     ],
     "cashbackCategories": [
       {
         "id": 625,
         "cardId": 175,
-        "category": "Selected Online and Overseas Spend",
-        "rate": 0.04,
+        "category": "Overseas spending in foreign currencies",
+        "rate": 0.012,
         "isDefault": false
       },
       {
         "id": 626,
         "cardId": 175,
         "category": "Other",
-        "rate": 0.004,
+        "rate": 0.008,
         "isDefault": true
       }
     ],
     "benefits": [
       {
-        "id": 688,
-        "cardId": 175,
-        "name": "Black Card Mastercard Benefits",
-        "description": "DBS Black World Mastercard is positioned around Mastercard World privileges and rewards on eligible spending.",
-        "annualValue": 500
-      },
-      {
         "id": 689,
         "cardId": 175,
         "name": "Travel and Lifestyle Offers",
-        "description": "Issuer page links current DBS cardholder offers, which can vary by campaign period.",
-        "annualValue": 500
+        "description": "Rotating DBS cardholder offers; in 2026 they include a JPY600 cash rebate on Suica top-ups, up to 15% cash rebate at designated overseas merchants and 45% off iGO Rewards redemptions.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "Hong Kong",
     "currency": "HKD",
-    "sourceUrl": "https://www.dbs.com.hk/personal/credit-cards/credit-cards/black-mc?pid=hk-personal-en-card-comparator-blackMC",
+    "sourceUrl": "https://www.dbs.com.hk/personal/credit-cards/credit-cards/black-mc",
     "imageSourceUrl": "https://www.dbs.com.hk/personal/credit-cards/credit-cards/black-mc?pid=hk-personal-en-card-comparator-blackMC",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 176,
@@ -13553,20 +15479,23 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "2% (including the 1% basic rebate) on Hong Kong-dollar spending at dining outlets and hotels in Hong Kong, and on all retail spending in foreign currencies; 1% on everything else. No minimum spend or cap.",
+      "The foreign-currency rebate excludes card-present spending at merchants in the UK and EEA; foreign-currency transactions carry a 1.95% fee.",
+      "Rebates are credited once the accumulated balance reaches HK$200."
     ],
     "cashbackCategories": [
       {
         "id": 627,
         "cardId": 176,
-        "category": "Dining",
+        "category": "Dining in Hong Kong (HKD)",
         "rate": 0.02,
         "isDefault": false
       },
       {
         "id": 628,
         "cardId": 176,
-        "category": "Hotel Stays",
+        "category": "Hotels in Hong Kong (HKD)",
         "rate": 0.02,
         "isDefault": false
       },
@@ -13576,31 +15505,31 @@ export const BUILTIN_CARDS = [
         "category": "Other",
         "rate": 0.01,
         "isDefault": true
+      },
+      {
+        "id": 9207,
+        "cardId": 176,
+        "category": "Foreign currency spending",
+        "rate": 0.02,
+        "isDefault": false
       }
     ],
     "benefits": [
       {
-        "id": 690,
-        "cardId": 176,
-        "name": "Simple Cash Back Structure",
-        "description": "Citi positions the card around cash back on eligible dining, hotel, and everyday spending.",
-        "annualValue": 500
-      },
-      {
         "id": 691,
         "cardId": 176,
         "name": "Citi Merchant Offers",
-        "description": "Citi Hong Kong publishes rotating merchant offers and cardholder promotions on the issuer page.",
-        "annualValue": 500
+        "description": "Citi Hong Kong publishes rotating merchant offers and cardholder promotions; no fixed value.",
+        "annualValue": null
       }
     ],
     "inWallet": false,
     "market": "Hong Kong",
     "currency": "HKD",
-    "sourceUrl": "https://www.citibank.com.hk/english/credit-cards/cash-back-card",
+    "sourceUrl": "https://www1.citibank.com.hk/english/credit-cards/cash-back-card",
     "imageSourceUrl": "https://www.citibank.com.hk/english/credit-cards/cash-back-card",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 177,
@@ -13608,7 +15537,7 @@ export const BUILTIN_CARDS = [
     "issuer": "DBS Singapore",
     "network": "Visa",
     "annualFee": 196.2,
-    "signupBonus": "See issuer page for current welcome gift",
+    "signupBonus": null,
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f766e, #bef264)",
     "logoUrl": "https://logo.clearbit.com/dbs.com.sg",
@@ -13619,21 +15548,25 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Closed to new applicants since 2026-09-07; existing cardholders keep the card and earn cashback as usual.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Bonus cashback needs at least S$800 of eligible spend in the calendar month: an extra 5.7% (6% in total) on Shopping (apparel, department stores, electronics and computers, home furnishing, personal services, specialty retail, watches and jewellery; in-store or online, in Singapore or overseas), capped at S$50 a month (about S$877 of spend); and on Transport (public transport, ride-hailing and taxis), capped at S$20 a month (about S$350 of spend).",
+      "All eligible spend earns 0.3% with no cap or minimum.",
+      "In-store spending in 15 selected Asian currencies gets an extra 3.25% (capped at S$50 a month) under a separate promotion; it only offsets the card's foreign-exchange fees, so it is not modelled."
     ],
     "cashbackCategories": [
       {
         "id": 630,
         "cardId": 177,
-        "category": "Online Spend",
-        "rate": 0.05,
+        "category": "Shopping, in-store and online retail: apparel, department stores, electronics, furnishings and specialty retail (up to $877/month)",
+        "rate": 0.06,
         "isDefault": false
       },
       {
         "id": 631,
         "cardId": 177,
-        "category": "Contactless Spend",
-        "rate": 0.05,
+        "category": "Transport: public transit, taxis and rideshare (up to $350/month)",
+        "rate": 0.06,
         "isDefault": false
       },
       {
@@ -13644,29 +15577,16 @@ export const BUILTIN_CARDS = [
         "isDefault": true
       }
     ],
-    "benefits": [
-      {
-        "id": 692,
-        "cardId": 177,
-        "name": "Online and Contactless Cashback",
-        "description": "DBS advertises elevated cashback for eligible online and contactless spend, subject to minimum spend and caps.",
-        "annualValue": 300
-      },
-      {
-        "id": 693,
-        "cardId": 177,
-        "name": "Eco-Positioned Card",
-        "description": "Live Fresh is positioned as a lifestyle card for digital and contactless everyday spending.",
-        "annualValue": 50
-      }
-    ],
+    "benefits": [],
     "inWallet": false,
     "market": "Singapore",
     "currency": "SGD",
     "sourceUrl": "https://www.dbs.com.sg/personal/cards/credit-cards/live-fresh-dbs-visa-paywave-platinum-card",
     "imageSourceUrl": "https://www.dbs.com.sg/personal/cards/credit-cards/live-fresh-dbs-visa-paywave-platinum-card",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
+    "availability": "closed-to-new-applicants",
+    "availabilityChangedAt": "2026-09-07"
   },
   {
     "id": 178,
@@ -13678,7 +15598,7 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #0f3f8f, #7dd3fc)",
     "logoUrl": "https://logo.clearbit.com/uob.com.sg",
-    "cardImageUrl": "/card-images/178-uob-one-card.png",
+    "cardImageUrl": "/card-images/178-uob-one-card.webp",
     "rewardType": "cashback",
     "rewardProgram": "UOB Cashback",
     "rewardUnitName": "Cash Back",
@@ -13686,55 +15606,49 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Cap or timing language appears in the official earning categories: Daily Spend Bonus Categories; Quarterly Cashback Tiers; Other.",
-      "UOB One cashback depends on quarterly spend tiers and eligible merchant/category rules; statement-cycle timing is important."
+      "Cashback is earned per quarter: spend at least S$600, S$1,000 or S$2,000, with at least 10 transactions, in every statement month of the quarter to get S$60, S$100 or S$200 (up to 3.33% of spend). Rates here assume the S$1,000 tier. If no quarter qualifies in a year, only 0.03% base cashback is paid.",
+      "Additional cashback, only in qualifying quarters: Grab (excluding wallet top-ups), McDonald's, Shopee Singapore and SimplyGo +5% (+6.67% at the S$2,000 tier); grocery stores and supermarkets (MCC 5411) +2.67% (+4.67% at S$2,000; none at S$600); Singapore Power +1%; Shell +1.67% at the S$2,000 tier only.",
+      "Additional cashback is capped at S$120 per statement month (maximum S$2,240 a year including quarterly cashback). The app caps the bonus rows at S$2,400 of monthly spend (where +5% reaches S$120) and tracks groceries as a separate bucket.",
+      "Annual fee S$196.20, waived for the first year."
     ],
     "cashbackCategories": [
       {
         "id": 633,
         "cardId": 178,
-        "category": "Daily Spend Bonus Categories",
-        "rate": 0.1,
-        "isDefault": false
-      },
-      {
-        "id": 634,
-        "cardId": 178,
-        "category": "Quarterly Cashback Tiers",
-        "rate": 0.033,
+        "category": "Grab, McDonald's, Shopee Singapore and SimplyGo bus and train rides (up to $2,400/month combined)",
+        "rate": 0.0833,
         "isDefault": false
       },
       {
         "id": 635,
         "cardId": 178,
         "category": "Other",
-        "rate": 0.001,
+        "rate": 0.0333,
         "isDefault": true
-      }
-    ],
-    "benefits": [
-      {
-        "id": 694,
-        "cardId": 178,
-        "name": "Tiered Quarterly Cashback",
-        "description": "UOB One Card uses quarterly cashback tiers and additional daily spend categories, subject to current terms.",
-        "annualValue": 300
       },
       {
-        "id": 695,
+        "id": 9208,
         "cardId": 178,
-        "name": "Campaign Cashback Offers",
-        "description": "UOB advertises time-limited enhanced cashback campaigns on the official card page.",
-        "annualValue": 200
+        "category": "Groceries (supermarket MCC 5411) (up to $2,400/month combined)",
+        "rate": 0.06,
+        "isDefault": false
+      },
+      {
+        "id": 9209,
+        "cardId": 178,
+        "category": "SP Group (Singapore Power) payments (up to $2,400/month combined)",
+        "rate": 0.0433,
+        "isDefault": false
       }
     ],
+    "benefits": [],
     "inWallet": false,
     "market": "Singapore",
     "currency": "SGD",
     "sourceUrl": "https://www.uob.com.sg/personal/cards/cashback/one-card.page",
     "imageSourceUrl": "https://www.uob.com.sg/personal/cards/cashback/one-card.page",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 179,
@@ -13753,20 +15667,25 @@ export const BUILTIN_CARDS = [
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "From 2026-11-01 (by posting date), with at least S$800 of eligible spend in the calendar month: dining (including fast food and food delivery), groceries, land transport and petrol earn 6%, in Singapore or overseas, in-store or online. Watsons earns 3% until 2027-03-31, then 0.25%. EV charging, streaming, telco and utility bills drop to the 0.25% base.",
+      "Total cashback is capped at S$160 per calendar month (single tier; the old S$80 cap for S$800-1,599 of spend is gone). The app caps the bonus rows at S$2,666 of monthly spend (S$160 at 6%).",
+      "Below S$800 of monthly spend, all eligible spend earns 0.25%.",
+      "S$196.20 annual fee, waived for the first two years; later waivers need S$10,000 of spend in a card year.",
+      "ocbc.com blocks automated access; these terms come from two secondary sources and should be re-checked against OCBC's 1 Nov 2026 programme terms."
     ],
     "cashbackCategories": [
       {
         "id": 636,
         "cardId": 179,
-        "category": "Dining and Food Delivery",
-        "rate": 0.05,
+        "category": "Dining, food delivery, groceries, petrol and public transit (up to $2,666/month combined)",
+        "rate": 0.06,
         "isDefault": false
       },
       {
         "id": 637,
         "cardId": 179,
-        "category": "Streaming, Watsons, and EV Charging",
+        "category": "Watsons (up to $2,666/month combined)",
         "rate": 0.03,
         "isDefault": false
       },
@@ -13774,32 +15693,17 @@ export const BUILTIN_CARDS = [
         "id": 638,
         "cardId": 179,
         "category": "Other",
-        "rate": 0.003,
+        "rate": 0.0025,
         "isDefault": true
       }
     ],
-    "benefits": [
-      {
-        "id": 696,
-        "cardId": 179,
-        "name": "Everyday Cashback Categories",
-        "description": "OCBC advertises cashback on dining, food delivery, streaming, Watsons, and EV charging categories, subject to monthly caps.",
-        "annualValue": 300
-      },
-      {
-        "id": 697,
-        "cardId": 179,
-        "name": "Intro Fee Waiver",
-        "description": "OCBC advertises the first 2 years annual fee waiver for the 365 Credit Card.",
-        "annualValue": 196.2
-      }
-    ],
+    "benefits": [],
     "inWallet": false,
     "market": "Singapore",
     "currency": "SGD",
     "sourceUrl": "https://www.ocbc.com/personal-banking/cards/365-cashback-credit-card",
     "imageSourceUrl": "https://www.ocbc.com/personal-banking/cards/365-cashback-credit-card",
-    "lastReviewedAt": "2026-05-19",
+    "lastReviewedAt": "2026-10-31",
     "dataConfidence": "needs-review"
   },
   {
@@ -13812,45 +15716,42 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": null,
     "color": "linear-gradient(135deg, #f8fafc, #e11d48)",
     "logoUrl": "https://logo.clearbit.com/hsbc.com.sg",
-    "cardImageUrl": "/card-images/180-hsbc-revolution-credit-card.png",
+    "cardImageUrl": "/card-images/180-hsbc-revolution-credit-card.webp",
     "rewardType": "points",
     "rewardProgram": "HSBC Reward Points",
     "rewardUnitName": "Reward Points",
     "rewardUnitValueCents": 0.4,
-    "rewardValuationDescription": "HSBC Revolution rewards are modeled from the app catalog cash-equivalent earning rate; official point-to-mile/cash value varies by redemption.",
+    "rewardValuationDescription": "Rates are HSBC Reward points per S$1 (10X = 10 points). This app values a point at 0.4 SG cents, i.e. 0.4 miles per point (HSBC: 42,000 points = 16,800 miles) at 1 cent per mile, for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "10X Reward points (1X base + 9X bonus, up to 4 miles per S$1) on contactless and online payments at eligible merchant codes: dining, shopping, travel, ride-hailing, taxis and memberships, in Singapore or abroad. Bonus points are capped at 9,000 per calendar month (S$1,000 of spend); after that, 1X.",
+      "Cardholders keeping an average daily balance of at least S$50,000 in an HSBC Everyday Global Account earn 20X (19X bonus, capped at 22,800 bonus points a month); not modelled.",
+      "All other qualifying spending earns 1X with no cap.",
+      "HSBC currently waives the annual fee. The card is a Visa Signature card with complimentary travel insurance."
     ],
     "cashbackCategories": [
       {
         "id": 639,
         "cardId": 180,
-        "category": "Eligible Online and Contactless Spend",
-        "rate": 0.04,
+        "category": "Dining, shopping, travel, rideshare, taxis and memberships at eligible MCCs (up to $1,000/month)",
+        "rate": 0.1,
         "isDefault": false
       },
       {
         "id": 640,
         "cardId": 180,
         "category": "Other",
-        "rate": 0.004,
+        "rate": 0.01,
         "isDefault": true
       }
     ],
     "benefits": [
       {
-        "id": 698,
+        "id": 980,
         "cardId": 180,
-        "name": "Annual Fee Waiver",
-        "description": "HSBC states it is waiving the HSBC Revolution Credit Card annual fee.",
-        "annualValue": 0
-      },
-      {
-        "id": 699,
-        "cardId": 180,
-        "name": "Reward Points Offer",
-        "description": "HSBC advertises a 42,000 Reward points welcome offer, subject to current terms.",
-        "annualValue": 210
+        "name": "Complimentary Travel Insurance",
+        "description": "Complimentary travel insurance covering flight inconvenience and personal accident, up to S$1 million, for the cardholder and family (Visa Signature).",
+        "annualValue": null
       }
     ],
     "inWallet": false,
@@ -13858,8 +15759,8 @@ export const BUILTIN_CARDS = [
     "currency": "SGD",
     "sourceUrl": "https://www.hsbc.com.sg/credit-cards/products/revolution/",
     "imageSourceUrl": "https://www.hsbc.com.sg/credit-cards/products/revolution/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 181,
@@ -13871,27 +15772,31 @@ export const BUILTIN_CARDS = [
     "signupBonusValue": 300,
     "color": "linear-gradient(135deg, #0369a1, #0f172a)",
     "logoUrl": "https://logo.clearbit.com/citibank.com.sg",
-    "cardImageUrl": "/card-images/181-citi-cash-back-card-singapore.png",
+    "cardImageUrl": "/card-images/181-citi-cash-back-card-singapore.webp",
     "rewardType": "cashback",
     "rewardProgram": "Citi Cash Back",
     "rewardUnitName": "Cash Back",
     "rewardUnitValueCents": 1,
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
-      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "With at least S$800 of qualifying retail spend in the statement month: 8% (0.2% base + 7.8% bonus) on petrol and private-hire commutes (Grab, Gojek and similar), and 6% (0.2% + 5.8%) on dining and groceries, worldwide.",
+      "Total cash back is capped at S$80 per statement month across all spending; the app caps the bonus rows at S$1,000 of monthly spend (S$80 at 8%).",
+      "Below S$800, and on all other retail spending, cash back is 0.2%.",
+      "Annual fee S$196.20 including GST."
     ],
     "cashbackCategories": [
       {
         "id": 641,
         "cardId": 181,
-        "category": "Petrol and Private Commute",
+        "category": "Petrol, gas stations and private-hire rideshare such as Grab and Gojek, worldwide (up to $1,000/month combined)",
         "rate": 0.08,
         "isDefault": false
       },
       {
         "id": 642,
         "cardId": 181,
-        "category": "Dining and Groceries",
+        "category": "Dining and groceries, worldwide (up to $1,000/month combined)",
         "rate": 0.06,
         "isDefault": false
       },
@@ -13899,33 +15804,18 @@ export const BUILTIN_CARDS = [
         "id": 643,
         "cardId": 181,
         "category": "Other",
-        "rate": 0.0025,
+        "rate": 0.002,
         "isDefault": true
       }
     ],
-    "benefits": [
-      {
-        "id": 700,
-        "cardId": 181,
-        "name": "High Everyday Cashback",
-        "description": "Citi advertises elevated cashback on eligible petrol, private commute, dining, and grocery spend, subject to minimum spend and caps.",
-        "annualValue": 300
-      },
-      {
-        "id": 701,
-        "cardId": 181,
-        "name": "Welcome Cashback",
-        "description": "Citi advertises a S$300 cashback welcome offer for eligible applicants.",
-        "annualValue": 300
-      }
-    ],
+    "benefits": [],
     "inWallet": false,
     "market": "Singapore",
     "currency": "SGD",
-    "sourceUrl": "https://www1.citibank.com.sg/credit-cards/cashback/citi-cash-back-card",
+    "sourceUrl": "https://www.citibank.com.sg/credit-cards/cashback/cash-back-card",
     "imageSourceUrl": "https://www1.citibank.com.sg/credit-cards/cashback/citi-cash-back-card",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
   },
   {
     "id": 182,
@@ -13945,46 +15835,891 @@ export const BUILTIN_CARDS = [
     "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
     "rewardRuleNotes": [
       "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
-      "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle."
+      "Bonus merchants: SMART Dining (McDonald's, KFC, Burger King, Ya Kun Kaya Toast, Subway, Toast Box, Starbucks, The Coffee Bean & Tea Leaf, Pizza Hut, Domino's), SMART Transport (bus and MRT via SimplyGo, EV charging) and SMART Streaming (Netflix, Spotify, YouTube, Disney+, Amazon Prime, Viu, iQIYI, HBO GO).",
+      "Rates depend on total card spend in the statement month: below S$800, 0.5% on everything; S$800-1,499, 8% at bonus merchants and 0.5% otherwise (encoded here); S$1,500 and above, 10% at bonus merchants and 1% otherwise. No cashback cap.",
+      "Cashback is paid as 360° Rewards points (3,200 points = S$10).",
+      "Annual fee S$91 + 9% GST (S$99.19), waived for the first year for new cardholders."
     ],
     "cashbackCategories": [
       {
         "id": 644,
         "cardId": 182,
-        "category": "Selected Digital and Everyday Merchants",
-        "rate": 0.06,
+        "category": "Streaming, SimplyGo bus and train rides, EV charging, and selected fast-food and coffee chains",
+        "rate": 0.08,
         "isDefault": false
       },
       {
         "id": 645,
         "cardId": 182,
         "category": "Other",
-        "rate": 0.003,
+        "rate": 0.005,
         "isDefault": true
       }
     ],
-    "benefits": [
-      {
-        "id": 702,
-        "cardId": 182,
-        "name": "Low Annual Fee",
-        "description": "Standard Chartered lists the annual fee as S$91 before 9% GST, with first-year fee waiver terms on the official page.",
-        "annualValue": 99.19
-      },
-      {
-        "id": 703,
-        "cardId": 182,
-        "name": "Smart Card Merchant Offers",
-        "description": "The Smart Credit Card focuses on selected digital and everyday merchant cashback, subject to current issuer terms.",
-        "annualValue": 120
-      }
-    ],
+    "benefits": [],
     "inWallet": false,
     "market": "Singapore",
     "currency": "SGD",
     "sourceUrl": "https://www.sc.com/sg/credit-cards/smart-credit-card/",
     "imageSourceUrl": "https://www.sc.com/sg/credit-cards/smart-credit-card/",
-    "lastReviewedAt": "2026-05-19",
-    "dataConfidence": "needs-review"
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 183,
+    "name": "IHG One Rewards Premier Select Credit Card",
+    "issuer": "Chase / IHG",
+    "network": "Mastercard",
+    "annualFee": 350,
+    "signupBonus": null,
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #3d5a6c, #1c2f3a)",
+    "logoUrl": "https://logo.clearbit.com/chase.com",
+    "cardImageUrl": "/card-images/183-ihg-one-rewards-premier-select-credit-card.webp",
+    "rewardType": "points",
+    "rewardProgram": "IHG One Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 0.5,
+    "rewardValuationDescription": "IHG One Rewards value varies by redemption; this app uses an estimated 0.50 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+      "Launched 2026-10-01 (https://media.chase.com/news/ihg-premier-select-card-portfolio-updates) as the top tier of the IHG One Rewards card portfolio; the 6x travel category includes rideshare and transit and excludes IHG hotel stays, which earn 12x."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9166,
+        "cardId": 183,
+        "category": "IHG Hotels",
+        "rate": 0.12,
+        "isDefault": false
+      },
+      {
+        "id": 9167,
+        "cardId": 183,
+        "category": "Dining",
+        "rate": 0.06,
+        "isDefault": false
+      },
+      {
+        "id": 9168,
+        "cardId": 183,
+        "category": "Travel (including rideshare and transit)",
+        "rate": 0.06,
+        "isDefault": false
+      },
+      {
+        "id": 9169,
+        "cardId": 183,
+        "category": "Other",
+        "rate": 0.03,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 930,
+        "cardId": 183,
+        "name": "Anniversary Free Night",
+        "description": "A Free Night after each card anniversary at an IHG hotel with a redemption cap of 60,000 points; points can be added for pricier nights.",
+        "annualValue": 300,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 931,
+        "cardId": 183,
+        "name": "Food and Beverage Rewards",
+        "description": "A $75 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $300 a year).",
+        "annualValue": 300,
+        "period": "quarterly"
+      },
+      {
+        "id": 932,
+        "cardId": 183,
+        "name": "Airline Statement Credit",
+        "description": "$200 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+        "annualValue": 200,
+        "period": "calendar-year"
+      },
+      {
+        "id": 933,
+        "cardId": 183,
+        "name": "$50 United TravelBank Cash",
+        "description": "After registering the card with a MileagePlus account: $25 in United TravelBank cash for January-June and another $25 for July-December, up to $50 each calendar year.",
+        "annualValue": 50,
+        "period": "semiannual"
+      },
+      {
+        "id": 934,
+        "cardId": 183,
+        "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+        "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 935,
+        "cardId": 183,
+        "name": "DashPass Membership",
+        "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 936,
+        "cardId": 183,
+        "name": "Instacart Credit",
+        "description": "$10 Instacart credit each month (up to $120 a year) while an Instacart+ member (3 months complimentary, then $99/year); ends 12/31/2027.",
+        "annualValue": 120,
+        "period": "monthly"
+      },
+      {
+        "id": 937,
+        "cardId": 183,
+        "name": "Automatic Platinum Elite Status",
+        "description": "Automatic IHG One Rewards Platinum Elite status while the card is open; Diamond Elite after $25,000 in purchases in a calendar year.",
+        "annualValue": null
+      },
+      {
+        "id": 938,
+        "cardId": 183,
+        "name": "20 Elite Night Credits",
+        "description": "20 Elite Night Credits at account opening and each January, plus 2 more for every $5,000 spent and 5 more after $15,000 in a calendar year.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 939,
+        "cardId": 183,
+        "name": "4th Night Free",
+        "description": "When you redeem points for a consecutive four-night IHG stay, the fourth night is free.",
+        "annualValue": null
+      },
+      {
+        "id": 940,
+        "cardId": 183,
+        "name": "Second Anniversary Free Night After $40,000 Annual Spend",
+        "description": "An additional Free Night (60,000-point redemption cap) after $40,000 in purchases each calendar year.",
+        "annualValue": 300,
+        "period": "calendar-year"
+      },
+      {
+        "id": 941,
+        "cardId": 183,
+        "name": "20,000 Bonus Points After $15,000 Annual Spend",
+        "description": "20,000 bonus points after $15,000 in purchases each calendar year.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 942,
+        "cardId": 183,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees on purchases made outside the United States.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier-select",
+    "imageSourceUrl": "https://creditcards.chase.com/content/dam/jpmc-marketplace/card-art/ihg_premier_select_card.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 184,
+    "name": "Citi / AAdvantage Globe Mastercard",
+    "issuer": "Citi / American Airlines",
+    "network": "Mastercard",
+    "annualFee": 350,
+    "signupBonus": null,
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #2b3a3f, #4a5d63)",
+    "logoUrl": "https://logo.clearbit.com/citi.com",
+    "cardImageUrl": "/card-images/184-citi-aadvantage-globe-mastercard.webp",
+    "rewardType": "miles",
+    "rewardProgram": "American Airlines AAdvantage",
+    "rewardUnitName": "Miles",
+    "rewardUnitValueCents": 1.3,
+    "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Launched 2025-10-19 (Citigroup / American Airlines release; annual fee $350). Rides and Rails covers eligible taxis, rideshares and public transit.",
+      "Former Barclays AAdvantage Aviator Silver accounts were converted to this card on 2026-04-24; their grandfathered Barclays perks ended 2026-10-25."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9170,
+        "cardId": 184,
+        "category": "AAdvantage Hotels bookings",
+        "rate": 0.06,
+        "isDefault": false
+      },
+      {
+        "id": 9171,
+        "cardId": 184,
+        "category": "American Airlines",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9172,
+        "cardId": 184,
+        "category": "Restaurants (incl. takeout and delivery)",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9173,
+        "cardId": 184,
+        "category": "Rides and Rails (rideshare, taxis and transit)",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9174,
+        "cardId": 184,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 943,
+        "cardId": 184,
+        "name": "Turo Credit",
+        "description": "Up to $30 back per eligible completed Turo trip paid with the card (card linked to the Turo account), up to $240 per calendar year.",
+        "annualValue": 240,
+        "period": "calendar-year"
+      },
+      {
+        "id": 944,
+        "cardId": 184,
+        "name": "Inflight Purchase Credit",
+        "description": "Up to $100 in statement credits each calendar year on inflight purchases on American Airlines flights.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 945,
+        "cardId": 184,
+        "name": "Annual Splurge Credit",
+        "description": "Up to $100 in statement credits each calendar year on up to 2 of: AAdvantage Hotels bookings, 1stDibs, Future Personal Training and Live Nation (exclusions apply).",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 946,
+        "cardId": 184,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 947,
+        "cardId": 184,
+        "name": "Admirals Club Globe Passes",
+        "description": "4 Admirals Club Globe Passes (24-hour access each) every calendar year, stored in the AAdvantage wallet.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 948,
+        "cardId": 184,
+        "name": "American Airlines Companion Certificate",
+        "description": "From the second cardmembership year, after renewal: one round-trip domestic Main Cabin companion ticket for a $99 ticketing fee plus taxes and fees. No spend requirement.",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 949,
+        "cardId": 184,
+        "name": "First Checked Bag Free",
+        "description": "First checked bag free on domestic American Airlines itineraries for the cardholder and up to 8 companions on the same reservation.",
+        "annualValue": null
+      },
+      {
+        "id": 950,
+        "cardId": 184,
+        "name": "Preferred Boarding",
+        "description": "Preferred boarding on American Airlines flights for the cardholder and up to 8 companions on the same reservation.",
+        "annualValue": null
+      },
+      {
+        "id": 951,
+        "cardId": 184,
+        "name": "Flight Streak Loyalty Points Bonus",
+        "description": "5,000 bonus Loyalty Points after every 4 qualifying American Airlines flights, up to 15,000 per status qualification year.",
+        "annualValue": null
+      },
+      {
+        "id": 952,
+        "cardId": 184,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees on purchases.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-globe-mastercard",
+    "imageSourceUrl": "https://aemapi.citi.com/content/dam/cfs/uspb/usmkt/cards/en/static/images/citi-aadvantage-globe-mastercard/citi-aadvantage-globe-mastercard_306x192.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 185,
+    "name": "Atmos Rewards Summit Visa Infinite",
+    "issuer": "Bank of America / Alaska Airlines",
+    "network": "Visa",
+    "annualFee": 395,
+    "signupBonus": "80,000 bonus points plus a 25,000-point Global Companion Award after $4,000 spend in the first 90 days (limited-time online offer)",
+    "signupBonusValue": 1120,
+    "color": "linear-gradient(135deg, #050505, #3a3a3a)",
+    "logoUrl": "https://logo.clearbit.com/bankofamerica.com",
+    "cardImageUrl": "/card-images/185-atmos-rewards-summit-visa-infinite.webp",
+    "rewardType": "points",
+    "rewardProgram": "Atmos Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.4,
+    "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "The 3x foreign-transaction category follows Bank of America's definition of a foreign transaction; a logged purchase category cannot show that, so that row is matched only from Smart Suggest text.",
+      "Cardholders with an eligible Bank of America account earn a 10% bonus on points from card purchases; it is not included in the rates shown.",
+      "The Global Companion Award is 25,000 points each account anniversary, or 100,000 points after $60,000 or more in purchases in the account year."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9175,
+        "cardId": 185,
+        "category": "Alaska Airlines and Hawaiian Airlines purchases",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9176,
+        "cardId": 185,
+        "category": "Dining",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9177,
+        "cardId": 185,
+        "category": "Foreign transactions",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9178,
+        "cardId": 185,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 953,
+        "cardId": 185,
+        "name": "Global Companion Award",
+        "description": "25,000-point Global Companion Award on every account anniversary, or a 100,000-point award after $60,000 or more in purchases in the account year.",
+        "annualValue": 350,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 954,
+        "cardId": 185,
+        "name": "Alaska Lounge Passes",
+        "description": "8 Alaska Lounge passes every calendar year, issued 2 per quarter.",
+        "annualValue": null,
+        "period": "quarterly"
+      },
+      {
+        "id": 955,
+        "cardId": 185,
+        "name": "10,000 Anniversary Status Points",
+        "description": "10,000 Atmos Rewards status points on each account anniversary.",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 956,
+        "cardId": 185,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 Airport Security Statement Credit toward Global Entry or TSA PreCheck, every four years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 957,
+        "cardId": 185,
+        "name": "Instant Travel Delay Credit",
+        "description": "$50 Instant Travel Delay Credit for a cancellation or a departure delay of 2 hours or more.",
+        "annualValue": null
+      },
+      {
+        "id": 958,
+        "cardId": 185,
+        "name": "Waived Same-Day Change Fees",
+        "description": "Waived fees for same-day confirmed Alaska flight changes, worth up to $75 per change.",
+        "annualValue": null
+      },
+      {
+        "id": 959,
+        "cardId": 185,
+        "name": "Free Checked Bag and Preferred Boarding",
+        "description": "Free checked bag and preferred boarding for you and up to 6 guests on the same reservation when the Alaska or Hawaiian Airlines flight is paid with the card.",
+        "annualValue": null
+      },
+      {
+        "id": 960,
+        "cardId": 185,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bankofamerica.com/credit-cards/products/alaska-airlines-infinite-credit-card/",
+    "imageSourceUrl": "https://www.bankofamerica.com/content/images/ContextualSiteGraphics/CreditCardArt/en_US/Approved_PCM/1bed_rewcm_v_atmos_visafront_infinite_250.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 186,
+    "name": "Bilt Blue Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 0,
+    "signupBonus": "$100 in Bilt Cash at account opening (no spend requirement)",
+    "signupBonusValue": 100,
+    "color": "linear-gradient(135deg, #1e3a8a, #3b82f6)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": "/card-images/186-bilt-blue-card.webp",
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee. The Rent row uses the 1X tier. Under the Housing-only option the housing multiplier is set each billing cycle by everyday spend as a share of the housing payment: 25% gives 0.5X, 50% gives 0.75X, 75% gives 1X, 100% or more gives 1.25X, and below 25% earns a flat 250 points per billing cycle.",
+      "Accounts opened before 2027-01-01 may instead elect the Flexible Bilt Cash option: 4% back in Bilt Cash on everyday purchases, and every $3 of Bilt Cash redeemed unlocks 100 points on housing payments (up to 1X). Bilt Cash is not modeled as an earn rate. Accounts opened on or after 2027-01-01 get only the Housing-only option.",
+      "Bilt Travel portal bookings add +2X on hotels and +1X on flights to the card rate, and linking Lyft adds +2X; those rows show the totals Bilt publishes. Bilt Dining partner restaurants add a variable bonus (advertised as up to 4X total on this card); it varies by restaurant and is not modeled.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9179,
+        "cardId": 186,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9180,
+        "cardId": 186,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9181,
+        "cardId": 186,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9182,
+        "cardId": 186,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 9183,
+        "cardId": 186,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 961,
+        "cardId": 186,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee, by portal, ACH, Venmo or Bilt-issued check.",
+        "annualValue": null
+      },
+      {
+        "id": 962,
+        "cardId": 186,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Blue Card.",
+        "annualValue": null
+      },
+      {
+        "id": 963,
+        "cardId": 186,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Blue Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-tahoe.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 187,
+    "name": "Bilt Obsidian Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 95,
+    "signupBonus": "$200 in Bilt Cash at account opening (no spend requirement)",
+    "signupBonusValue": 200,
+    "color": "linear-gradient(135deg, #0b0b0f, #3f3f46)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": "/card-images/187-bilt-obsidian-card.webp",
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "3X applies to the cardholder's pick of dining (the default) or grocery stores and supermarkets; the other earns 1X. The pick can be changed once within 30 days of account opening, then is locked for the rest of the calendar year. Grocery earning is capped at $25,000 per calendar year, then 1X. The app applies the $25,000/year cap to whichever option is picked.",
+      "2X travel covers airlines, hotels, motels, resorts, cruise lines and car rental agencies booked directly. Bilt Travel portal bookings add +2X on hotels and +1X on flights, and linking Lyft adds +2X; those rows show the published totals. Bilt Dining partner restaurants add a variable bonus (advertised as up to 6X total with dining picked); it is not modeled.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee. The Rent row uses the 1X tier. Under the Housing-only option the multiplier is set each billing cycle by everyday spend as a share of the housing payment (25%: 0.5X, 50%: 0.75X, 75%: 1X, 100%+: 1.25X; below 25%: a flat 250 points). Accounts opened before 2027-01-01 may instead elect Flexible Bilt Cash: 4% back in Bilt Cash on everyday purchases, with $3 of Bilt Cash unlocking 100 housing points (up to 1X). Bilt Cash is not modeled as an earn rate.",
+      "From 2027-01-01, new accounts get $100 in Bilt Cash at opening and each card anniversary instead of the hotel credit. Existing accounts switch at their first card anniversary on or after 2027-01-01 unless they make a Legacy Election.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9184,
+        "cardId": 187,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 9185,
+        "cardId": 187,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9186,
+        "cardId": 187,
+        "category": "Dining or groceries, your pick (groceries up to $25,000/year)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9187,
+        "cardId": 187,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9188,
+        "cardId": 187,
+        "category": "Airlines, hotels, cruise lines and car rentals booked directly",
+        "rate": 0.02,
+        "isDefault": false
+      },
+      {
+        "id": 9189,
+        "cardId": 187,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 9190,
+        "cardId": 187,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "categoryChoices": [
+      {
+        "categoryId": 9186,
+        "mode": "user-selected",
+        "picks": 1,
+        "resets": "year",
+        "options": [
+          "Dining",
+          "Grocery stores and supermarkets"
+        ]
+      }
+    ],
+    "benefits": [
+      {
+        "id": 964,
+        "cardId": 187,
+        "name": "Bilt Travel Hotel Credit",
+        "description": "Up to $50 in each half of the calendar year (January-June and July-December) toward hotel bookings of 2+ nights made through the Bilt Travel portal, for a total of $100 per calendar year. Ends at the first card anniversary on or after 2027-01-01 (replaced by $100 annual Bilt Cash) unless a Legacy Election is made.",
+        "annualValue": 100,
+        "period": "semiannual"
+      },
+      {
+        "id": 965,
+        "cardId": 187,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee.",
+        "annualValue": null
+      },
+      {
+        "id": 966,
+        "cardId": 187,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Obsidian Card.",
+        "annualValue": null
+      },
+      {
+        "id": 967,
+        "cardId": 187,
+        "name": "Trip Protection",
+        "description": "Trip cancellation/interruption protection, trip delay reimbursement and lost or damaged luggage insurance (Obsidian Card Guide to Benefits).",
+        "annualValue": null
+      },
+      {
+        "id": 968,
+        "cardId": 187,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Obsidian Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-vail.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 188,
+    "name": "Bilt Palladium Card",
+    "issuer": "Column N.A. / Bilt",
+    "network": "Mastercard",
+    "annualFee": 495,
+    "signupBonus": "$300 in Bilt Cash at account opening, plus 50,000 points and Bilt Gold status after $4,000 in everyday purchases (excluding rent and mortgage) in the first 90 days",
+    "signupBonusValue": 925,
+    "color": "linear-gradient(135deg, #6b7280, #d1d5db)",
+    "logoUrl": "https://logo.clearbit.com/biltrewards.com",
+    "cardImageUrl": "/card-images/188-bilt-palladium-card.webp",
+    "rewardType": "points",
+    "rewardProgram": "Bilt Rewards",
+    "rewardUnitName": "Points",
+    "rewardUnitValueCents": 1.25,
+    "rewardValuationDescription": "Bilt Rewards value varies by redemption; this app uses an estimated 1.25 cents per point for annual-fee progress while displaying earned points separately.",
+    "rewardRuleNotes": [
+      "Issued by Column N.A. and serviced by Cardless Inc. Succeeds the Wells Fargo-issued Bilt Mastercard (catalog #45), retired 2026-02-07.",
+      "2X on all eligible purchases except housing payments. Bilt Travel portal bookings add +2X on hotels and +1X on flights, and linking Lyft adds +2X; those rows show the published totals. Bilt Dining partner restaurants add a variable bonus (advertised as up to 5X total); it is not modeled.",
+      "Rent, mortgage and HOA payments made through Bilt carry no transaction fee and do not earn the 2X rate. The Rent row uses the 1X tier. Under the Housing-only option the multiplier is set each billing cycle by everyday spend as a share of the housing payment (25%: 0.5X, 50%: 0.75X, 75%: 1X, 100%+: 1.25X; below 25%: a flat 250 points). Accounts opened before 2027-01-01 may instead elect Flexible Bilt Cash: 4% back in Bilt Cash on everyday purchases, with $3 of Bilt Cash unlocking 100 housing points (up to 1X). Bilt Cash is not modeled as an earn rate.",
+      "From 2027-01-01, new accounts get $600 in Bilt Cash at opening and each card anniversary in place of the $400 hotel credit and $200 annual Bilt Cash. Existing accounts switch at their first card anniversary on or after 2027-01-01 unless they make a Legacy Election.",
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9191,
+        "cardId": 188,
+        "category": "Hotels booked online through the Bilt Travel portal",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 9192,
+        "cardId": 188,
+        "category": "Lyft rides (linked Bilt account)",
+        "rate": 0.04,
+        "isDefault": false
+      },
+      {
+        "id": 9193,
+        "cardId": 188,
+        "category": "Flights booked online through the Bilt Travel portal",
+        "rate": 0.03,
+        "isDefault": false
+      },
+      {
+        "id": 9194,
+        "cardId": 188,
+        "category": "Rent",
+        "rate": 0.01,
+        "isDefault": false
+      },
+      {
+        "id": 9195,
+        "cardId": 188,
+        "category": "Other",
+        "rate": 0.02,
+        "isDefault": true
+      }
+    ],
+    "benefits": [
+      {
+        "id": 969,
+        "cardId": 188,
+        "name": "Bilt Travel Hotel Credit",
+        "description": "Up to $200 in each half of the calendar year (January-June and July-December) toward hotel bookings of 2+ nights made through the Bilt Travel portal, for a total of $400 per calendar year. Ends at the first card anniversary on or after 2027-01-01 (replaced by $600 annual Bilt Cash) unless a Legacy Election is made.",
+        "annualValue": 400,
+        "period": "semiannual"
+      },
+      {
+        "id": 970,
+        "cardId": 188,
+        "name": "Annual Bilt Cash",
+        "description": "$200 in Bilt Cash credited at account opening and on each card anniversary to the primary cardholder (Bilt Cash expires 12 months after it is earned). Replaced by $600 annual Bilt Cash at the first card anniversary on or after 2027-01-01 unless a Legacy Election is made.",
+        "annualValue": 200,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 971,
+        "cardId": 188,
+        "name": "Priority Pass Membership",
+        "description": "Priority Pass lounge membership covering 1,300+ airport lounges (Bilt lists it as worth $469 per year).",
+        "annualValue": null
+      },
+      {
+        "id": 972,
+        "cardId": 188,
+        "name": "No Fee on Rent and Mortgage Payments",
+        "description": "Rent, mortgage and HOA payments made through the Bilt app or website carry no transaction fee.",
+        "annualValue": null
+      },
+      {
+        "id": 973,
+        "cardId": 188,
+        "name": "No Foreign Transaction Fees",
+        "description": "Bilt lists no foreign transaction fees on the Palladium Card.",
+        "annualValue": null
+      },
+      {
+        "id": 974,
+        "cardId": 188,
+        "name": "Trip Protection",
+        "description": "Trip cancellation/interruption protection, trip delay reimbursement, lost or damaged luggage and baggage delay insurance (Palladium Card Guide to Benefits).",
+        "annualValue": null
+      },
+      {
+        "id": 975,
+        "cardId": 188,
+        "name": "Cell Phone Protection",
+        "description": "Cellular wireless telephone protection when the monthly phone bill is paid with the card (see the Palladium Card Guide to Benefits for limits).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.bilt.com/card",
+    "imageSourceUrl": "https://img.bilt.com/43819/1790799681-bilt-aspen.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  },
+  {
+    "id": 189,
+    "name": "DBS Chromo Card",
+    "issuer": "DBS Singapore",
+    "network": "Visa",
+    "annualFee": 196.2,
+    "signupBonus": "See issuer page for current welcome gift (new-to-DBS/POSB cardholders aged 21-29)",
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #b91c1c, #f87171)",
+    "logoUrl": "https://logo.clearbit.com/dbs.com.sg",
+    "cardImageUrl": "/card-images/189-dbs-chromo-card.webp",
+    "rewardType": "cashback",
+    "rewardProgram": "DBS Cashback",
+    "rewardUnitName": "Cash Back",
+    "rewardUnitValueCents": 1,
+    "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Only for applicants aged 21-29. Each calendar month the two local spend categories with the highest eligible spend (Dining, Travel, Shopping, Transport, Entertainment, Wellness) automatically earn an extra 4% (5% in total) once S$500 of eligible spend is reached. Bonus cashback is capped at S$30 per category (S$750 of spend each) and total cashback at S$150 a month including the base.",
+      "1% base cashback on other local (SGD) spend, with no minimum. Foreign-currency transactions earn no cashback but carry no FX fee; overseas purchases converted to SGD by the merchant (DCC) still earn.",
+      "Cardholders can switch to miles once a month: 1.3 miles per S$1, paid as DBS Points (1 point = 2 miles), uncapped.",
+      "From the fourth month after the cardholder's 30th birthday month the card earns a flat 1.7% cashback (or 1.3 miles per S$1) with no cap or minimum spend.",
+      "Annual fee S$196.20, waived for the first five years."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 9210,
+        "cardId": 189,
+        "category": "Top 2 local spend categories each month, picked automatically (up to $1,500/month combined)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 9211,
+        "cardId": 189,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "categoryChoices": [
+      {
+        "categoryId": 9210,
+        "mode": "automatic-top-spend",
+        "picks": 2,
+        "resets": "month",
+        "options": [
+          "Dining",
+          "Travel",
+          "Shopping, including online retail",
+          "Transport: public transit, taxis and rideshare",
+          "Entertainment, streaming and telco phone plans",
+          "Wellness: groceries, drugstores, beauty and gyms"
+        ]
+      }
+    ],
+    "benefits": [
+      {
+        "id": 981,
+        "cardId": 189,
+        "name": "No Foreign Transaction Fees",
+        "description": "No FX fee on foreign-currency spending online or in-store (such spending earns no cashback).",
+        "annualValue": null
+      },
+      {
+        "id": 982,
+        "cardId": 189,
+        "name": "Complimentary Basic Travel Insurance",
+        "description": "Complimentary basic travel insurance underwritten by Chubb, redeemable once a month until 31 Aug 2027 (cardholders 18 and above).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "Singapore",
+    "currency": "SGD",
+    "sourceUrl": "https://www.dbs.com.sg/personal/cards/credit-cards/dbs-chromo-card",
+    "imageSourceUrl": "https://www.dbs.com.sg/iwov-resources/media/images/cards/credit-cards/dbs-chromo-card/dbs-chromo-card-220x140.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
+    "availability": "open"
   }
 ] satisfies VerifiedCreditCard[];

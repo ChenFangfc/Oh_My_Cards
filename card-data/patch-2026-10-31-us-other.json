@@ -1,0 +1,1352 @@
+{
+  "_note": "us-other refresh, 2026-10-31: Bank of America, Wells Fargo, U.S. Bank, Barclays and other US issuers. Queue items from card-data/pending-corrections.md (signup-bonus items skipped), issuer-confirmed changes since 2026-08-01, and `period` backfill for existing monetary benefits. annualValue is dollars per year (multi-year credits amortized). New cards the catalog lacks are in card-data/new-cards-2026-10-31-us-other.json, not here. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-10-31-us-other.json",
+  "patches": [
+    {
+      "cardId": 21,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/travel-rewards-credit-card/",
+      "confidence": "official",
+      "_why": "Fee ($0), unlimited 1.5 points per $1 and no foreign transaction fee re-confirmed on the issuer page 2026-10-31. Bank of America replaced Preferred Rewards with BofA Rewards in May 2026; the card bonus is now 10% Member / 25% Preferred Plus ($30k) / 50% Preferred Honors ($100k) / 75% Premier ($1M), per the Merrill (Bank of America) program page https://www.pbig.ml.com/solutions/bofa-rewards.html. Benefit description updated; the name is kept so the row id survives.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Rewards Bonus",
+            "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 22,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-credit-card/",
+      "confidence": "official",
+      "_why": "Fee $95, 2 points/$1 travel and dining, 1.5 points/$1 other, no foreign transaction fee, up to $100 airline incidental credit and up to $100 TSA PreCheck/Global Entry credit every four years all re-confirmed on the issuer page 2026-10-31; no changes announced. Period backfill: the product page says the airline credit is paid 'annually'; the card terms quoted by Doctor of Credit's 2026-reset post (https://www.doctorofcredit.com/triggers-bank-america-premium-rewards-100-travel-credit/) and Frequent Miler (https://frequentmiler.com/bank-of-america-premium-rewards-credit-card-complete-guide/) say 'up to $100 each calendar year'. Preferred Rewards became BofA Rewards in May 2026 (https://www.pbig.ml.com/solutions/bofa-rewards.html).",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$100 Airline Incidental Credit",
+            "description": "Up to $100 in Airline Incidental Statement Credits each calendar year for qualifying purchases such as seat upgrades, baggage fees, in-flight services and airline lounge fees.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$100 TSA PreCheck / Global Entry Credit",
+            "description": "Up to $100 in Airport Security Statement Credits toward TSA PreCheck or Global Entry application fees, every four years.",
+            "annualValue": 25,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Preferred Rewards Bonus",
+            "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 23,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/cash-back-credit-card/",
+      "confidence": "official",
+      "_why": "Fee $0, 3% choice category (6% in year one), 2% grocery stores and wholesale clubs, $2,500 combined quarterly cap, the six choice options and the once-per-calendar-month change re-confirmed on the issuer page 2026-10-31. Only change: the Preferred Rewards note (25-75%) is replaced by BofA Rewards, launched May 2026, whose card bonus is 10%-75% by tier (https://www.pbig.ml.com/solutions/bofa-rewards.html).",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "New accounts earn 6% in the choice category for the first year, then 3%. This app uses the standing 3% rate.",
+          "The 3% choice category and the 2% grocery/wholesale-club rate share one $2,500 combined cap per quarter; spend beyond it earns 1%.",
+          "BofA Rewards members (the program replaced Preferred Rewards in May 2026) earn a 10%-75% bonus on these rates, depending on tier."
+        ]
+      }
+    },
+    {
+      "cardId": 35,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/alaska-airlines-credit-card/",
+      "confidence": "official",
+      "_why": "Issuer page re-read 2026-10-31 (fee $95). Applied the four non-signup queue items, all still true on the page: 3x covers 'eligible Alaska Airlines and Hawaiian Airlines purchases' (Atmos launch, 2025-08-20); there is no grocery bonus; $100 off an annual Alaska Lounge+ membership; the $99 Companion Fare (plus taxes and fees from $23) is issued each account anniversary only after $6,000+ in purchases in the prior anniversary year. Also corrected the 2x row: the page lists 2 points on 'eligible gas, EV charging station, cable, streaming services and local transit purchases, including rideshare', not gas alone. Free bag and in-flight descriptions updated to cover Hawaiian and preferred boarding. Alaska's 2026-09-29 Atmos announcement (https://news.alaskaair.com/loyalty/atmos-rewards-expands/) changes nothing on this card. Label note: the 2x row says 'pay TV' rather than 'cable' because the engine maps the word cable to all Phone and Internet spend.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 2x bucket is Bank of America's 'gas, EV charging station, cable, streaming services and local transit (including rideshare)' category. The label says 'pay TV' for cable so the app does not also pay 2x on wireless phone bills (Phone and Internet), which the issuer does not name. Groceries earn 1x.",
+          "Cardholders with an eligible Bank of America account earn a 10% bonus on points from card purchases; it is not included in the rates shown."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Alaska Airlines Purchases",
+            "to": "Alaska Airlines and Hawaiian Airlines purchases"
+          },
+          {
+            "from": "Gas",
+            "to": "Gas, EV charging, pay TV, streaming and local transit including rideshare"
+          }
+        ],
+        "remove": [
+          "Groceries"
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Annual Companion Fare",
+            "description": "$99 Companion Fare (plus taxes and fees from $23) each account anniversary, issued after spending $6,000 or more on purchases in the prior anniversary year. Valid on Alaska and Hawaiian Airlines flights.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Free First Checked Bag",
+            "description": "Free checked bag and preferred boarding for you and up to 6 guests on the same reservation when the Alaska or Hawaiian Airlines flight is paid with the card."
+          },
+          {
+            "name": "20% Back on In-Flight Purchases",
+            "description": "20% back as a statement credit on Alaska and Hawaiian Airlines in-flight purchases paid with the card."
+          },
+          {
+            "name": "Alaska Lounge+ Membership Discount",
+            "description": "$100 off an annual Alaska Lounge+ membership purchased with the card.",
+            "annualValue": 100
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 104,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/unlimited-cash-back-credit-card/",
+      "confidence": "official",
+      "_why": "Fee $0 and unlimited 1.5% cash back re-confirmed on the issuer page 2026-10-31. Intro APR is 0% for 15 billing cycles on purchases and on balance transfers made in the first 60 days, so the intro-APR pseudo-benefit is marked one-time. Preferred Rewards became BofA Rewards in May 2026 (https://www.pbig.ml.com/solutions/bofa-rewards.html). The live page showed no first-year 2% rate, but some promo modules did not render and other sources still list it, so the 'First-year purchases' row is left as is. It matches no logged category either way.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Rewards Boost",
+            "description": "BofA Rewards, which replaced Preferred Rewards in May 2026, adds a bonus on card rewards by tier: Member 10%, Preferred Plus 25% ($30,000+ in qualifying balances), Preferred Honors 50% ($100,000+), Premier 75% ($1,000,000+). Former Preferred Rewards members keep their prior card bonus for at least six months after May 2026."
+          },
+          {
+            "name": "Low Intro APR",
+            "description": "0% intro APR for the first 15 billing cycles on purchases and on balance transfers made within 60 days of account opening.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 105,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/bankamericard-credit-card/",
+      "confidence": "official",
+      "_why": "Fee $0, no rewards and 'No penalty APR' re-confirmed on the issuer page 2026-10-31. The intro APR is 0% for the first 21 billing cycles on purchases and on balance transfers made within 60 days, so the intro-APR pseudo-benefit is marked one-time and its description now states the term.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Long Intro APR",
+            "description": "0% intro APR for the first 21 billing cycles on purchases and on balance transfers made within 60 days of account opening.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 106,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bankofamerica.com/credit-cards/products/premium-rewards-elite-credit-card/",
+      "confidence": "official",
+      "_why": "Fee $550, 2 points/$1 travel and dining, 1.5 points/$1 other, $300 airline incidental, $150 lifestyle and $120 Global Entry/TSA PreCheck (every four years) credits re-confirmed on the issuer page 2026-10-31. Added the queue item 'up to 4 complimentary Priority Pass Select memberships', which is on the issuer page; it is non-monetary, so its value is null. The trusted-traveler credit's annualValue goes from 120 to 30 ($120 every 4 years). Cadence: the product page says only 'annually'. Bank of America's terms, as quoted by Doctor of Credit (2026-05-11, https://doctorofcredit.com/maximizing-the-bank-of-america-premium-rewards-elite-lifestyle-credits), give the lifestyle credit as 'up to $150 each calendar year'. The same family's airline credit terms read 'each calendar year' (Frequent Miler, https://frequentmiler.com/bank-of-america-premium-rewards-credit-card-complete-guide/).",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$300 Airline Incidental Credit",
+            "description": "Up to $300 in Airline Incidental Statement Credits each calendar year for qualifying purchases such as seat upgrades, baggage fees, airline lounge fees and in-flight services.",
+            "annualValue": 300,
+            "period": "calendar-year"
+          },
+          {
+            "name": "$150 Lifestyle Credit",
+            "description": "Up to $150 in statement credits each calendar year for lifestyle conveniences: video streaming, food delivery, fitness subscriptions and rideshare.",
+            "annualValue": 150,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 in statement credits toward Global Entry or TSA PreCheck application fees, every four years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Priority Pass Select Membership",
+            "description": "Up to 4 complimentary Priority Pass Select memberships for airport lounge access.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 160,
+      "reviewedAt": "2026-10-31",
+      "source": "https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards",
+      "confidence": "official",
+      "_why": "The old sourceUrl (.../small-business/credit-cards/business-advantage-customized-cash-rewards-mastercard) now returns 404; the card is live with an Apply button at the new URL. Re-confirmed there 2026-10-31: $0 fee; 3% choice category and 2% dining on the 'first $50,000 in combined choice category/dining purchases each calendar year', then 1%; the same six choice options, with gas/EV as the default. The page still does not say how often the choice can be changed, so the choice keeps resets 'unknown'."
+    },
+    {
+      "cardId": 162,
+      "reviewedAt": "2026-10-31",
+      "source": "https://business.bankofamerica.com/en/credit-cards/business-advantage-travel-rewards",
+      "confidence": "official",
+      "_why": "Fee $0, no international transaction fee and 1.5 points/$1 everyday earning re-confirmed 2026-10-31. Bank of America now brands the 3x portal as BofA Travel ('3 points for every $1 spent on travel purchases made at BofA Travel'), so the row is relabelled. 'Travel Center' stays in the label so the engine keeps it portal-only.",
+      "categories": {
+        "rename": [
+          {
+            "from": "Bank of America Travel Center",
+            "to": "Travel purchases at BofA Travel (formerly Travel Center)"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 168,
+      "reviewedAt": "2026-10-31",
+      "source": "https://business.bankofamerica.com/en/credit-cards/atmos-rewards",
+      "confidence": "official",
+      "_why": "Issuer page re-read 2026-10-31. 3x Alaska and Hawaiian and 2x gas/EV, shipping and local transit including rideshare are unchanged. Applied the non-signup queue item, still on the page: 20% back on Alaska and Hawaiian inflight purchases, $100 off an annual Alaska Lounge+ membership, 'No international transaction fees', and the $99 Companion Fare (plus taxes and fees from $23) gated on $6,000 in anniversary-year purchases. Fee correction: the page states '$70 per company and $25 per card', so a one-card account pays $95. This is not a fee increase; the catalog had recorded only the company fee. Alaska announced on 2026-09-29 (https://news.alaskaair.com/loyalty/atmos-rewards-expands/) that the card will be refreshed in late 2026 with 10x on eligible Atmos Rewards for Business purchases, lounge passes and free same-day changes. No details or effective date had been published by 2026-10-31, so this is recorded as a note only.",
+      "set": {
+        "annualFee": 95,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Bank of America charges $70 per company plus $25 per card each year; the $95 shown is the cost of a single-card account.",
+          "Companies with an eligible Bank of America small business account earn a 10% bonus on points from card purchases; it is not included in the rates shown.",
+          "Alaska Airlines announced on 2026-09-29 that Bank of America will refresh this card in late 2026 (planned: 10x on eligible purchases through Atmos Rewards for Business, lounge passes, free same-day confirmed flight changes). Details had not been published as of 2026-10-31; the rates shown are the current structure."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Annual Companion Fare",
+            "description": "$99 Companion Fare (plus taxes and fees from $23) each account anniversary, issued after spending $6,000 or more on purchases in the prior anniversary year.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "20% Back on In-Flight Purchases",
+            "description": "20% back on Alaska and Hawaiian Airlines in-flight purchases paid with the card.",
+            "annualValue": 20
+          },
+          {
+            "name": "Alaska Lounge+ Membership Discount",
+            "description": "$100 off an annual Alaska Lounge+ membership purchased with the card.",
+            "annualValue": 100
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "No international transaction fees.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 20,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/autograph-visa-credit-card/",
+      "confidence": "official",
+      "_why": "Queue item confirmed on the issuer page 2026-10-31: no foreign transaction fee (\"We won't charge a fee for converting your purchases to U.S dollars\"). Earn rates (3X restaurants, travel, gas & transit, popular streaming, phone plans; 1X other) and the $0 fee are unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "Wells Fargo charges no foreign transaction fee on Autograph Card purchases converted to U.S. dollars.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 45,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.bilt.com/card",
+      "confidence": "needs-review",
+      "_why": "Corrects the successor-product note only. Bilt's current cards are the Bilt Blue ($0), Bilt Obsidian ($95) and Bilt Palladium ($495) Mastercards, issued by Column N.A. and serviced by Cardless Inc. (bilt.com/card; Bilt Card Offer Terms last updated 2026-10-27, https://www.bilt.com/terms/bilt-card-offer-terms). Silver/Gold/Platinum are Bilt elite-status tiers, not cards. This row stays discontinued (2026-02-07); the new cards are proposed separately in the new-cards file.",
+      "set": {
+        "rewardRuleNotes": [
+          "The Wells Fargo-issued Bilt Mastercard was discontinued on 2026-02-07.",
+          "Its successors are the Bilt Blue ($0), Bilt Obsidian ($95) and Bilt Palladium ($495) Mastercards, issued by Column N.A. and serviced by Cardless Inc. They are separate products with different fees and earning structures.",
+          "The rates below describe the retired Wells Fargo product and should not be used for planning."
+        ]
+      }
+    },
+    {
+      "cardId": 72,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/reflect-visa-credit-card/",
+      "confidence": "official",
+      "_why": "Period backfill: the intro APR is a one-time offer from account opening (\"0% intro APR for 21 months from account opening on purchases and qualifying balance transfers\"; transfers must be made within 120 days). $0 annual fee unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "21-Month 0% Intro APR",
+            "description": "0% intro APR for 21 months from account opening on purchases and on balance transfers made within the first 120 days.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 73,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/choice-hotels-privileges-select-mastercard/",
+      "confidence": "official",
+      "_why": "Queue item confirmed: automatic Choice Privileges Platinum Elite status (25% bonus on qualifying stays, issuer product page) plus Elite Qualifying Nights, 10 within 14 days of opening and 10 more each January 1 (Choice Select terms, rates as of Sept 2026: https://www.wellsfargo.com/credit-cards/documents/choice-select-terms/). Resolves the earlier $100-vs-$120 conflict: the product page states \"one statement credit up to $120 every four years\" for Global Entry/TSA PreCheck, so annualValue 120 -> 30 with period multi-year/4. Anniversary bonus confirmed as 30,000 points every account anniversary, so period cardmember-year. Earn rates (10X Choice stays and point purchases; 5X gas, grocery, home improvement, phone plans; 1X other) and the $95 fee are unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Anniversary Bonus",
+            "description": "30,000 Choice Privileges points every account anniversary while the account is open, current and not in default.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "One statement credit up to $120 every four years toward a Global Entry or TSA PreCheck application or renewal fee.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Automatic Platinum Elite Status + Elite Qualifying Nights",
+            "description": "Choice Privileges Platinum Elite status (25% bonus points on qualifying Choice stays), plus 10 Elite Qualifying Nights within 14 days of account opening and 10 more each January 1 while the account is open.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 108,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/",
+      "confidence": "official",
+      "_why": "Period backfill: the $50 airline credit is one statement credit per 12-month period for the first airline purchase of $50 or more. It is available at account opening in year one, and later periods begin the first day of the month after the annual fee is assessed, so the period is cardmember-year. Earn rates (5X hotels, 4X airlines, 3X other travel and restaurants, 1X other) and the $95 fee are unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$50 Airline Statement Credit",
+            "description": "One $50 statement credit each year for the first airline purchase of at least $50; after year one the 12-month credit period begins the first day of the month after the annual fee is assessed.",
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 110,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/choice-hotel-privileges-mastercard/",
+      "confidence": "official",
+      "_why": "Queue item, now issuer-confirmed (it was secondary-only on 2026-08-06): 10 Elite Qualifying Nights each calendar year guaranteeing Choice Privileges Gold Elite status (10% bonus on qualifying stays), and no foreign transaction fee (product page; Choice terms list Foreign Transaction: None, rates as of Sept 2026: https://www.wellsfargo.com/credit-cards/documents/choice-terms/). Earn rates (5X Choice stays and point purchases; 3X gas, grocery, home improvement, phone plans; 1X other) and the $0 fee are unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Gold Elite Status + Elite Qualifying Nights",
+            "description": "10 Elite Qualifying Nights each calendar year (within 14 days of account opening, then every January 1), guaranteeing Choice Privileges Gold Elite status and its 10% bonus on qualifying stays.",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fee",
+            "description": "No foreign currency conversion or foreign transaction fee.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 132,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/one-key-credit-card/",
+      "confidence": "official",
+      "_why": "Source moved from the 2024 launch release (it returns 403 to the crawler) to the live issuer product page. Verified 2026-10-31: $0 fee; 3% OneKeyCash on Expedia, Hotels.com and Vrbo and at gas stations, grocery stores and dining; 1.5% on other purchases; automatic Silver tier, with Gold after $15,000 in net purchases in a calendar year; no foreign transaction fees. Earn rates are unchanged; only the Silver benefit's description gains the Gold threshold.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic One Key Silver",
+            "description": "Automatic One Key Silver tier while the card is open (Silver member prices, 15%+ off 10,000+ hotels); Gold tier after $15,000 in net purchases in a calendar year."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 133,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.wellsfargo.com/",
+      "confidence": "needs-review",
+      "_why": "Wells Fargo appears to have stopped offering the One Key+ between 2026-08-06 and 2026-10-31. Its product URL (https://creditcards.wellsfargo.com/one-key-plus-credit-card/) now redirects to the card index, and the index lineup lists only the $0 One Key Card. On 2026-08-06 the page was live: pending-corrections.md quotes it, and the crawler saw a $99 fee on the index. No announcement was found, so availabilityChangedAt is the date the closure was observed. Benefit fixes for existing cardholders come from the issuer's launch release (https://newsroom.wf.com/news-releases/news-details/2024/Expedia-Group-Wells-Fargo-and-Mastercard-announce-new-suite-of-One-Key-credit-cards/default.aspx): $100 OneKeyCash each cardholder anniversary (period cardmember-year), automatic Gold tier with Platinum at $30,000 calendar-year spend, and no foreign transaction fees (queue item). The trusted-traveler credit is up to $120 once every four years per the issuer page as read on 2026-08-06; the refuted item's description fix was confirmed correct, and under the per-year rule it is annualValue 25 -> 30, multi-year/4. Re-checked 2026-10-31: https://creditcards.wellsfargo.com/one-key-plus-credit-card/ answers with a 301 to the card index, whose lineup references only the $0 One Key Card; no Wells Fargo or press announcement was found, so 2026-10-31 is the date the closure was observed, not the closure date.",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-10-31",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Apparently closed to new applicants: by 2026-10-31 Wells Fargo had removed the One Key+ product page and dropped the card from its lineup (it was still offered on 2026-08-06). Wells Fargo has published no statement. Existing cardholders keep the card.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$100 OneKeyCash Anniversary Bonus",
+            "description": "$100 in OneKeyCash each cardholder anniversary.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Trusted Traveler Credit",
+            "description": "Up to $120 statement credit toward Global Entry or TSA PreCheck, once every four years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Automatic One Key Gold Tier",
+            "description": "Automatic One Key Gold tier while the card is open; Platinum tier after $30,000 in purchases in a calendar year.",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "No foreign transaction fees.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 24,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html",
+      "confidence": "official",
+      "_why": "Issuer page (read 2026-10-31) lists 5% cash back on prepaid air, hotel and car reservations booked in the U.S. Bank Travel Center (1% base + 4% additional, footnote 3), which the catalog omitted; the page gives no date for it. The 5% cap is $2,000 in combined net purchases per quarter across both chosen categories, so the stale note saying '$2,000/quarter each' is corrected. The only queue item (signup-bonus window) was skipped as a signup-bonus item.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
+          "The 5% rate applies to the first $2,000 in combined net purchases each quarter across both chosen categories; categories must be chosen every quarter, otherwise purchases earn 1%.",
+          "The 2% everyday category excludes discount stores/supercenters and wholesale clubs."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          {
+            "category": "Prepaid air, hotel and car reservations in the U.S. Bank Travel Center",
+            "rate": 0.05
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 25,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/credit-cards/altitude-connect-visa-signature-credit-card.html",
+      "confidence": "official",
+      "_why": "Issuer page states 4X at gas stations/EV charging stations applies only to the first $1,000 each quarter; the cap was missing from the label, so the engine never enforced it (effective date not stated on the page). Other rates (5X Travel Center prepaid hotels/car rentals, 4X travel, 2X dining/streaming/grocery, 1X other) and the $0 annual fee are confirmed unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "Gas/EV 4X and grocery 2X exclude discount stores/supercenters and wholesale clubs, which earn 1X."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Gas and EV charging",
+            "to": "Gas and EV charging (up to $1,000/quarter)"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 67,
+      "reviewedAt": "2026-10-31",
+      "source": "https://rewards.usbank.com/benefits/card/AltitudeReserveBenefits/faqs",
+      "confidence": "needs-review",
+      "_why": "U.S. Bank's cardholder rewards FAQ (read 2026-10-31) confirms the 2025-12-15 earn changes: 10X on prepaid car and hotel reservations and 5X on prepaid flights in the U.S. Bank Travel Center, 3X on travel booked directly (unchanged), and 3X mobile wallet only on the first $5,000 each billing cycle (1X after). Independently confirmed on that issuer page; it matches the 'actual' recorded under the refuted #67 proposal. Queue item applied: since 2025-12-15 the $325 annual credit covers only U.S. Bank Travel Center bookings. No reachable issuer page states this (the product page was removed), so it rests on https://upgradedpoints.com/news/us-bank-altitude-reserve-card-changes/ and https://www.nerdwallet.com/credit-cards/news/us-bank-altitude-reserve-making-major-negative-changes, with a 2026-06-22 cardholder report at https://travelwithgrant.boardingarea.com/2026/06/22/success-i-used-my-325-altitude-reserve-travel-credit-through-the-us-bank-travel-center/. The benefit keeps its existing name so its id (and any usage logged against it) survives; only the description and period change, because the patch format has no benefit rename.",
+      "set": {
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2024-11-11. Existing cardholders keep the card.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Since 2025-12-15 the 3X mobile-wallet rate applies only to the first $5,000 of mobile wallet purchases each billing cycle, then 1X; the app approximates the billing cycle as a calendar month.",
+          "Since 2025-12-15 prepaid hotels and car rentals booked in the U.S. Bank Travel Center earn 10X and prepaid flights 5X; travel booked directly with airlines, hotels, car rentals, taxis, trains and cruise lines still earns 3X.",
+          "Points are worth 1 cent each toward travel since 2025-12-15 (previously 1.5 cents)."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Mobile Wallet",
+            "to": "Mobile wallet purchases (first $5,000/month)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Prepaid hotels and car rentals in the U.S. Bank Travel Center",
+            "rate": 0.1
+          },
+          {
+            "category": "Prepaid flights in the U.S. Bank Travel Center",
+            "rate": 0.05
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$325 Travel & Dining Credit",
+            "description": "Up to $325 in statement credits each cardmember year, now only for travel booked through the U.S. Bank Travel Center. Since 2025-12-15 general travel and dining purchases no longer qualify.",
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 68,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/credit-cards/altitude-go-visa-signature-credit-card.html",
+      "confidence": "official",
+      "_why": "Issuer page (read 2026-10-31): 4X on dining, takeout and restaurant delivery applies to the first $2,000 each quarter (cap now in the label so it is enforced); 2X covers gas stations and EV charging stations, excluding discount stores/supercenters and wholesale clubs. Queue items applied: the intro APR is 0% on purchases and balance transfers for the first 15 billing cycles (not 12 months), and cell phone protection is not offered (absent from the issuer page). The $15 streaming credit is per 12-month period after 11 consecutive calendar months of eligible streaming purchases (footnote 7). The page gives no effective dates.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Grocery and gas/EV charging 2X exclude discount stores/supercenters and wholesale clubs, which earn 1X."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Dining",
+            "to": "Dining, takeout and restaurant delivery (up to $2,000/quarter)"
+          },
+          {
+            "from": "Gas",
+            "to": "Gas and EV charging"
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "0% Intro APR for 12 Months",
+          "Cell Phone Protection"
+        ],
+        "upsert": [
+          {
+            "name": "0% Intro APR for 15 Billing Cycles",
+            "description": "0% intro APR on purchases and balance transfers for the first 15 billing cycles, then a variable APR.",
+            "annualValue": 100,
+            "period": "one-time"
+          },
+          {
+            "name": "$15 Streaming Credit",
+            "description": "Automatic $15 statement credit per 12-month period after 11 consecutive calendar months of eligible streaming service purchases.",
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 111,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/credit-cards/bank-smartly-visa-signature-credit-card.html",
+      "confidence": "official",
+      "_why": "Issuer page (read 2026-10-31): 2% base on every purchase; the Smartly Earning Bonus raises the total to 2.5% (qualifying balance $10,000-$49,999), 3% ($50,000-$99,999) or 4% ($100,000+) on the first $10,000 in eligible net purchases each billing cycle, then 2%. The 4% row lacked that cap; the label now carries it and a note records the tiers. No tier change found since 2026-08-01.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
+          "The 4% row is the top Smartly tier ($100,000+ qualifying balance); lower tiers earn 2.5% ($10,000-$49,999) or 3% ($50,000-$99,999). Boosted rates apply to the first $10,000 in eligible net purchases each billing cycle (approximated as a calendar month); everything else earns 2%."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Relationship-tier purchases",
+            "to": "Smartly Earning Bonus tier, up to 4% total (first $10,000/month)"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 113,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/credit-cards/shield-visa-credit-card.html",
+      "confidence": "official",
+      "_why": "Issuer page (read 2026-10-31): the Shield earns 4% cash back on prepaid air, hotel and car reservations booked directly in the U.S. Bank Travel Center (footnote 3), while the catalog modeled no rewards at all (the page gives no start date). Queue items applied: an automatic $20 statement credit per 12-month period after 11 consecutive calendar months of purchases (footnote 4), and cell phone protection up to $600 when the monthly bill is paid with the card. The queue's $100 deductible / one-claim-per-12-months details are not on the issuer page and were left out. Intro APR confirmed: 0% on purchases for 21 billing cycles; balance transfers made within 60 days of opening also qualify.",
+      "set": {
+        "rewardType": "cashback",
+        "rewardProgram": "U.S. Bank Cash Rewards",
+        "rewardUnitName": "Cash Back",
+        "rewardUnitValueCents": 1,
+        "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
+        "rewardRuleNotes": [
+          "Only prepaid air, hotel and car reservations booked directly in the U.S. Bank Travel Center earn rewards (4% cash back); all other purchases earn nothing.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          {
+            "category": "Prepaid air, hotel and car reservations in the U.S. Bank Travel Center",
+            "rate": 0.04
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Long Intro APR",
+            "description": "0% intro APR on purchases for the first 21 billing cycles; balance transfers made within 60 days of account opening also qualify (5% balance transfer fee, $5 minimum).",
+            "period": "one-time"
+          },
+          {
+            "name": "$20 Annual Statement Credit",
+            "description": "Automatic $20 statement credit per 12-month period after 11 consecutive calendar months of purchases, with the account in good standing.",
+            "annualValue": 20,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Cell Phone Protection",
+            "description": "Up to $600 reimbursement if your cell phone is stolen or damaged when you pay your monthly cellular bill with the card; terms and exclusions in the Guide to Benefits.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 114,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/business-banking/business-credit-cards/business-triple-cash-back-credit-card.html",
+      "confidence": "official",
+      "_why": "Queue item applied: a $100 statement credit per 12-month period after 11 consecutive months of eligible software service purchases (e.g. QuickBooks, FreshBooks), confirmed on the issuer page (footnote 3). The queue's suggested cell phone protection is not listed on the issuer page and was not added. The issuer page also says the 3% gas/EV rate applies only to transactions of $200 or less (footnote 2). Rates otherwise unchanged. The signup-bonus queue item was skipped.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "Gas and EV charging transactions over $200 earn 1%, and discount stores/supercenters and wholesale clubs are excluded from the 3% gas/EV category."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$100 Annual Software Subscription Credit",
+            "description": "Automatic $100 statement credit per 12-month period after 11 consecutive months of eligible software service purchases made directly with a software provider (e.g. QuickBooks, FreshBooks).",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 115,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html",
+      "confidence": "needs-review",
+      "_why": "U.S. Bank appears to have stopped taking Business Leverage applications. The card's product page (business-leverage-visa-signature-card.html) now returns 404, and the URL above now serves U.S. Bank's business card overview (read 2026-10-31), which lists only Business Essentials, Business Essentials Plus, Triple Cash Rewards, Business Shield and Business Altitude Connect. Doctor of Credit reported the discontinuation on 2026-10-11 (https://www.doctorofcredit.com/u-s-bank-discontinues-u-s-bank-leverage-business-card/), shortly after U.S. Bank launched the Business Essentials cards. U.S. Bank has published no statement. Queue item 'Intro First-Year Annual Fee Waived' was dropped because a new-account fee waiver no longer applies.",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-10-11",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since approximately 2026-10-11, when U.S. Bank removed the product page. Existing cardholders keep the card and its earning structure.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Selected, top-spend, or relationship-tier categories depend on issuer selection rules and may reset monthly, quarterly, or by billing cycle.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates."
+        ]
+      }
+    },
+    {
+      "cardId": 163,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html",
+      "confidence": "official",
+      "_why": "Queue item applied and completed against U.S. Bank's Amazon business card page (read 2026-10-31). The 2% tier is not three fixed categories: 2% applies automatically to the top 3 spending categories outside Amazon, set each billing cycle by Mastercard category code on the combined spend of all cardmembers, from a 15-category list. The queue's 9-category list was incomplete; the full list matches the 'actual' under the refuted #164 proposal and was confirmed independently here. The page also shows 5% back on prepaid travel booked in the U.S. Bank Travel Center, plus caps: 5% at Amazon-covered sites on the first $150,000 of those purchases per calendar year, and 2% on the first $150,000 spent outside Amazon per calendar year, then 1%. The Gas/EV row is renamed to the automatic top-3 row (keeping its id), and the Restaurants and Wireless rows are removed. The page gives no effective dates.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 2% tier applies automatically to the account's top 3 eligible spend categories outside Amazon each billing cycle, based on the combined spend of all cardmembers and Mastercard category codes; the app approximates the billing cycle as a calendar month.",
+          "5% at Amazon-covered sites applies to the first $150,000 of those purchases each calendar year, and 2% to the first $150,000 spent outside Amazon each calendar year; spend beyond each cap earns 1%.",
+          "Requires an eligible Prime membership; adding or cancelling Prime after account opening changes the account's reward program."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Amazon Business / Amazon.com / AWS / Whole Foods",
+            "to": "Amazon Business / Amazon.com / AWS / Whole Foods (up to $150,000/year)"
+          },
+          {
+            "from": "Gas / EV Charging",
+            "to": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)"
+          }
+        ],
+        "remove": [
+          "Restaurants",
+          "Wireless Services"
+        ],
+        "upsert": [
+          {
+            "category": "Prepaid travel in the U.S. Bank Travel Center",
+            "rate": 0.05
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)",
+          "mode": "automatic-top-spend",
+          "picks": 3,
+          "resets": "month",
+          "options": [
+            "Accounting and tax services",
+            "Advertising and direct marketing",
+            "Airlines",
+            "Car rentals",
+            "Cell phone service providers",
+            "Computer and software services",
+            "Dining",
+            "Drugstores and pharmacies",
+            "Entertainment",
+            "Gas and EV charging stations",
+            "Grocery stores",
+            "Hotels",
+            "Office supplies",
+            "Postal and shipping services",
+            "Utilities"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 164,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html",
+      "confidence": "official",
+      "_why": "Independently confirmed on U.S. Bank's Amazon business card page (read 2026-10-31); this matches the 'actual' under the refuted #164 proposal, not the refuted proposal itself. The 2% tier applies automatically to the top 3 spending categories outside Amazon, set each billing cycle by Mastercard category code from a 15-category list, rather than three fixed categories. The page also shows 3% back on prepaid travel in the U.S. Bank Travel Center, plus caps: 3% at Amazon-covered sites on the first $150,000 of those purchases per calendar year, and 2% on the first $150,000 spent outside Amazon per calendar year, then 1%. The Gas/EV row is renamed to the automatic top-3 row (keeping its id), and the Restaurants and Wireless rows are removed.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 2% tier applies automatically to the account's top 3 eligible spend categories outside Amazon each billing cycle, based on the combined spend of all cardmembers and Mastercard category codes; the app approximates the billing cycle as a calendar month.",
+          "3% at Amazon-covered sites applies to the first $150,000 of those purchases each calendar year, and 2% to the first $150,000 spent outside Amazon each calendar year; spend beyond each cap earns 1%."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Amazon Business / Amazon.com / AWS / Whole Foods",
+            "to": "Amazon Business / Amazon.com / AWS / Whole Foods (up to $150,000/year)"
+          },
+          {
+            "from": "Gas / EV Charging",
+            "to": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)"
+          }
+        ],
+        "remove": [
+          "Restaurants",
+          "Wireless Services"
+        ],
+        "upsert": [
+          {
+            "category": "Prepaid travel in the U.S. Bank Travel Center",
+            "rate": 0.03
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Top 3 eligible spend categories each billing cycle (up to $150,000/year)",
+          "mode": "automatic-top-spend",
+          "picks": 3,
+          "resets": "month",
+          "options": [
+            "Accounting and tax services",
+            "Advertising and direct marketing",
+            "Airlines",
+            "Car rentals",
+            "Cell phone service providers",
+            "Computer and software services",
+            "Dining",
+            "Drugstores and pharmacies",
+            "Entertainment",
+            "Gas and EV charging stations",
+            "Grocery stores",
+            "Hotels",
+            "Office supplies",
+            "Postal and shipping services",
+            "Utilities"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 42,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.wyndhamrewardscreditcard.com/earner-plus/",
+      "confidence": "official",
+      "_why": "Wyndham and Barclays refreshed the card on 2026-06-17 (https://investor.wyndhamhotels.com/news-events/press-releases/detail/422/wyndham-and-barclays-launch-updated-credit-card-suite), confirmed on the card page on 2026-10-31. Queue items applied: 6X at Hotels by Wyndham (gas moved out); a new 4X travel bucket (gas, EV charging, air, car rental, rideshare, tolls, trains per the release); 15,000 anniversary points after the annual fee is paid; Diamond status the first year, then Platinum; up to $25 meal-delivery credit every 6 months ($50 per calendar year); 15,000 points after five qualifying nights, at most once per calendar year; Emerald Club Executive status with National, now issuer-confirmed. Also corrected beyond the queue: dining and grocery earn 4X, not 5X (card page and release). The release does not say when existing cardmembers moved to the new structure.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "4X dining and grocery exclude Target and Walmart; Vacation Club purchases also earn 4X (down payments earn 1X)."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Wyndham Hotels & Gas",
+            "to": "Hotels by Wyndham"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Hotels by Wyndham",
+            "rate": 0.06
+          },
+          {
+            "category": "Dining",
+            "rate": 0.04
+          },
+          {
+            "category": "Groceries",
+            "rate": 0.04
+          },
+          {
+            "category": "Travel incl. gas, EV charging, airfare, car rentals, rideshare, tolls and trains",
+            "rate": 0.04
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "7,500 Anniversary Bonus Points"
+        ],
+        "upsert": [
+          {
+            "name": "15,000 Anniversary Bonus Points",
+            "description": "15,000 bonus points each account anniversary year after the annual fee is paid.",
+            "annualValue": 135,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Automatic Wyndham Diamond Status",
+            "description": "Wyndham Rewards Diamond member level for the first year, then Platinum."
+          },
+          {
+            "name": "Meal Delivery Credit",
+            "description": "Up to $25 in statement credits every 6 months on eligible meal delivery purchases, up to $50 per calendar year.",
+            "annualValue": 50,
+            "period": "semiannual"
+          },
+          {
+            "name": "Annual Free Night Award",
+            "description": "15,000 Wyndham Rewards points (marketed as a free night) after five qualifying nights at Hotels by Wyndham paid with the card; capped at 15,000 points per calendar year.",
+            "annualValue": 135,
+            "period": "calendar-year"
+          },
+          {
+            "name": "National Car Rental Emerald Club Executive Status",
+            "description": "Complimentary Emerald Club Executive status with National Car Rental.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 63,
+      "reviewedAt": "2026-10-31",
+      "source": "https://cards.barclaycardus.com/banking/cards/jetblue-plus-card/",
+      "confidence": "official",
+      "_why": "Queue items confirmed on the Barclays product page (read 2026-10-31): a $100 statement credit after buying a JetBlue Vacations package of $100 or more (limit one per year), 50% savings on inflight purchases on JetBlue-operated flights, and a 0% foreign transaction fee. The 5,000 bonus points each year after the account anniversary are confirmed. The queue's relabel of the 6X row was dropped: the issuer page says only 'eligible JetBlue purchases', which the existing label already matches. The $99 fee and the 6X/2X/1X rates are unchanged.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "5,000 Anniversary Points",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "JetBlue Vacations Statement Credit",
+            "description": "$100 statement credit after purchasing a JetBlue Vacations package of $100 or more with the card; limit one statement credit per year.",
+            "annualValue": 100
+          },
+          {
+            "name": "50% Inflight Savings",
+            "description": "50% savings on eligible inflight purchases on JetBlue-operated flights.",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "Foreign transaction fee: 0%.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 64,
+      "reviewedAt": "2026-10-31",
+      "source": "https://yourmileagemayvary.com/2026/10/01/hawaiian-airlines-card-atmos-rewards/",
+      "confidence": "needs-review",
+      "_why": "Queue item applied: HawaiianMiles merged into Atmos Rewards on 2025-10-01 (balances converted 1:1), so the card earns Atmos Rewards points. They are valued at the catalog's Atmos rate (1.4c, as on #35/#168). Barclays' Hawaiian product page now returns 404, so this rests on secondary reporting dated after the change. Your Mileage May Vary (2026-10-01) and Danny the Deal Guru (2026-07-17, https://dannydealguru.com/barclays-hawaiian-airlines-card-70k-bonus/) both list 3X Hawaiian purchases, 2X gas/dining/grocery and 1X other, which matches the catalog's rates. Both also list a $100 companion discount each account anniversary, a one-time 50%-off companion discount for roundtrip coach travel between Hawaii and North America, and two free checked bags. Availability is left closed because Barclays' own page is gone, but both sources say a Barclays-issued variant is still offered (YMMV: through Bank of Hawaii's website). YMMV also reports that Alaska and Bank of America said in April 2026 they are working toward Bank of America issuing all Atmos co-brand cards.",
+      "set": {
+        "rewardType": "points",
+        "rewardProgram": "Atmos Rewards",
+        "rewardUnitName": "Points",
+        "rewardUnitValueCents": 1.4,
+        "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
+        "rewardRuleNotes": [
+          "Barclays removed its own application page for this card on 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program (balances converted 1:1); secondary sources (2026) report a Barclays-issued variant still offered through Bank of Hawaii. Existing accounts earn Atmos Rewards points.",
+          "Alaska Airlines and Bank of America have said they are working toward Bank of America issuing all Atmos Rewards co-branded cards; no conversion date for Barclays Hawaiian accounts has been announced.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "$100 Companion Discount",
+            "description": "$100 companion discount for roundtrip travel between Hawaii and North America on Hawaiian Airlines, each account anniversary.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "50% Off One-Way Companion Ticket",
+            "description": "One-time 50%-off companion discount for roundtrip coach travel between Hawaii and North America on Hawaiian Airlines.",
+            "period": "one-time"
+          },
+          {
+            "name": "Free First Checked Bag",
+            "description": "Two free checked bags for the primary cardmember on eligible Hawaiian Airlines flights booked with the card."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 120,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.wyndhamrewardscreditcard.com/earner-card/",
+      "confidence": "official",
+      "_why": "Refresh announced 2026-06-17 (https://investor.wyndhamhotels.com/news-events/press-releases/detail/422/wyndham-and-barclays-launch-updated-credit-card-suite), confirmed on the card page on 2026-10-31. Queue items applied: 5X at Hotels by Wyndham (gas moved out), dining 2X to 3X, new 3X gas and EV charging, and 10% fewer points on free-night redemptions. Also corrected beyond the queue: grocery is 3X (was 2X). The anniversary bonus is confirmed as 7,500 points each anniversary year after $15,000 in purchases (stored value left as is). The card page lists a 0% foreign transaction fee.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "3X dining and grocery exclude Target and Walmart; Vacation Club purchases also earn 3X (down payments earn 1X)."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Wyndham hotels and gas",
+            "to": "Hotels by Wyndham"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Restaurants",
+            "rate": 0.03
+          },
+          {
+            "category": "Groceries",
+            "rate": 0.03
+          },
+          {
+            "category": "Gas and EV charging",
+            "rate": 0.03
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Anniversary Bonus",
+            "description": "7,500 bonus points each account anniversary year after $15,000 in eligible purchases.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "10% Off Award Redemptions",
+            "description": "Redeem 10% fewer Wyndham Rewards points for free nights.",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "Foreign transaction fee: 0%.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 121,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.wyndhamrewardscreditcard.com/earner-business-card/",
+      "confidence": "official",
+      "_why": "Refresh announced 2026-06-17 (https://investor.wyndhamhotels.com/news-events/press-releases/detail/422/wyndham-and-barclays-launch-updated-credit-card-suite), confirmed on the card page on 2026-10-31. Queue items applied: 8X at Hotels by Wyndham (gas moved out); the 5X bucket is now gas, EV charging, Vacation Club, marketing, advertising, office supply stores and shipping (utilities dropped); a $65 warehouse club membership credit per calendar year; up to $50 accounting software credit per calendar year; 20% fewer points on free-night redemptions. Also from the card page: the anniversary bonus is 15,000 points after the annual fee is paid (stored $90 value left as is), plus Emerald Club Executive status and a 0% foreign transaction fee.",
+      "categories": {
+        "rename": [
+          {
+            "from": "Wyndham hotels and gas",
+            "to": "Hotels by Wyndham"
+          },
+          {
+            "from": "Marketing, advertising, and utilities",
+            "to": "Gas, EV charging, Vacation Club, marketing, advertising, office supplies and shipping"
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Anniversary Bonus",
+            "description": "15,000 bonus points each account anniversary year after the annual fee is paid.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Warehouse Club Membership Credit",
+            "description": "Up to $65 statement credit each calendar year on eligible wholesale club memberships or renewals.",
+            "annualValue": 65,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Accounting Software Credit",
+            "description": "Up to $50 statement credit each calendar year after qualifying accounting software purchases.",
+            "annualValue": 50,
+            "period": "calendar-year"
+          },
+          {
+            "name": "20% Off Award Redemptions",
+            "description": "Redeem 20% fewer Wyndham Rewards points for free nights.",
+            "annualValue": null
+          },
+          {
+            "name": "National Car Rental Emerald Club Executive Status",
+            "description": "Complimentary Emerald Club Executive status with National Car Rental.",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "Foreign transaction fee: 0%.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 122,
+      "reviewedAt": "2026-10-31",
+      "source": "https://frequentmiler.com/hawaiian-airlines-cards-issued-by-barclays-still-available-for-now/",
+      "confidence": "needs-review",
+      "_why": "Queue item applied: HawaiianMiles merged into Atmos Rewards on 2025-10-01 with balances converted 1:1, so the card now earns Atmos Rewards points. The queue's sources are the Frequent Miler URL above and https://upgradedpoints.com/news/barclays-american-hawaiian-credit-cards-update/; https://yourmileagemayvary.com/2026/10/01/hawaiian-airlines-card-atmos-rewards/ (2026-10-01) confirms Barclays Hawaiian accounts earn Atmos points. Points are valued at the catalog's Atmos rate (1.4c). The existing companion discount is one-time per its description. No issuer page exists for this card any more, and its earn rates were not re-verified.",
+      "set": {
+        "rewardType": "points",
+        "rewardProgram": "Atmos Rewards",
+        "rewardUnitName": "Points",
+        "rewardUnitValueCents": 1.4,
+        "rewardValuationDescription": "Atmos Rewards value varies by redemption; this app uses an estimated 1.40 cents per point for annual-fee progress while displaying earned points separately.",
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2025-10-01, when HawaiianMiles folded into Alaska's Atmos Rewards program (balances converted 1:1). Existing accounts earn Atmos Rewards points.",
+          "Alaska Airlines and Bank of America have said they are working toward Bank of America issuing all Atmos Rewards co-branded cards; no conversion date for Barclays Hawaiian accounts has been announced.",
+          "Earn rates and benefits below have not been re-verified since the Atmos transition."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Companion Discount",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 26,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-unlimited-visa-credit-card.html",
+      "confidence": "official",
+      "_why": "Cell phone protection is up to $800 per the issuer page, not $1,000 (description corrected; perk value left as-is). Unlimited 2% cash back and $0 annual fee re-confirmed 2026-10-31.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cell Phone Protection",
+            "description": "Up to $800 reimbursement if your cell phone is stolen or damaged when you pay your monthly wireless bill with the card; limitations apply."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 43,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.apple.com/apple-card/",
+      "confidence": "official",
+      "_why": "Issuer transition announced, not yet effective: on 2026-01-07 Apple and JPMorgan Chase announced Chase will become the Apple Card issuer in approximately 24 months, subject to regulatory approvals (https://learn.applecard.apple/transition; https://media.chase.com/news/chase-to-become-new-issuer-of-apple-card). apple.com/apple-card and the transition FAQ still name Goldman Sachs Bank USA, Salt Lake City Branch as issuer, so the issuer field is unchanged and a dated note is added. Re-checked 2026-10-31 and unchanged: 3% at Apple and with Apple Pay at Ace Hardware, Booking.com, ChargePoint, Exxon/Mobil, Hertz, Nike, Uber/Uber Eats, Walgreens/Duane Reade; 2% other Apple Pay; 1% card; no fees.",
+      "set": {
+        "rewardRuleNotes": [
+          "Apple Card earns 3% Daily Cash on purchases from Apple and select Apple Pay merchants, 2% on other Apple Pay purchases, and 1% with the titanium card or card number.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Issuer transition: on 2026-01-07 Apple and JPMorgan Chase announced that Chase will become the Apple Card issuer in approximately 24 months, subject to regulatory approvals. Until it closes, Goldman Sachs Bank USA remains the issuer; Apple says Daily Cash and the no-fee terms continue during the transition."
+        ]
+      }
+    },
+    {
+      "cardId": 46,
+      "reviewedAt": "2026-10-31",
+      "source": "https://robinhood.com/creditcard",
+      "confidence": "official",
+      "_why": "Queue item confirmed on the issuer's own disclosure: Robinhood's rates-and-fees page (https://api.robinhood.com/creditcard/legal/interest-fees, 'Updated - Jul 1, 2026') now lists a foreign transaction fee of 3% of each transaction made in a foreign currency. Robinhood's statement quoted by Doctor of Credit (https://www.doctorofcredit.com/robinhood-adds-3-foreign-transaction-fee/, 2026-07-02) limits it to customers onboarded on or after 2026-07-01 ('Current credit card customers are not impacted by this change for now'). Recorded as a rule note, not a benefit. 3% cash back on all purchases, no card annual fee and the Gold-membership requirement re-confirmed on robinhood.com/creditcard 2026-10-31.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Foreign transaction fee: accounts onboarded on or after 2026-07-01 pay 3% of each transaction made in a foreign currency. Robinhood says cardholders onboarded before that date are not affected for now.",
+          "No separate card annual fee, but an active Robinhood Gold membership is required, and cash back is redeemed through a Robinhood brokerage account."
+        ]
+      }
+    },
+    {
+      "cardId": 74,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-rewards-visa-credit-card.html",
+      "confidence": "official",
+      "_why": "The intro APR applies to balance transfers only (0% for the first 15 months following account opening on balances transferred within the first 90 days); the issuer page lists no purchase intro APR, so the old description was wrong. Marked one-time. 4% gas / 3% dining / 2% grocery on the first $8,000 in combined purchases annually, 1% other, $0 annual fee re-confirmed 2026-10-31.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "0% Intro APR for 15 Months",
+            "description": "0% intro APR for the first 15 months after account opening on balances transferred within the first 90 days. No intro APR on purchases.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 75,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/double-up",
+      "confidence": "official",
+      "_why": "TD's page now states 'Earn unlimited 2% Cash Back on all eligible purchases' with no condition about redeeming into a TD deposit account, so the benefit description was corrected. The intro APR is 0% on balance transfers for the first 15 billing cycles (transfers within 90 days of opening) and is marked one-time. $0 annual fee re-confirmed 2026-10-31. Queue signup item skipped per the signup-bonus rule.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "2% Cash Back Everywhere",
+            "description": "Unlimited 2% Cash Back on all eligible purchases, with no rotating categories, caps or limits."
+          },
+          {
+            "name": "0% Intro APR for 15 Billing Cycles",
+            "description": "0% intro APR on balance transfers for the first 15 billing cycles when transferred within 90 days of account opening.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 78,
+      "reviewedAt": "2026-10-31",
+      "source": "https://pep.paypal.com/us/digital-wallet/manage-money/paypal-cashback-mastercard",
+      "confidence": "official",
+      "_why": "Purchases outside PayPal earn 1.5%, not 2%: PayPal's card page states '3% cash back when you check out with PayPal' and '1.5% cash back on all other purchases everywhere Mastercard is accepted', no caps, no annual fee, issued by Synchrony Bank. The 2% -> 1.5% cut dates to 2024 (Doctor of Credit update 2024-05-31: https://www.doctorofcredit.com/review-of-paypal-cashback-mastercard-2-everywhere-card/), so the catalog row was stale.",
+      "categories": {
+        "upsert": [
+          {
+            "category": "Other",
+            "rate": 0.015
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 116,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.navyfederal.org/loans-cards/credit-cards/cash-rewards.html",
+      "confidence": "official",
+      "_why": "Period backfill: the balance-transfer promo is a one-time new-account offer (1.99% intro APR for 12 months from account opening on balances transferred from non-Navy Federal cards within 60 days; applications by 2027-01-03). Re-confirmed 2026-10-31: unlimited 2% on cashRewards Plus (credit limit $5,000+), no annual, foreign transaction or balance transfer fee.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Balance Transfer Promo",
+            "description": "1.99% intro APR for 12 months from account opening on balances transferred from non-Navy Federal cards within 60 days of opening (applications submitted by 2027-01-03); no balance transfer fee. Transferred balances do not earn rewards.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 118,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.navyfederal.org/about/press-releases/2026-press-releases/Flagship-Premier-Launch.html",
+      "confidence": "needs-review",
+      "_why": "Navy Federal launched the Flagship Premier Visa Signature on 2026-09-10 (press release), its card lineup (https://www.navyfederal.org/loans-cards/credit-cards.php) now lists only Flagship Premier, and the old Flagship product URL now serves the Premier page. The release lets current Flagship Rewards cardholders switch without a new application; Upgraded Points (https://upgradedpoints.com/news/navy-federal-flagship-premier-card-refresh, updated 2026-09-14) calls the $49 / 3x travel / 2x other card 'outgoing' and says existing cardholders may keep it. Closed to new applicants from 2026-09-10 is inferred from the launch date (Navy Federal states no closure date), hence needs-review. Trusted-traveler credit: Upgraded Points says the 'up to $120 every 4 years' credit carries over to Premier, whose issuer page footnote states the same -> period multi-year/4, annualValue 120 -> 30 per the per-year convention.",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-09-10",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-09-10, when Navy Federal launched the Flagship Premier Visa Signature ($95 annual fee; 4X travel, 3X dining, 1X other) in its place. Existing Flagship Rewards cardholders can keep the card or switch to Flagship Premier without a new application.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category."
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Global Entry / TSA PreCheck Credit",
+            "description": "Up to $120 in statement credits toward Global Entry or TSA PreCheck application fees, once every 4 years.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 119,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.navyfederal.org/loans-cards/credit-cards/go-rewards.html",
+      "confidence": "official",
+      "_why": "Period backfill: the intro APR is a one-time new-account offer (0.99% intro APR on purchases for 6 months from account opening; applications by 2027-01-03). Re-confirmed 2026-10-31: 3X restaurants, 2X gas, 1X other, no annual or foreign transaction fee.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Low Intro APR Offer",
+            "description": "0.99% intro APR on purchases for 6 months from account opening (applications submitted by 2027-01-03), then the standard variable APR.",
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 126,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.fidelity.com/spend-save/visa-signature-card",
+      "confidence": "official",
+      "_why": "Verified unchanged on the Fidelity product page 2026-10-31: 2 points per $1 (2% when deposited to an eligible Fidelity account), no annual fee, no foreign transaction fee, and 'Earn up to $100 in Reward Points when you apply for either Global Entry or TSA PreCheck.' The product page does not state the cadence and its terms link (Fidelity.com/AirportBenefits) redirects to an Elan portal that returns 403, so the four-year cadence comes from Fidelity's launch announcement as quoted by Doctor of Credit on 2024-10-28 ('Receive up to 10,000 Reward Points every four years when you apply for either Global Entry or TSA PreCheck', https://doctorofcredit.com/fidelity-2-card-adds-100-tsa-precheck-or-global-entry-credit-plus-rental-car-insurance) and by Your Mileage May Vary on 2024-11-04 (https://yourmileagemayvary.com/2024/11/04/fidelity-rewards-visa-signature-card-adds-new-travel-benefits/). annualValue goes from 100 to 25 because $100 every four years is $25 a year. No change since 2026-08-01.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Global Entry / TSA PreCheck Benefit",
+            "description": "Up to $100 in Reward Points (10,000 points) once every four years when the Global Entry or TSA PreCheck application fee is paid with the card.",
+            "annualValue": 25,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 137,
+      "reviewedAt": "2026-10-31",
+      "source": "https://mwg.aaa.com/credit-card",
+      "confidence": "official",
+      "_why": "The catalog had no spend cap. AAA's product page, footnote 1, as of 2026-10-31 says: 'Maximum of $500 USD cash back earned in a calendar year at grocery stores, wholesale clubs and gas stations combined. After that, purchases will earn 1% cash back for the remainder of the calendar year.' The engine only enforces spend caps, so the three capped rows share a $10,000/calendar-year purchase cap ($500 / 5% grocery rate) and say 'combined' so normalizeCapGroup buckets them together. Their labels deliberately do not name each other: 'combined with gas stations and wholesale clubs' made the 5% grocery row get credited for Gas and Warehouse Clubs. EV charging earns 3% but is outside the cap, so it moves out of the old 'Gas / EV Charging' row into its own row. Rates are unchanged: 5% grocery; 3% gas, EV charging, wholesale clubs, streaming, pharmacy and AAA; 1% other; $0 annual fee; 0% foreign transaction fee. The cap is a standing term, not a change since 2026-08-01.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "AAA caps cash back at grocery stores, wholesale clubs and gas stations at $500 combined per calendar year; after that those purchases earn 1% for the rest of the calendar year.",
+          "The app models that cap as one shared $10,000 purchase cap per calendar year (the 5% grocery equivalent of $500), so spend at the 3% gas and wholesale-club rates can earn somewhat more before the real cap than shown.",
+          "EV charging, streaming, pharmacy and AAA purchases earn 3% with no stated cap."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Groceries",
+            "to": "Groceries (up to $10,000/year combined cap)"
+          },
+          {
+            "from": "Gas / EV Charging",
+            "to": "Gas stations (up to $10,000/year combined cap)"
+          },
+          {
+            "from": "Wholesale Clubs",
+            "to": "Wholesale Clubs (up to $10,000/year combined cap)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "EV Charging",
+            "rate": 0.03
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 138,
+      "reviewedAt": "2026-10-31",
+      "source": "https://mwg.aaa.com/credit-card",
+      "confidence": "official",
+      "_why": "The catalog had no spend cap. AAA's product page, footnote 5, as of 2026-10-31 says: 'Maximum of $350 USD in cash back in a calendar year on the 5% category, and earn 1% cash back on all net eligible purchases thereafter.' At 5%, $350 equals $7,000 of gas and EV charging spend, which is now written into the label. Rates are unchanged: 5% gas and EV charging; 3% grocery, restaurant, travel and AAA; 1% other; $0 annual fee; 0% foreign transaction fee. The cap is a standing term, not a change since 2026-08-01.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 5% gas and EV charging category is capped at $350 cash back per calendar year ($7,000 of purchases); after that it earns 1% for the rest of the calendar year."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Gas / EV Charging",
+            "to": "Gas / EV Charging (up to $7,000/year)"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 143,
+      "reviewedAt": "2026-10-31",
+      "confidence": "needs-review",
+      "_why": "Effective 2026-09-28, PenFed no longer waives the Pathfinder's $95 annual fee for Honors Advantage members. Cardholders were told by letter: 'The account will be charged an Annual Fee of $95. This fee is no longer eligible to be waived.' Sources: Doctor of Credit, 2026-08-15, quoting the letter (https://www.doctorofcredit.com/penfed-to-remove-annual-fee-waiver-on-pathfinder/); Miles to Memories, 2026-08-19 (https://milestomemories.com/penfed-pathfinder-card-fee-no-longer-waived-for-honors-advantage-members); NerdWallet news (https://www.nerdwallet.com/credit-cards/news/penFed-pathfinder-ending-waiver-of-annual-fee). annualFee is already 95, so only a note is added. penfed.org product pages and terms PDFs return 403 or time out to automated fetches, so 'source' is omitted on purpose: the existing PenFed terms PDF stays as sourceUrl instead of a blog URL. Earn rates and credits were not re-verified, hence needs-review.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "From 2026-09-28 the $95 annual fee is charged to every cardholder; PenFed no longer waives it for Honors Advantage members."
+        ]
+      }
+    },
+    {
+      "cardId": 144,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/cash-card",
+      "confidence": "official",
+      "_why": "Source fix only: the previous sourceUrl (td.com/.../credit-cards/cash) returns 404; TD's product page is now /credit-cards/cash-card. Re-confirmed there 2026-10-31: 3% and 2% on two Spend Categories chosen from Dining, Entertainment, Gas Stations, Grocery Stores and Travel, switchable quarterly; 1% other; $0 annual fee."
+    },
+    {
+      "cardId": 146,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/secured-credit-card",
+      "confidence": "official",
+      "_why": "Source fix only: the previous sourceUrl (td.com/.../credit-cards/cash-secured) returns 404; TD's product page is now /credit-cards/secured-credit-card. Re-confirmed there 2026-10-31: $29 annual fee; 3% and 2% on chosen Spend Categories (Dining, Entertainment, Gas Stations, Grocery Stores, Travel), switchable quarterly; 1% other."
+    },
+    {
+      "cardId": 147,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.td.com/us/en/personal-banking/credit-cards/business",
+      "confidence": "official",
+      "_why": "Source fix only: the catalog pointed at a TD listing URL (/credit-cards/no-annual-fee) rather than the card's own page. Re-confirmed on the TD Business Solutions page 2026-10-31: unlimited 2% Cash Back with no caps, no annual fee."
+    },
+    {
+      "cardId": 165,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.synchrony.com/document/mlpra-terms.pdf",
+      "confidence": "needs-review",
+      "_why": "This applies an independently confirmed correction, not the refuted proposal, which wanted to delete these rows. Synchrony's own 'MyLowe's PRO Rewards American Express Card Rewards Program Terms (REV 1/2026)' say special retailers earn '2 Points for every 1 U.S. dollar spent' and 'As of April 2026, the Special Retailers include dining establishments, office supply stores, and wireless telephone service providers'. All other purchases earn 1 point per $1, and Lowe's purchases earn points by MyLowe's PRO Rewards status. The catalog's 3x on these three rows was carried over from the discontinued Amex-issued Lowe's Business Rewards card, so they move to 0.02. rewardProgram is renamed to the program the terms name. The Lowe's 5% row and the $0 annual fee could not be re-verified because lowes.com returns 403, hence needs-review.",
+      "set": {
+        "rewardProgram": "MyLowe's Pro Rewards",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "U.S. dining establishments, office supply stores and wireless telephone service providers earn 2 MyLowe's Rewards points per $1 (Synchrony's special-retailer list as of April 2026); purchases with a foreign merchant code and all other purchases earn 1 point per $1.",
+          "Purchases at Lowe's and Lowes.com also earn MyLowe's Pro Rewards points according to the cardholder's Pro Rewards status; the Lowe's row reflects the card's everyday 5% discount and does not add those points."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          {
+            "category": "Restaurants",
+            "rate": 0.02
+          },
+          {
+            "category": "Office supplies",
+            "rate": 0.02
+          },
+          {
+            "category": "Wireless",
+            "rate": 0.02
+          }
+        ]
+      }
+    }
+  ]
+}

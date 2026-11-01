@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { readFileSync } from "fs";
 
 const rawPort = process.env.PORT;
 
@@ -25,8 +26,21 @@ if (!basePath) {
   );
 }
 
+// One version for the web build and the desktop bundle: tauri.conf.json.
+const appVersion = (
+  JSON.parse(
+    readFileSync(
+      path.resolve(import.meta.dirname, "src-tauri", "tauri.conf.json"),
+      "utf8",
+    ),
+  ) as { version: string }
+).version;
+
 export default defineConfig({
   base: basePath,
+  define: {
+    __APP_VERSION__: JSON.stringify(appVersion),
+  },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

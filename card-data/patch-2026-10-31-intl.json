@@ -1,0 +1,940 @@
+{
+  "_note": "2026-10-31 refresh of the international group (Canada #79-87, Hong Kong #171-176, Singapore #177-182). Turns the still-valid pending-corrections.md queue items into patches, verifies HK/SG cards against issuer pages, key facts statements and T&C PDFs, and records changes announced since 2026-08-01. BMO eclipse (#82) is not patched: bmo.com timed out for every fetch. Apply with: pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-10-31-intl.json",
+  "patches": [
+    {
+      "cardId": 79,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.rbcroyalbank.com/credit-cards/travel/rbc-avion-visa-infinite.html",
+      "confidence": "official",
+      "_why": "Re-verified on RBC's product page: $120 annual fee, 1.25 Avion points per $1 on travel and 1 point per $1 on everything else are unchanged, and the page shows no change notice since 2026-08-01. The page also lists a 12-month DoorDash DashPass partner offer, but the DashPass proposal is under 'Proposals that were refuted' in pending-corrections.md, so it is deliberately not added."
+    },
+    {
+      "cardId": 80,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.td.com/ca/en/personal-banking/products/credit-cards/aeroplan/aeroplan-visa-infinite-card",
+      "confidence": "official",
+      "_why": "TD's page (rates and fees effective 2026-09-01), footnote 5: 1.5 points per $1 on gas, EV charging, grocery and direct Air Canada purchases (incl. Air Canada Vacations) is earned only on a combined maximum of $80,000 of those purchases a year. The cap was missing and EV charging was not listed, so gas, EV charging and groceries are merged into one row and both bonus rows share the cap. Queue item applied (footnote 6): primary cardholders earn 1.5 points per $1 CAD at participating Hyatt hotels from 2026-07-15 to 2029-07-15 on up to $80,000 of Hyatt spend a year, a separate cap. NEXUS credit is up to $100 once every 48 months per cardholder, so annualValue is annualised to 25 with period multi-year/4. $139 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "1.5 points per $1 on gas, EV charging, groceries and purchases made directly with Air Canada (including Air Canada Vacations) applies to a combined $80,000 of those purchases per year; after that they earn 1 point per $1.",
+          "Hyatt: primary cardholders earn 1.5 Aeroplan points per $1 CAD at participating Hyatt hotels and resorts from 2026-07-15 to 2029-07-15, on up to $80,000 of Hyatt spend per year (a separate cap); these points replace the base rate. The extra 1 World of Hyatt point per $1 (after linking accounts) is not modelled.",
+          "The annual fee is rebated every year with a TD All-Inclusive Banking Plan."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Groceries",
+            "to": "Gas, EV charging and groceries (up to $80,000/year combined)"
+          },
+          {
+            "from": "Air Canada",
+            "to": "Air Canada and Air Canada Vacations, bought direct (up to $80,000/year combined with gas, EV charging and groceries)"
+          }
+        ],
+        "remove": [
+          "Gas"
+        ],
+        "upsert": [
+          {
+            "category": "Hyatt hotels and resorts (up to $80,000/year)",
+            "rate": 0.015
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "NEXUS Credit",
+            "description": "Statement credit of up to $100 CAD toward a NEXUS application fee once every 48 months for each eligible cardholder (primary and additional).",
+            "annualValue": 25,
+            "period": "multi-year",
+            "periodYears": 4
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 81,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-card.html",
+      "confidence": "official",
+      "_why": "The product page now names the card 'Scotiabank Passport Visa Infinite +' (queue rename applied; fee, earn and 6 lounge visits unchanged). Earn footnote (legal 19): 3 points only at Sobeys-family banners; 2 points at other grocery stores, dining, entertainment and daily transit. Queue items applied: dining, entertainment and daily transit 0.03 -> 0.02 and the grocery split; the three 2x rows are merged into one so they share the cap. The same footnote limits all 3x/2x earn to the first $50,000 of purchases per calendar year, which was not modelled. Scene+ Travel hotels and car rentals earn 1 point plus an extra 3 ('Up to 4 points' on the page), resolving the low-confidence queue item at 0.04. Lounge visits renew each membership year. $150 fee unchanged.",
+      "set": {
+        "name": "Scotiabank Passport Visa Infinite +",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "3 Scene+ points per $1 at Sobeys-family grocers (Sobeys, Safeway, IGA, Foodland and participating Co-ops, FreshCo, Chalo! FreshCo, Thrifty Foods, Rachelle Béry, Les Marchés, Voilà); 2 points per $1 at other grocery stores and on dining, entertainment and daily transit including rideshare; 1 point per $1 otherwise.",
+          "The 3x and 2x rates together apply to the first $50,000 of purchases each calendar year (January 1 to December 31); after that everything earns 1 point per $1. The app tracks the Sobeys row and the 2x row against the cap separately.",
+          "Hotels and car rentals booked through Scene+ Travel (powered by Expedia) earn an extra 3 points per $1 on top of the 1-point base (4 in total).",
+          "An annual bonus starting at 10,000 Scene+ points is paid once $40,000 of eligible purchases is made in an account year (not modelled).",
+          "No foreign transaction fees. The $150 fee is rebated with a Scotiabank Ultimate Package; Preferred Package holders get a $40 rebate after $15,000 of qualifying purchases."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Groceries",
+            "to": "Sobeys, Safeway, IGA, Foodland, FreshCo, Thrifty Foods and other Sobeys-family stores (up to $50,000/year combined)"
+          },
+          {
+            "from": "Dining",
+            "to": "Other groceries, dining, entertainment, transit and rideshare (up to $50,000/year combined)"
+          }
+        ],
+        "remove": [
+          "Entertainment",
+          "Daily transit"
+        ],
+        "upsert": [
+          {
+            "category": "Other groceries, dining, entertainment, transit and rideshare (up to $50,000/year combined)",
+            "rate": 0.02
+          },
+          {
+            "category": "Hotels and car rentals booked through Scene+ Travel (Expedia)",
+            "rate": 0.04
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Airport Lounge Visits",
+            "description": "Six complimentary lounge visits per membership year through the Visa Airport Companion Program (DragonPass), usable by the cardholder or accompanying guests; extra visits cost US$32.",
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 83,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
+      "confidence": "official",
+      "_why": "Queue item applied: Skip+ membership, which CIBC values at $110 for the first year; CIBC's Skip+ terms say the free membership continues while the card stays linked, so it is recorded as an ongoing monthly perk rather than first-year-only. CIBC's grocery-multiplier footnote (cibc.com/content/dam/disclaimers/cibc-public/personal-banking/cards/aventura/aventura-cibc-infinite-grocery-multiplier) limits 1.5 points per $1 to the first $80,000 of net annual card purchases and includes EV charging, so gas, EV, grocery and drugstore are merged into one capped row. The old 'Travel via CIBC Rewards Centre' label was credited for all travel; it is renamed so 2x applies only to CIBC Rewards Centre (CIBC by Expedia) bookings. The NEXUS rebate is one fee every 4 years (CIBC values it at $160, annualised to 40). Lounge visits renew each membership year and CIBC states a yearly value of up to $285. The first-year fee rebate is one-time. $139 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "1.5 points per $1 on gas, EV charging (MCC 5552), grocery and drugstore purchases applies only until $80,000 of net card purchases of any kind is reached in the year; the limit resets after the December statement. The app approximates this by capping the bonus categories themselves at $80,000.",
+          "2 points per $1 applies only to travel bought through the CIBC Rewards Centre (CIBC by Expedia); other travel earns 1 point per $1."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Groceries",
+            "to": "Gas, EV charging, groceries and drugstores (up to $80,000/year combined)"
+          },
+          {
+            "from": "Travel via CIBC Rewards Centre",
+            "to": "Travel booked through CIBC Rewards Centre (CIBC by Expedia)"
+          }
+        ],
+        "remove": [
+          "Gas",
+          "Drugstores"
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Airport Lounge Visits",
+            "description": "Four complimentary Visa Airport Companion (DragonPass) lounge visits per membership year for the primary cardholder and guests; CIBC values them at up to $285 a year.",
+            "annualValue": 285,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "NEXUS Rebate",
+            "description": "Statement credit for one NEXUS application fee every four years (CIBC values it at $160; the credit is capped at $200).",
+            "annualValue": 40,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Annual Fee Rebate Offer",
+            "description": "One-time first-year annual fee rebate under the current offer: $139 for the primary cardholder and $50 each for up to three authorized users.",
+            "period": "one-time"
+          },
+          {
+            "name": "Skip+ Membership",
+            "description": "Free Skip+ membership ($0 delivery fees and discounted service fees on eligible orders) plus a $10 monthly voucher while an eligible CIBC card is linked to your Skip account. CIBC values the first year at $110.",
+            "annualValue": 110,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 84,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.americanexpress.com/en-ca/credit-cards/cobalt-card/",
+      "confidence": "official",
+      "_why": "Cobalt's categories and benefits had never been audited (pending-corrections, 'Cards that could not be verified'). The earn footnote on Amex's page caps 5x at a combined $2,500 of net purchases per month (reset on the 1st) and includes stand-alone grocery stores and food/grocery delivery in Canada; the old label missed both the cap and groceries. Added the +1 point per $1 bonus on hotel and car rental bookings through American Express Travel Online and the Instacart credit ($5 a month, up to $60 per 12 months, until 2027-12-31) shown on the page. Removed 'High Food Earn Rate' (it duplicated the 5x earn row) and 'Flexible Membership Rewards' (a redemption feature, not a benefit); the supplementary-card fee waiver has no dollar value. Fee $15.99/month = $191.88 a year confirmed.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "5 points per $1 at restaurants, coffee shops, bars, stand-alone grocery stores and food or grocery delivery in Canada applies to a combined $2,500 of net purchases per calendar month (resets on the 1st); after that these earn 1 point per $1.",
+          "3 points per $1 on eligible streaming subscriptions in Canada (select providers listed at americanexpress.ca/streaming); 2 points per $1 at stand-alone gas stations and on local commuter transit, taxis and ride sharing in Canada.",
+          "1 bonus point per $1 on hotel and car rental bookings made through American Express Travel Online (The Hotel Collection excluded).",
+          "The fee is $15.99 a month ($191.88 a year) outside Quebec; Quebec residents pay $191.88 annually. Foreign-currency purchases carry a 2.5% conversion charge."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Eats and drinks in Canada",
+            "to": "Eats and drinks in Canada, including groceries and food delivery (up to $2,500/month combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Hotels and car rentals booked through American Express Travel Online",
+            "rate": 0.02
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "High Food Earn Rate",
+          "Flexible Membership Rewards"
+        ],
+        "upsert": [
+          {
+            "name": "No Supplementary Card Fee",
+            "description": "No annual fee for additional Cobalt cards.",
+            "annualValue": null
+          },
+          {
+            "name": "Instacart Statement Credits",
+            "description": "Up to $5 back each month (maximum $60 in a 12-month period) on Instacart orders of $10 or more in Canada; enrolment required; offer runs until 2027-12-31.",
+            "annualValue": 60,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 85,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.rogersbank.com/en/help_centre_answers/upcoming_account_changes",
+      "confidence": "official",
+      "_why": "Queue item applied and now issuer-confirmed: Rogers Bank's own legal clause served on rogersbank.com (content entry 6fgyQ5xCGN9gIiim9721ri, updated 2026-10-29) says the cash back offers apply 'on the first $61,000 spent on your Account during your annual period', then 1.5% until the reset date; the upcoming-changes page says the limit resets on the account-opening or product-switch anniversary. Same page: from 2026-11-18 every Rogers Red cardholder earns 5% on eligible Rogers purchases (no Rogers service needed, within the annual limit) and the 1.5x redemption bonus ends, so the 5% row is added and the redemption-bonus benefit removed, effective 2026-11-18. That is 18 days after this review; it is applied now because the issuer has confirmed it and the date is in the rule notes. The 2027-01-12 switch from Roam Like Home days to a $75 roaming credit is only noted, because the current benefit runs for another 2.5 months. Removed the 'No Annual Fee' benefit: having no fee is not a separate benefit.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Since 2026-08-04 the accelerated rates apply only to the first $61,000 spent on the account in each annual period (reset on the account-opening or product-switch anniversary); after that everything earns the 1.5% base until the reset. The app caps the bonus rows at a combined $61,000 per calendar year, which is looser than the real limit because the real limit counts all card spend.",
+          "From 2026-11-18, eligible Rogers purchases earn 5% for every cardholder, within the same annual limit: Rogers, Fido, Shaw and Comwave bill payments (not in-store), online Rogers and Fido purchases, TSC, direct Sportsnet+, CityTV+ and Discovery+ subscriptions, and the Jays Shop at Rogers Centre. The 1.5x redemption bonus on Rogers purchases ends; last redemptions 2026-11-17.",
+          "2% on non-U.S.-dollar purchases requires at least one eligible Rogers, Fido, Shaw or Comwave service; without one the rate is 1.5%.",
+          "From 2027-01-12 the five annual Roam Like Home days are replaced by a $75 annual roaming credit (reimbursement request required)."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "U.S. dollar purchases",
+            "to": "U.S. dollar purchases (up to $61,000/year combined)"
+          },
+          {
+            "from": "Non-U.S. purchases with eligible Rogers service",
+            "to": "Non-U.S. purchases with eligible Rogers service (up to $61,000/year combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Eligible Rogers purchases: Rogers, Fido, Shaw and Comwave account payments, rogers.com, fido.ca and TSC (up to $61,000/year combined)",
+            "rate": 0.05
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Rogers Redemption Bonus",
+          "No Annual Fee"
+        ],
+        "upsert": [
+          {
+            "name": "Roam Like Home Days",
+            "description": "Five Roam Like Home days at no cost each year for eligible Rogers mobile plans (Rogers values them at up to $90). Replaced on 2027-01-12 by a $75 annual roaming credit."
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 86,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.mbna.ca/en/credit-cards/rewards/mbna-rewards-world-elite-mastercard",
+      "confidence": "official",
+      "_why": "MBNA's programme footnote: 5 points per $1 on restaurant, grocery, digital media, membership and household utility purchases 'until you spend $50,000 annually (per calendar year) in the applicable category'. These per-category caps were not recorded and are now on each row. The old 'Digital media' label was credited for nothing, because the word 'digital' carries the engine's online-only tag, so it is relabelled to be credited for streaming. The birthday bonus is paid once a year (calendar-year). $120 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "5 points per $1 on eligible restaurant, grocery, digital media, membership and household utility purchases until $50,000 is spent in that category in the calendar year; each category has its own $50,000 limit, then 1 point per $1.",
+          "MBNA's 'digital media' category is shown here as streaming, music, e-books, games and apps; MBNA classifies it by merchant code.",
+          "Birthday bonus: each year, 10% of the points earned in the 12 months before the primary cardholder's birthday month, up to 15,000 points."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Restaurants",
+            "to": "Restaurants (up to $50,000/year)"
+          },
+          {
+            "from": "Groceries",
+            "to": "Groceries (up to $50,000/year)"
+          },
+          {
+            "from": "Digital media",
+            "to": "Streaming, music, e-books, games and apps (up to $50,000/year)"
+          },
+          {
+            "from": "Memberships",
+            "to": "Memberships (up to $50,000/year)"
+          },
+          {
+            "from": "Household utilities",
+            "to": "Household utilities (up to $50,000/year)"
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Birthday Bonus Points",
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 87,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.nbc.ca/personal/mastercard-credit-cards/world-elite.html",
+      "confidence": "official",
+      "_why": "Queue items applied from nbc.ca: travel booked through the À la carte Travel agency earns 2 points per $1 (footnote 12); 5x on groceries and restaurants applies only until $2,500 of gross monthly purchases is charged to the account, then 2x. This is encoded as a $2,500/month combined cap, with the 2x fallback explained in the notes. The lounge benefit is corrected to the National Bank Lounge at Montréal-Trudeau as NBC describes it, with no Mastercard Travel Pass/DragonPass mention; it has no stated dollar value, so annualValue is null instead of 200. Gas row renamed to include EV charging ('Gas and electric vehicle charging: 2 points'). The travel refund resets January 1 (footnote 5). $150 fee unchanged.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "5 points per $1 on groceries and restaurants applies until $2,500 of gross purchases of any kind is charged to the account in the month; after that groceries and restaurants earn 2 points per $1. The app caps the two categories at a combined $2,500 a month and then falls back to 1 point, so it is approximate in both directions.",
+          "2 points per $1 on gas and EV charging, on recurring bill payments automatically charged by the merchant, and on travel booked through the À la carte Travel agency on the À la carte Rewards site.",
+          "Travel expense refund: up to $150 per calendar year for airport parking, baggage fees, seat selection, airport lounge access and airline ticket upgrades charged to the card (primary cardholder; claim within 60 days)."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Groceries",
+            "to": "Groceries (up to $2,500/month combined)"
+          },
+          {
+            "from": "Restaurants",
+            "to": "Restaurants (up to $2,500/month combined)"
+          },
+          {
+            "from": "Gas",
+            "to": "Gas and EV charging"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Travel booked online through the À la carte Travel agency",
+            "rate": 0.02
+          }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Expense Reimbursement",
+            "description": "Refund of up to $150 between January 1 and December 31 each year for airport parking, baggage fees, seat selection, airport lounge access and airline ticket upgrades charged to the card.",
+            "annualValue": 150,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Airport Lounge Access",
+            "description": "Free, unlimited access to the National Bank Lounge at Montréal-Trudeau (YUL) with one guest and two children aged 12 or under; the lounge is temporarily relocated during renovations from 2026-10-05.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 171,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.hsbc.com.hk/credit-cards/products/red/",
+      "confidence": "official",
+      "_why": "Verified on HSBC's Red page and HSBC's credit card KFS (hsbc.com.hk/content/dam/hsbc/hk/docs/credit-cards/key-fact-statement.pdf: annual fee 'Waived permanently'). Queue items applied: the 4% tier is online spending only, capped at HK$10,000 a month (label and cap fixed); the 8% designated-merchant tier is capped at HK$1,250 a month. Added the McDonald's Reward+ stamp offer: up to $30 RewardCash a month, maximum $360 in the 2026 promotion, which runs 2 Jan-31 Dec 2026 per hsbc.com.hk/content/dam/hsbc/hk/docs/red/terms-and-conditions-mcdonald.pdf. Also added the HK Express in-flight drink. The drink is worth up to HK$25 each time with no annual frequency, so annualValue is null rather than the queue's 25. Removed 'RewardCash Multipliers' (duplicated the earn rows) and the fee-waiver benefit (now a rule note). The page notes the overseas designated-merchant list changed on 2026-07-15.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "4% RewardCash on the first HK$10,000 of online spending each calendar month, then 0.4%; mobile or contactless payments in physical stores are not online spending.",
+          "8% RewardCash at designated merchants on the first HK$1,250 each calendar month, then 0.4%. Local: Sushiro, TamJai SamGor Mixian, TamJai Yunnan Mixian, Bakehouse, Decathlon, NAMCO, TAITO STATION, Sephora, @cosme, 3COINS. Overseas (list updated 2026-07-15): Suica, OLIVE YOUNG in Korea, Mobile Tmoney, FamilyMart in Japan.",
+          "All other spending earns 0.4% RewardCash (HK$250 = $1 RewardCash).",
+          "Annual fee permanently waived."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Online and Mobile Payment",
+            "to": "Online spending (up to $10,000/month)"
+          },
+          {
+            "from": "Designated Merchants",
+            "to": "Designated merchants (up to $1,250/month)"
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "RewardCash Multipliers",
+          "Perpetual Annual Fee Waiver"
+        ],
+        "upsert": [
+          {
+            "name": "McDonald's Monthly RewardCash",
+            "description": "Up to $30 RewardCash a month via HSBC Reward+ stamps: one stamp per McDonald's transaction of HK$30 or more (one a day, eight a month), redeemed in sets of four for $15 RewardCash. The 2026 promotion runs 2 January to 31 December 2026.",
+            "annualValue": 360,
+            "period": "monthly"
+          },
+          {
+            "name": "HK Express In-flight Drink",
+            "description": "Complimentary drink (worth up to HK$25) when you use the physical card to buy in-flight food of HK$30 or more on HK Express flights.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 172,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.hsbc.com.hk/credit-cards/products/visa-signature/",
+      "confidence": "official",
+      "_why": "Queue item applied: the designated-category rate is 3.6% (9X = 1X basic + 5X Red Hot Rewards of Your Choice + Visa Signature's extra 3X), not 2.4%, which is the RoYC rate on other cards. HSBC's 2026 RoYC terms (hsbc.com.hk/content/dam/hsbc/hk/docs/credit-cards/rewards/2026-red-hot-rewards-of-your-choice-terms-and-conditions.pdf) cap extra RewardCash at the first HK$100,000 of eligible spending and fix the allocation for the year after registration, which closes 2026-10-31. The choice therefore resets yearly and the cap is on the label. The page says the extra 3X applies automatically to all RoYC categories, so Dining and Overseas spending that is not allocated still earns 1.6%. This resolves the 'could not be verified' note: the 3X does not apply to non-RoYC spend, so 'Other' stays 0.4%. HK$2,000 fee per HSBC's KFS; the 2-year waiver moves to rule notes. Visa Signature privileges carry no fixed dollar value.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Red Hot Rewards of Your Choice (2026 programme): register once and allocate the extra 5X RewardCash to Dining, Home, Lifestyle, Shopping or Overseas & Mainland China spending; the allocation cannot be changed for the year. Extra RewardCash applies to the first HK$100,000 of eligible spending in the year (maximum extra $2,000 RewardCash). Registration for 2026 closed on 2026-10-31; HSBC runs the programme by calendar year.",
+          "Visa Signature adds an extra 3X (1.2%) automatically on all five Rewards of Your Choice categories: 9X (3.6%) in the category you allocate to and 4X (1.6%) in the others. Home, Lifestyle and Shopping are designated-merchant lists that the app cannot match automatically.",
+          "All other spending earns 0.4% RewardCash (HK$250 = $1 RewardCash).",
+          "HK$2,000 annual fee, waived for the first two years for new cardholders."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Rewards of Your Choice Category",
+            "to": "Red Hot Rewards of Your Choice category (up to $100,000/year)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Red Hot Rewards of Your Choice category (up to $100,000/year)",
+            "rate": 0.036
+          },
+          {
+            "category": "Dining in Hong Kong (Visa Signature extra 3X)",
+            "rate": 0.016
+          },
+          {
+            "category": "Overseas and Mainland China spending (Visa Signature extra 3X)",
+            "rate": 0.016
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Red Hot Rewards of Your Choice category (up to $100,000/year)",
+          "mode": "user-selected",
+          "picks": 1,
+          "resets": "year",
+          "options": [
+            "Dining",
+            "Home",
+            "Lifestyle",
+            "Shopping",
+            "Overseas and Mainland China spending"
+          ]
+        }
+      ],
+      "benefits": {
+        "remove": [
+          "Intro Annual Fee Waiver"
+        ],
+        "upsert": [
+          {
+            "name": "Visa Signature Privileges",
+            "description": "Visa Signature offers such as 15% off at designated restaurants (Lai Sun Dining, Hyatt Regency Tsim Sha Tsui outlets), Emperor Cinemas ticket offers, 30% off cross-border limousines and a 24/7 Visa concierge; offers change over time.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 173,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.sc.com/hk/credit-cards/cathay/",
+      "confidence": "official",
+      "_why": "Queue items applied, corrected against SC's 2026 selected-category terms (av.sc.com/hk/content/docs/hk-cc-cx-card-selected-category-tnc.pdf). The HK$4-per-mile tier is dining, hotels and, on the standard card, overseas spending; online is not a bonus. Other HKD spending earns HK$6 per mile. Rates are now miles per HK$ (HK$4 -> 0.0025, HK$6 -> 0.001667), fixing the 6x overstatement. rewardUnitValueCents moves from a 1-cent placeholder to 5 HK cents, the ratio in SC's own welcome offer on the same page (40,000 Asia Miles or a HK$2,000 Cathay Gift Card). Dropped the queue's HK$2-per-mile Cathay/HK Express rate: per av.sc.com/hk/content/docs/hk-cxuo-bonus-miles-tnc.pdf it is a one-off 2,667-mile bonus once HK$8,000 is spent in 1 Jul-31 Dec 2026, not a standing rate, so that row is removed. Removed the welcome-offer benefit (it duplicated signupBonus); status points have no cash value. HK$2,000 fee with first-year waiver confirmed.",
+      "set": {
+        "rewardUnitValueCents": 5,
+        "rewardValuationDescription": "Asia Miles value varies by itinerary and redemption path; this app uses an estimated 5.00 HK cents per mile, the ratio Standard Chartered offers in its own welcome offer (40,000 Asia Miles or a HK$2,000 Cathay Gift Card), for annual-fee progress while displaying earned miles separately.",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Rates are Asia Miles per HK$1: HK$4 = 1 mile on dining, hotels booked directly with the hotel, and overseas foreign-currency spending; HK$6 = 1 mile on other spending posted in Hong Kong dollars. The Priority Banking and Priority Private versions earn more on overseas spending (HK$3 and HK$2 per mile).",
+          "Purchases made directly with Cathay and HK Express earn the base HK$6 = 1 mile. The advertised 'up to HK$2 = 1 mile' is a one-off 2,667-mile bonus once HK$8,000 is spent with Cathay and HK Express in the 1 Jul-31 Dec 2026 promotion; the app does not model it.",
+          "Annual fee HK$2,000, waived for the first year."
+        ]
+      },
+      "categories": {
+        "remove": [
+          "Cathay and Travel"
+        ],
+        "rename": [
+          {
+            "from": "Dining and Online",
+            "to": "Dining and hotels"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Dining and hotels",
+            "rate": 0.0025
+          },
+          {
+            "category": "Overseas spending in foreign currencies",
+            "rate": 0.0025
+          },
+          {
+            "category": "Other",
+            "rate": 0.001667
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Asia Miles Welcome Offer"
+        ],
+        "upsert": [
+          {
+            "name": "Cathay Membership Benefits",
+            "description": "Earn up to 100 Cathay Status Points for HK$500,000 of eligible spending, credited quarterly.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 174,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.hangseng.com/en-hk/personal/cards/products/mmpower-card/",
+      "confidence": "official",
+      "_why": "Verified on Hang Seng's MMPOWER page and the programme terms (hangseng.com/content/dam/wpb/hase/rwd/personal/cards/pdfs/everyday_tnc_en.pdf, MMP CVP T&C 04/2026). Queue items applied: added the 5% general online tier and the 4% overseas physical-store tier. The HK$3,000 monthly minimum, the $500-a-month extra cap and the 31 Dec 2026 programme end are in the rule notes, and the cap is enforced as a shared HK$6,579 of monthly spend ($500 / 7.6% extra). The 8% online entertainment and fashion tier is also added. The terms say the rebates include the basic 0.4% (HK$250 = $1), confirming the 0.004 default. The '+FUN Dollars Offers' benefit is removed rather than revalued to 6,000, because it restated the earn programme now modelled in the categories; the fee-waiver benefit moves to notes. The reward unit is renamed +FUN Dollars, as the issuer calls it.",
+      "set": {
+        "rewardProgram": "Hang Seng +FUN Dollars",
+        "rewardUnitName": "+FUN Dollars",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "+FUN Dollars Reward Programme (1 Apr-31 Dec 2026): register once and spend at least HK$3,000 of eligible spending in the calendar month (waived for full-time tertiary students). Qualifying spending earns 8% at Amazon, GU, lululemon, Taobao and Uniqlo; 8% on online entertainment (designated streaming, cinema, ticketing and theme-park merchants) and online fashion; 5% on other online spending; and 4% on foreign-currency spending at physical stores outside Hong Kong. Rates include the 0.4% basic +FUN Dollars.",
+          "Extra +FUN Dollars are capped at $500 per calendar month across all four tiers combined. The app caps the bonus rows at a shared HK$6,579 of monthly spend (where the 8% tier alone reaches the $500 cap), so cardholders who spread spending across tiers may earn somewhat more than shown.",
+          "Everything else, and all spending in a month below HK$3,000, earns the basic 0.4% (HK$250 = $1 +FUN Dollar). Alipay and WeChat Pay transactions, recurring payments and e-wallet top-ups do not qualify.",
+          "Annual fee permanently waived for principal and supplementary cards."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Selected Spending",
+            "to": "Designated merchants: Amazon, GU, lululemon, Taobao and Uniqlo (up to $6,579/month combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Designated streaming services, plus cinema, ticketing, theme-park and fashion merchants paid on the web (up to $6,579/month combined)",
+            "rate": 0.08
+          },
+          {
+            "category": "Online retail spending at other merchants (up to $6,579/month combined)",
+            "rate": 0.05
+          },
+          {
+            "category": "Foreign currency spending at overseas physical stores (up to $6,579/month combined)",
+            "rate": 0.04
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "+FUN Dollars Offers",
+          "Perpetual Annual Fee Waiver"
+        ]
+      }
+    },
+    {
+      "cardId": 175,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.dbs.com.hk/personal/credit-cards/credit-cards/black-mc",
+      "confidence": "official",
+      "_why": "Queue items applied: online is not a bonus category. Overseas foreign-currency spending earns 3X DBS$ (1.2%) and local spending 2X (0.8%), per DBS Black Card DBS$ Conversion Rates (dbs.com.hk/iwov-resources/pdf/creditcards/DBS-Black-Card-Conversion-Rates.pdf); DBS$1 = HK$1 cash rebate per the DBS$ reward scheme terms. The 6X overseas promotion needs registration and HK$20,000 of monthly spending (dbs.com.hk/iwov-resources/pdf/creditcards/BlackMC_CVP_2026_TnC_EN.pdf), so it stays in the notes. The annual fee comes from DBS's own fee schedule (dbs.com.hk/iwov-resources/pdf/creditcards/HK_CPF_CSV_0036.pdf, effective 2026-05-01): HK$3,600 for the principal card, with a first-year waiver per the product page. It replaces the HK$2,000 placeholder and settles the HK$3,600-vs-3,800 question in the queue. Removed a generic 'Mastercard benefits' row that named no actual perk; the remaining offers row has no fixed value.",
+      "set": {
+        "annualFee": 3600,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "DBS$ are worth HK$1 each as cash rebate. Overseas foreign-currency spending earns DBS$3 per HK$250 (HK$4 = 1 mile, 1.2%); other eligible spending earns DBS$2 per HK$250 (HK$6 = 1 mile, 0.8%); Octopus automatic add-value and instalments earn DBS$1 per HK$250. Miles convert at DBS$48 = 1,000 Asia Miles.",
+          "2026 promotion (register in the DBS Card+ app): in any calendar month with HK$20,000 or more of eligible retail spending, overseas spending earns an extra DBS$3 per HK$250 (6X, HK$2 = 1 mile), capped at DBS$240 a month and DBS$2,880 for the year; not modelled.",
+          "Annual fee HK$3,600, waived for the first year."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Selected Online and Overseas Spend",
+            "to": "Overseas spending in foreign currencies"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Overseas spending in foreign currencies",
+            "rate": 0.012
+          },
+          {
+            "category": "Other",
+            "rate": 0.008
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Black Card Mastercard Benefits"
+        ],
+        "upsert": [
+          {
+            "name": "Travel and Lifestyle Offers",
+            "description": "Rotating DBS cardholder offers; in 2026 they include a JPY600 cash rebate on Suica top-ups, up to 15% cash rebate at designated overseas merchants and 45% off iGO Rewards redemptions.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 176,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www1.citibank.com.hk/english/credit-cards/cash-back-card",
+      "confidence": "official",
+      "_why": "Verified against Citi HK's product page, the 'Citi Cash Back Card Cash Rebate Program' terms printed on it, and Citi's fee schedule (citibank.com.hk/english/credit-cards/pdf/Fee_Schedule.pdf, effective 2025-12-01: HK$1,800 principal card). Queue item applied: 2% foreign-currency rebate added. The terms limit the 2% dining and hotel rebates to HKD spending at outlets in Hong Kong, so the labels now say so (the queue's remark that they are global no longer holds). Removed a benefit row that only restated the earn rate; merchant offers have no fixed value.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "2% (including the 1% basic rebate) on Hong Kong-dollar spending at dining outlets and hotels in Hong Kong, and on all retail spending in foreign currencies; 1% on everything else. No minimum spend or cap.",
+          "The foreign-currency rebate excludes card-present spending at merchants in the UK and EEA; foreign-currency transactions carry a 1.95% fee.",
+          "Rebates are credited once the accumulated balance reaches HK$200."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Dining",
+            "to": "Dining in Hong Kong (HKD)"
+          },
+          {
+            "from": "Hotel Stays",
+            "to": "Hotels in Hong Kong (HKD)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Foreign currency spending",
+            "rate": 0.02
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Simple Cash Back Structure"
+        ],
+        "upsert": [
+          {
+            "name": "Citi Merchant Offers",
+            "description": "Citi Hong Kong publishes rotating merchant offers and cardholder promotions; no fixed value.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 177,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.dbs.com.sg/personal/cards/credit-cards/live-fresh-dbs-visa-paywave-platinum-card",
+      "confidence": "official",
+      "_why": "DBS's product page: 'From 7 Sep 2026, we will no longer accept new applications for DBS Live Fresh Card'. The application FAQ (dbs.com.sg/iwov-resources/media/pdf/cards/live-fresh-application-faq.pdf) says existing cards keep earning, so the card is marked closed-to-new-applicants. DBS points applicants to the DBS Chromo Card, which is described in card-data/new-cards-2026-10-31-intl.json. Queue item applied per the cashback terms (dbs.com.sg/iwov-resources/media/pdf/cards/live-fresh-cashback-tnc.pdf, last updated 2026-01-16): the bonus tiers are Shopping and Transport, each 0.3% + 5.7% = 6% with a S$800 minimum spend. Bonus cashback is capped at S$50 and S$20 a month, converted to S$877 and S$350 of spend. The 3.25% in-store overseas offset was a refuted queue proposal and is not added as a category. Removed two benefit rows that restated the earn structure or described no actual perk. S$196.20 fee with 1-year waiver confirmed.",
+      "set": {
+        "availability": "closed-to-new-applicants",
+        "availabilityChangedAt": "2026-09-07",
+        "signupBonus": null,
+        "signupBonusValue": null,
+        "rewardRuleNotes": [
+          "Closed to new applicants since 2026-09-07; existing cardholders keep the card and earn cashback as usual.",
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Bonus cashback needs at least S$800 of eligible spend in the calendar month: an extra 5.7% (6% in total) on Shopping (apparel, department stores, electronics and computers, home furnishing, personal services, specialty retail, watches and jewellery; in-store or online, in Singapore or overseas), capped at S$50 a month (about S$877 of spend); and on Transport (public transport, ride-hailing and taxis), capped at S$20 a month (about S$350 of spend).",
+          "All eligible spend earns 0.3% with no cap or minimum.",
+          "In-store spending in 15 selected Asian currencies gets an extra 3.25% (capped at S$50 a month) under a separate promotion; it only offsets the card's foreign-exchange fees, so it is not modelled."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Online Spend",
+            "to": "Shopping, in-store and online retail: apparel, department stores, electronics, furnishings and specialty retail (up to $877/month)"
+          },
+          {
+            "from": "Contactless Spend",
+            "to": "Transport: public transit, taxis and rideshare (up to $350/month)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Shopping, in-store and online retail: apparel, department stores, electronics, furnishings and specialty retail (up to $877/month)",
+            "rate": 0.06
+          },
+          {
+            "category": "Transport: public transit, taxis and rideshare (up to $350/month)",
+            "rate": 0.06
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Online and Contactless Cashback",
+          "Eco-Positioned Card"
+        ]
+      }
+    },
+    {
+      "cardId": 178,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.uob.com.sg/personal/cards/cashback/one-card.page",
+      "confidence": "official",
+      "_why": "Queue item applied per UOB's page and full terms (uob.com.sg/assets/pdfs/one_card_full_tnc.pdf). The 10% headline covers only Grab, McDonald's, Shopee and SimplyGo at the S$2,000 tier. Groceries (MCC 5411, +2.67%/+4.67% at the S$1,000/S$2,000 tiers since 2025-07-01), Singapore Power (+1%) and Shell (+1.67%, S$2,000 tier only) are separate. Additional cashback is capped at S$120 per statement month, with S$2,240 a year in total. Quarterly cashback of S$60/S$100/S$200 is 3.33% of spend at every tier, so it is now the default rate and the separate 'Quarterly Cashback Tiers' row is removed. The old 0.1% default matched nothing; the terms only pay 0.03% when no quarter qualifies. Rates are encoded for the S$1,000-a-month tier (typical qualifying cardholder): partners 8.33%, groceries 6%, Singapore Power 4.33%. The S$2,000 tier is in the notes. The S$120 cap is enforced as S$2,400 of monthly spend (S$120 / 5%). Removed two benefits that restated earn rates. The queue's signup-offer item is skipped; it also expired on 2026-09-30.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Cashback is earned per quarter: spend at least S$600, S$1,000 or S$2,000, with at least 10 transactions, in every statement month of the quarter to get S$60, S$100 or S$200 (up to 3.33% of spend). Rates here assume the S$1,000 tier. If no quarter qualifies in a year, only 0.03% base cashback is paid.",
+          "Additional cashback, only in qualifying quarters: Grab (excluding wallet top-ups), McDonald's, Shopee Singapore and SimplyGo +5% (+6.67% at the S$2,000 tier); grocery stores and supermarkets (MCC 5411) +2.67% (+4.67% at S$2,000; none at S$600); Singapore Power +1%; Shell +1.67% at the S$2,000 tier only.",
+          "Additional cashback is capped at S$120 per statement month (maximum S$2,240 a year including quarterly cashback). The app caps the bonus rows at S$2,400 of monthly spend (where +5% reaches S$120) and tracks groceries as a separate bucket.",
+          "Annual fee S$196.20, waived for the first year."
+        ]
+      },
+      "categories": {
+        "remove": [
+          "Quarterly Cashback Tiers"
+        ],
+        "rename": [
+          {
+            "from": "Daily Spend Bonus Categories",
+            "to": "Grab, McDonald's, Shopee Singapore and SimplyGo bus and train rides (up to $2,400/month combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Grab, McDonald's, Shopee Singapore and SimplyGo bus and train rides (up to $2,400/month combined)",
+            "rate": 0.0833
+          },
+          {
+            "category": "Groceries (supermarket MCC 5411) (up to $2,400/month combined)",
+            "rate": 0.06
+          },
+          {
+            "category": "SP Group (Singapore Power) payments (up to $2,400/month combined)",
+            "rate": 0.0433
+          },
+          {
+            "category": "Other",
+            "rate": 0.0333
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Tiered Quarterly Cashback",
+          "Campaign Cashback Offers"
+        ]
+      }
+    },
+    {
+      "cardId": 179,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.ocbc.com/personal-banking/cards/365-cashback-credit-card",
+      "confidence": "needs-review",
+      "_why": "ocbc.com returned HTTP 403 to every request (product page, the 1 Nov 2026 T&C PDF and the press release), so this follows two secondary sources, dated after OCBC's announcement, that agree. They are SingSaver (updated 2026-10-05, https://www.singsaver.com.sg/credit-card/blog/ocbc-365-credit-card-cashback-cap-increase-2026) and littlebigreddot (2026-10-04, https://littlebigreddot.com/ocbc-365-credit-card-6-percent-cashback-1-november-2026/, citing OCBC's release ocbc.com/group/media/release/2026/ocbc-card-6-percent-cashback-groceries-transport). From 2026-11-01: 6% on dining, groceries, land transport and petrol; Watsons 3% until 2027-03-31; EV charging, streaming and utilities 0.25%; a single S$800 tier with a S$160 monthly cap. Queue items: petrol 6% applied (inside the merged 6% row); 'Other' 0.003 -> 0.0025 applied. The 3% 'groceries, transport, utilities, Watsons, streaming, EV' relabel is dropped because that tier no longer exists from 2026-11-01. Removed benefits that restated earn rates or the fee waiver (now in notes). The sourceUrl is kept on OCBC's product page, which could not be fetched.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "From 2026-11-01 (by posting date), with at least S$800 of eligible spend in the calendar month: dining (including fast food and food delivery), groceries, land transport and petrol earn 6%, in Singapore or overseas, in-store or online. Watsons earns 3% until 2027-03-31, then 0.25%. EV charging, streaming, telco and utility bills drop to the 0.25% base.",
+          "Total cashback is capped at S$160 per calendar month (single tier; the old S$80 cap for S$800-1,599 of spend is gone). The app caps the bonus rows at S$2,666 of monthly spend (S$160 at 6%).",
+          "Below S$800 of monthly spend, all eligible spend earns 0.25%.",
+          "S$196.20 annual fee, waived for the first two years; later waivers need S$10,000 of spend in a card year.",
+          "ocbc.com blocks automated access; these terms come from two secondary sources and should be re-checked against OCBC's 1 Nov 2026 programme terms."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Dining and Food Delivery",
+            "to": "Dining, food delivery, groceries, petrol and public transit (up to $2,666/month combined)"
+          },
+          {
+            "from": "Streaming, Watsons, and EV Charging",
+            "to": "Watsons (up to $2,666/month combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Dining, food delivery, groceries, petrol and public transit (up to $2,666/month combined)",
+            "rate": 0.06
+          },
+          {
+            "category": "Other",
+            "rate": 0.0025
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Everyday Cashback Categories",
+          "Intro Fee Waiver"
+        ]
+      }
+    },
+    {
+      "cardId": 180,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.hsbc.com.sg/credit-cards/products/revolution/",
+      "confidence": "official",
+      "_why": "Rates were stored as 0.04 and 0.004, which the engine reads as 4 and 0.4 points per S$1. HSBC's page says 10X and 1X Reward points, so they are now 0.10 and 0.01; with the existing 0.4-cent point value this gives the 4% and 0.4% the catalog intended. Queue items applied: the 9,000 bonus-points-a-month cap (S$1,000 of spend) and the complimentary travel insurance benefit (page: Visa Signature, cover up to S$1 million). The 20X Everyday Global Account tier needs S$50,000 in deposits, so it is described in the notes rather than added as a row every cardholder would match. The 'online and contactless' label was credited for nothing; the new label names the eligible spend types, which in practice are paid contactless or online. Removed the fee-waiver benefit (now a note) and the welcome-offer benefit (duplicates signupBonus).",
+      "set": {
+        "rewardValuationDescription": "Rates are HSBC Reward points per S$1 (10X = 10 points). This app values a point at 0.4 SG cents, i.e. 0.4 miles per point (HSBC: 42,000 points = 16,800 miles) at 1 cent per mile, for annual-fee progress.",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "10X Reward points (1X base + 9X bonus, up to 4 miles per S$1) on contactless and online payments at eligible merchant codes: dining, shopping, travel, ride-hailing, taxis and memberships, in Singapore or abroad. Bonus points are capped at 9,000 per calendar month (S$1,000 of spend); after that, 1X.",
+          "Cardholders keeping an average daily balance of at least S$50,000 in an HSBC Everyday Global Account earn 20X (19X bonus, capped at 22,800 bonus points a month); not modelled.",
+          "All other qualifying spending earns 1X with no cap.",
+          "HSBC currently waives the annual fee. The card is a Visa Signature card with complimentary travel insurance."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Eligible Online and Contactless Spend",
+            "to": "Dining, shopping, travel, rideshare, taxis and memberships at eligible MCCs (up to $1,000/month)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Dining, shopping, travel, rideshare, taxis and memberships at eligible MCCs (up to $1,000/month)",
+            "rate": 0.1
+          },
+          {
+            "category": "Other",
+            "rate": 0.01
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Annual Fee Waiver",
+          "Reward Points Offer"
+        ],
+        "upsert": [
+          {
+            "name": "Complimentary Travel Insurance",
+            "description": "Complimentary travel insurance covering flight inconvenience and personal accident, up to S$1 million, for the cardholder and family (Visa Signature).",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 181,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.citibank.com.sg/credit-cards/cashback/cash-back-card",
+      "confidence": "official",
+      "_why": "Queue item applied: Citi SG states 0.2% base cash back on all retail purchases (Other 0.0025 -> 0.002). The 8% and 6% bonus rates are confirmed; the S$800 statement-month minimum and the S$80 combined monthly cap are now in the notes, and the cap is enforced as a shared S$1,000 of spend (S$80 at 8%). The old sourceUrl now redirects to citibank.com.sg/credit-cards/cashback/cash-back-card. Removed a benefit that restated the earn rates and the S$300 welcome-cashback benefit (duplicates signupBonus). S$196.20 fee confirmed.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "With at least S$800 of qualifying retail spend in the statement month: 8% (0.2% base + 7.8% bonus) on petrol and private-hire commutes (Grab, Gojek and similar), and 6% (0.2% + 5.8%) on dining and groceries, worldwide.",
+          "Total cash back is capped at S$80 per statement month across all spending; the app caps the bonus rows at S$1,000 of monthly spend (S$80 at 8%).",
+          "Below S$800, and on all other retail spending, cash back is 0.2%.",
+          "Annual fee S$196.20 including GST."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Petrol and Private Commute",
+            "to": "Petrol, gas stations and private-hire rideshare such as Grab and Gojek, worldwide (up to $1,000/month combined)"
+          },
+          {
+            "from": "Dining and Groceries",
+            "to": "Dining and groceries, worldwide (up to $1,000/month combined)"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Other",
+            "rate": 0.002
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "High Everyday Cashback",
+          "Welcome Cashback"
+        ]
+      }
+    },
+    {
+      "cardId": 182,
+      "reviewedAt": "2026-10-31",
+      "source": "https://www.sc.com/sg/credit-cards/smart-credit-card/",
+      "confidence": "official",
+      "_why": "Queue items applied per SC's page (structure since 2024-12-06; the 4% sub-S$800 promotion ended 2025-03-31). 6% is not a rate the card pays: bonus merchants earn 8% at S$800-1,499 of monthly spend and 10% at S$1,500+, and other spending earns 0.5% (1% at S$1,500+). This is encoded at the S$800 tier (0.08 / 0.005) as the typical qualifying cardholder, not the queue's suggested 10% headline, which needs S$1,500+ a month; both tiers are in the notes. There is no cap. Fee S$91 + 9% GST = S$99.19 with first-year waiver confirmed; removed benefit rows that restated the fee and the earn rates.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Bonus merchants: SMART Dining (McDonald's, KFC, Burger King, Ya Kun Kaya Toast, Subway, Toast Box, Starbucks, The Coffee Bean & Tea Leaf, Pizza Hut, Domino's), SMART Transport (bus and MRT via SimplyGo, EV charging) and SMART Streaming (Netflix, Spotify, YouTube, Disney+, Amazon Prime, Viu, iQIYI, HBO GO).",
+          "Rates depend on total card spend in the statement month: below S$800, 0.5% on everything; S$800-1,499, 8% at bonus merchants and 0.5% otherwise (encoded here); S$1,500 and above, 10% at bonus merchants and 1% otherwise. No cashback cap.",
+          "Cashback is paid as 360° Rewards points (3,200 points = S$10).",
+          "Annual fee S$91 + 9% GST (S$99.19), waived for the first year for new cardholders."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Selected Digital and Everyday Merchants",
+            "to": "Streaming, SimplyGo bus and train rides, EV charging, and selected fast-food and coffee chains"
+          }
+        ],
+        "upsert": [
+          {
+            "category": "Streaming, SimplyGo bus and train rides, EV charging, and selected fast-food and coffee chains",
+            "rate": 0.08
+          },
+          {
+            "category": "Other",
+            "rate": 0.005
+          }
+        ]
+      },
+      "benefits": {
+        "remove": [
+          "Low Annual Fee",
+          "Smart Card Merchant Offers"
+        ]
+      }
+    }
+  ]
+}

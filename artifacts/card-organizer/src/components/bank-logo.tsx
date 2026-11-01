@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { PUBLIC_SITE_URL, isDesktopApp } from "@/lib/desktop";
+import { t } from "@/lib/i18n";
 
 type IssuerBrand = {
   name: string;
@@ -8,6 +10,16 @@ type IssuerBrand = {
   abbr: string;
   match: (issuer: string) => boolean;
 };
+
+/**
+ * The same artwork on the public site. A desktop build only bundles the art
+ * that existed when it was built, so a card added by a later rules update has
+ * to borrow its image from there.
+ */
+function remoteAssetUrl(url?: string | null): string | null {
+  if (!url || !isDesktopApp() || /^(https?:|data:|blob:)/.test(url)) return null;
+  return `${PUBLIC_SITE_URL}${url.replace(/^\//, "")}`;
+}
 
 function resolvePublicAssetUrl(url?: string | null): string | null {
   if (!url) return null;
@@ -327,7 +339,7 @@ export function BankLogo({ issuer, size = "md", className }: BankLogoProps) {
     return (
       <div
         role="img"
-        aria-label={`${brand.name} logo`}
+        aria-label={t("{name} logo", { name: brand.name })}
         className={cn(
           dim,
           "shrink-0 rounded-md flex items-center justify-center font-bold tracking-tight leading-none ring-1 ring-black/5",
@@ -347,7 +359,7 @@ export function BankLogo({ issuer, size = "md", className }: BankLogoProps) {
   return (
     <div
       role="img"
-      aria-label={`${issuer} logo`}
+      aria-label={t("{name} logo", { name: issuer })}
       className={cn(
         dim,
         "shrink-0 rounded-md bg-white/20 flex items-center justify-center text-white font-bold backdrop-blur-sm border border-white/30",
@@ -414,12 +426,16 @@ export function CardArt({
   issuer,
   network,
 }: CardArtProps) {
-  // Tracks the URL that failed rather than a boolean, so a later card rendered
+  // Tracks the URLs that failed rather than a boolean, so a later card rendered
   // by the same component instance still gets a chance to load its own art.
-  const [failedImageUrl, setFailedImageUrl] = useState<string | null>(null);
-  const resolvedCardImageUrl = resolvePublicAssetUrl(cardImageUrl);
-  const showImage =
-    resolvedCardImageUrl && resolvedCardImageUrl !== failedImageUrl;
+  const [failedImageUrls, setFailedImageUrls] = useState<string[]>([]);
+  const candidates = [
+    resolvePublicAssetUrl(cardImageUrl),
+    remoteAssetUrl(cardImageUrl),
+  ].filter((url): url is string => Boolean(url));
+  const resolvedCardImageUrl =
+    candidates.find((url) => !failedImageUrls.includes(url)) ?? null;
+  const showImage = Boolean(resolvedCardImageUrl);
   const showOverlayBadges = showImage && (issuer || network);
 
   return (
@@ -431,13 +447,20 @@ export function CardArt({
           : color || "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
       }}
     >
-      {showImage ? (
+      {showImage && resolvedCardImageUrl ? (
         <img
+          key={resolvedCardImageUrl}
           src={resolvedCardImageUrl}
           alt={alt}
           loading="lazy"
           decoding="async"
-          onError={() => setFailedImageUrl(resolvedCardImageUrl)}
+          onError={() =>
+            setFailedImageUrls((failed) =>
+              failed.includes(resolvedCardImageUrl)
+                ? failed
+                : [...failed, resolvedCardImageUrl],
+            )
+          }
           className={cn(
             "absolute inset-0 h-full w-full object-contain p-3 drop-shadow-md",
             imageClassName,

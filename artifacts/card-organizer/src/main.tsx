@@ -1,78 +1,48 @@
+import { Fragment, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { ThemeProvider } from "next-themes";
-import { initializeLocalDataStore } from "@workspace/api-client-react";
+import {
+  initializeLocalDataStore,
+  setUiTextTranslator,
+} from "@workspace/api-client-react";
 import App from "./App";
+import {
+  getAppView,
+  installExternalLinkHandler,
+  isDesktopApp,
+} from "@/lib/desktop";
+import { markWebUpdateReady } from "@/lib/app-update";
+import { t, useLocale } from "@/lib/i18n";
+import { capturePwaInstallPrompt } from "@/lib/pwa-install";
 import "./index.css";
 
-const UPDATE_BANNER_ID = "app-update-banner";
-
-function isTauriRuntime() {
-  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+/**
+ * Re-renders everything when the language changes. Strings are translated
+ * as components render, so a fresh tree is the simplest way to get them all.
+ */
+function LocaleRoot({ children }: { children: ReactNode }) {
+  const locale = useLocale();
+  return <Fragment key={locale}>{children}</Fragment>;
 }
 
-function createBannerButton(label: string, emphasis: "primary" | "quiet") {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.textContent = label;
-  button.style.cssText = [
-    "appearance:none",
-    "cursor:pointer",
-    "flex:none",
-    "min-height:2.25rem",
-    "padding:0 .875rem",
-    "border-radius:.625rem",
-    "font:600 .8125rem/1 inherit",
-    emphasis === "primary"
-      ? "border:1px solid var(--primary-border);background:hsl(var(--primary));color:hsl(var(--primary-foreground))"
-      : "border:1px solid var(--button-outline);background:transparent;color:hsl(var(--muted-foreground))",
-  ].join(";");
-  return button;
-}
-
-function showUpdateBanner() {
-  if (document.getElementById(UPDATE_BANNER_ID)) return;
-
-  const banner = document.createElement("div");
-  banner.id = UPDATE_BANNER_ID;
-  banner.setAttribute("role", "status");
-  banner.style.cssText = [
-    "position:fixed",
-    "left:50%",
-    "bottom:calc(1rem + env(safe-area-inset-bottom))",
-    "transform:translateX(-50%)",
-    "z-index:60",
-    "display:flex",
-    "align-items:center",
-    "gap:.5rem",
-    "max-width:min(28rem, calc(100vw - 2rem))",
-    "padding:.5rem .5rem .5rem 1rem",
-    "border-radius:.875rem",
-    "border:1px solid hsl(var(--card-border))",
-    "background:hsl(var(--card))",
-    "color:hsl(var(--card-foreground))",
-    "box-shadow:var(--app-shadow-card)",
-    "font:500 .875rem/1.25rem var(--app-font-sans)",
-  ].join(";");
-
-  const message = document.createElement("span");
-  message.style.cssText = "flex:1 1 auto";
-  message.textContent = "A new version is available.";
-
-  const reload = createBannerButton("Reload", "primary");
-  reload.addEventListener("click", () => window.location.reload());
-
-  const dismiss = createBannerButton("Later", "quiet");
-  dismiss.addEventListener("click", () => banner.remove());
-
-  banner.append(message, reload, dismiss);
-  document.body.append(banner);
+function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <LocaleRoot>{children}</LocaleRoot>
+    </ThemeProvider>
+  );
 }
 
 function registerServiceWorker() {
   if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return;
   // The desktop build ships its assets locally and serves them from a Tauri
   // scheme where registration always rejects.
-  if (isTauriRuntime()) return;
+  if (isDesktopApp()) return;
 
   const register = () => {
     let hasController = Boolean(navigator.serviceWorker.controller);
@@ -82,7 +52,7 @@ function registerServiceWorker() {
         hasController = true;
         return;
       }
-      showUpdateBanner();
+      markWebUpdateReady();
     });
 
     navigator.serviceWorker
@@ -107,17 +77,31 @@ function registerServiceWorker() {
 }
 
 async function bootstrap() {
+  // The browser offers installation once, early; keep it for Settings.
+  capturePwaInstallPrompt();
+  // Sentences the reward engine builds follow the UI language too.
+  setUiTextTranslator(t);
   await initializeLocalDataStore();
+  installExternalLinkHandler();
+  const container = document.getElementById("root")!;
 
-  createRoot(document.getElementById("root")!).render(
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+  // The desktop app's menu bar panel loads this same page in its own window.
+  if (getAppView() === "quick") {
+    document.documentElement.classList.add("quick-panel");
+    if (isDesktopApp()) document.documentElement.classList.add("native-panel");
+    const { default: QuickPanelRoot } = await import("./quick/quick-panel");
+    createRoot(container).render(
+      <Providers>
+        <QuickPanelRoot />
+      </Providers>,
+    );
+    return;
+  }
+
+  createRoot(container).render(
+    <Providers>
       <App />
-    </ThemeProvider>,
+    </Providers>,
   );
 
   registerServiceWorker();

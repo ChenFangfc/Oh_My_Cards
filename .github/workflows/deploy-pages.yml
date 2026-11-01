@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    # The freshness bot commits reports here daily; they change nothing the
+    # site serves, so they must not trigger a redeploy.
+    paths-ignore:
+      - "card-data/**"
   workflow_dispatch:
 
 permissions:
@@ -51,6 +55,10 @@ jobs:
 
       # Emits public/card-rules/{manifest.json,<version>.json} so already-installed
       # PWAs can pull new card rules without waiting for an app update.
+      # Installed apps replace their whole rulebook with the published feed.
+      - name: Lint card catalog
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:lint
+
       - name: Publish card rules feed
         run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:publish
 
@@ -64,6 +72,13 @@ jobs:
       # through the 404 handler instead of GitHub's own error page.
       - name: Add SPA fallback
         run: cp artifacts/card-organizer/dist/public/index.html artifacts/card-organizer/dist/public/404.html
+
+      # The film, playable in a browser from the README ("Watch with sound").
+      # Copied here rather than into public/, so the desktop app doesn't ship it.
+      - name: Add the film
+        run: |
+          mkdir -p artifacts/card-organizer/dist/public/video
+          cp docs/promo/*.mp4 artifacts/card-organizer/dist/public/video/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

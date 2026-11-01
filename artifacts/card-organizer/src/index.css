@@ -78,11 +78,13 @@
   --background: 40 36% 95%;
   --foreground: 218 22% 11%;
   --border: 38 18% 84%;
-  --card: 0 0% 100%;
+  /* A whisper of the page's warmth: pure white cards read as pasted-on
+     rectangles against the warm background. */
+  --card: 40 40% 99.2%;
   --card-foreground: 218 22% 11%;
   --card-border: 38 18% 84%;
   
-  --sidebar: 0 0% 100%;
+  --sidebar: 40 40% 99.2%;
   --sidebar-foreground: 218 22% 11%;
   --sidebar-border: 38 18% 84%;
   --sidebar-primary: 218 22% 11%;
@@ -92,7 +94,7 @@
   /* Focus rings must clear 3:1 against --background and --card (WCAG 1.4.11 / 2.4.11). */
   --sidebar-ring: 176 57% 32%;
 
-  --popover: 0 0% 100%;
+  --popover: 40 40% 99.2%;
   --popover-foreground: 218 22% 11%;
   --popover-border: 38 18% 84%;
 
@@ -108,16 +110,20 @@
   --accent: 207 77% 78%;
   --accent-foreground: 218 22% 11%;
   
-  --destructive: 7 83% 69%;
+  /* 5.6:1 against white text and on the light card; the former coral was
+     2.6:1, too faint for error messages and the delete buttons. */
+  --destructive: 4 70% 45%;
   --destructive-foreground: 0 0% 100%;
 
   --input: 38 18% 82%;
   --ring: 176 57% 32%;
 
-  --chart-1: 176 57% 68%;
-  --chart-2: 207 77% 78%;
-  --chart-3: 41 89% 67%;
-  --chart-4: 7 83% 69%;
+  /* Chart marks need 3:1 against the card (WCAG 1.4.11); the pastel set
+     reached only 1.6–2.6:1 in light mode. */
+  --chart-1: 176 55% 36%;
+  --chart-2: 207 65% 45%;
+  --chart-3: 36 85% 42%;
+  --chart-4: 4 68% 50%;
   --chart-5: 213 27% 13%;
 
   --app-font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", sans-serif;
@@ -188,7 +194,8 @@
   --accent-foreground: 213 27% 10%;
   
   --destructive: 7 83% 69%;
-  --destructive-foreground: 0 0% 100%;
+  /* Dark text on the coral: white on it is 2.6:1. */
+  --destructive-foreground: 213 27% 10%;
 
   --input: 212 25% 24%;
   --ring: 176 57% 68%;
@@ -224,6 +231,78 @@
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  button,
+  a,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+}
+
+/* The menu bar panel: in the desktop app the window itself is transparent and
+   macOS draws its popover material behind the page; previewed in a browser
+   (?view=quick) it is a plain popover-sized card. */
+html.quick-panel,
+html.quick-panel body,
+html.quick-panel #root {
+  background: transparent;
+}
+html.quick-panel body {
+  user-select: none;
+}
+html.quick-panel input,
+html.quick-panel select {
+  user-select: text;
+}
+html.quick-panel:not(.native-panel) body {
+  display: grid;
+  place-items: center;
+  background: hsl(var(--background));
+}
+html.quick-panel:not(.native-panel) #root {
+  width: 380px;
+  height: 560px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  background: hsl(var(--popover));
+  box-shadow: 0 18px 48px rgba(17, 24, 32, 0.18);
+  overflow: hidden;
+}
+
+/* On a trackpad or mouse the whole window rubber-banding past its edges reads
+   as a web page, not an app — most noticeable in the desktop build. */
+@media (pointer: fine) {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+/* Reduced motion drops movement, not feedback: fades and color changes stay,
+   slides and zooms go. Pulsing placeholders stop entirely. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    --tw-enter-translate-x: 0 !important;
+    --tw-enter-translate-y: 0 !important;
+    --tw-enter-scale: 1 !important;
+    --tw-enter-rotate: 0 !important;
+    --tw-exit-translate-x: 0 !important;
+    --tw-exit-translate-y: 0 !important;
+    --tw-exit-scale: 1 !important;
+    --tw-exit-rotate: 0 !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-pulse {
+    animation: none !important;
+  }
+  .active-elevate-2:active {
+    transform: none;
   }
 }
 

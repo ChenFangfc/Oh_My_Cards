@@ -1,0 +1,34 @@
+{
+  "_note": "Follow-ups from the 2026-10-31 review that change modelling, not terms: renewal periods for trusted-traveler credits (stored amortized per year, as everywhere else), and a benefit rename that keeps the benefit id so logged usage stays attached.",
+  "keepReviewDate": true,
+  "patches": [
+    {
+      "cardId": 25,
+      "_why": "Trusted-traveler fee credit renews every 4 years; value amortized to $25/yr like the rest of the catalog.",
+      "benefits": {
+        "upsert": [
+          { "name": "Global Entry / TSA PreCheck Credit", "annualValue": 25, "period": "multi-year", "periodYears": 4 }
+        ]
+      }
+    },
+    {
+      "cardId": 67,
+      "_why": "The credit is Travel Center-only since 2025-12-15 (see the 2026-10-31 us-other patch); renamed in place so recorded usage keeps its id.",
+      "benefits": {
+        "rename": [{ "from": "$325 Travel & Dining Credit", "to": "$325 Travel Center Credit" }],
+        "upsert": [
+          { "name": "Global Entry / TSA PreCheck", "annualValue": 25, "period": "multi-year", "periodYears": 4 }
+        ]
+      }
+    },
+    {
+      "cardId": 166,
+      "_why": "$120 trusted-traveler credit every 4 years, amortized to $30/yr.",
+      "benefits": {
+        "upsert": [
+          { "name": "Global Entry / TSA PreCheck Credit", "annualValue": 30, "period": "multi-year", "periodYears": 4 }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "_note": "Label fixes so the engine applies a bonus only through the channel the issuer names.",
+  "keepReviewDate": true,
+  "patches": [
+    {
+      "cardId": 2,
+      "_why": "Chase: 4x on flights and hotels booked direct (https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve). Without 'direct' the row paid 4x on Expedia and other online-travel-agency bookings.",
+      "categories": {
+        "rename": [{ "from": "Flights and Hotels", "to": "Flights and hotels booked direct" }]
+      }
+    }
+  ]
+}

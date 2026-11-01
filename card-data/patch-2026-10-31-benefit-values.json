@@ -1,0 +1,1522 @@
+{
+  "_note": "Product features listed as benefits with an invented dollar value (no-fee claims, intro APRs, earn-rate restatements, elite status, redemption discounts, automatic matches). They inflated wallet benefit totals and appeared as 'unused credits' with a meaningless Mark Used button. Values are cleared; the perks stay listed in card details. Allowances a cardholder actually spends (statement credits, free nights, memberships, anniversary point deposits) keep their values.",
+  "keepReviewDate": true,
+  "patches": [
+    {
+      "cardId": 6,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 7,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 13,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 14,
+      "_why": "Cleared values: No Annual Fee ($95); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual Fee",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 15,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 16,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 17,
+      "_why": "Cleared values: Cashback Match First Year ($150); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cashback Match First Year",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 18,
+      "_why": "Cleared values: Miles Match First Year ($150); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Miles Match First Year",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 21,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30); Preferred Rewards Bonus ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          },
+          {
+            "name": "Preferred Rewards Bonus",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 22,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30); Preferred Rewards Bonus ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          },
+          {
+            "name": "Preferred Rewards Bonus",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 23,
+      "_why": "Cleared values: Choice Category Flexibility ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Choice Category Flexibility",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 24,
+      "_why": "Cleared values: ExtendPay ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "ExtendPay",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 25,
+      "_why": "Cleared values: No Annual Fee ($95); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual Fee",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 35,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 36,
+      "_why": "Cleared values: Automatic Silver Elite Status ($75); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Silver Elite Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 37,
+      "_why": "Cleared values: Automatic Discoverist Status ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Discoverist Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 38,
+      "_why": "Cleared values: 4th Night Free ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "4th Night Free",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 39,
+      "_why": "Cleared values: Automatic Platinum Elite Status ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Platinum Elite Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 40,
+      "_why": "Cleared values: Automatic Hilton Honors Gold Status ($200); Path to Diamond Status ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Hilton Honors Gold Status",
+            "annualValue": null
+          },
+          {
+            "name": "Path to Diamond Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 41,
+      "_why": "Cleared values: Automatic Hilton Honors Diamond Status ($500)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Hilton Honors Diamond Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 42,
+      "_why": "Cleared values: Automatic Wyndham Diamond Status ($150); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Wyndham Diamond Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 43,
+      "_why": "Cleared values: Daily Cash ($50); No Annual Fee ($30); Financial Health Tools ($20)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Daily Cash",
+            "annualValue": null
+          },
+          {
+            "name": "No Annual Fee",
+            "annualValue": null
+          },
+          {
+            "name": "Financial Health Tools",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 44,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 45,
+      "_why": "Cleared values: Pay Rent Without Fees ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Pay Rent Without Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 46,
+      "_why": "Cleared values: No Card Annual Fee ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Card Annual Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 50,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 51,
+      "_why": "Cleared values: 0% Intro APR for 12 Months ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "0% Intro APR for 12 Months",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 53,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 54,
+      "_why": "Cleared values: Marriott Bonvoy Silver Status ($50); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Marriott Bonvoy Silver Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 55,
+      "_why": "Cleared values: 4th Reward Night Free ($200); IHG Silver Elite Status ($50); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "4th Reward Night Free",
+            "annualValue": null
+          },
+          {
+            "name": "IHG Silver Elite Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 58,
+      "_why": "Cleared values: Marriott Gold Elite Status ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Marriott Gold Elite Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 59,
+      "_why": "Cleared values: Hilton Honors Silver Status ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Hilton Honors Silver Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 60,
+      "_why": "Cleared values: No Annual Fee ($95)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 63,
+      "_why": "Cleared values: Mosaic Status with $50k Spend ($200); 10% Points Rebate ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Mosaic Status with $50k Spend",
+            "annualValue": null
+          },
+          {
+            "name": "10% Points Rebate",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 66,
+      "_why": "Cleared values: 25K Aeroplan Status ($200); No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "25K Aeroplan Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 68,
+      "_why": "Cleared values: 0% Intro APR for 15 Billing Cycles ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "0% Intro APR for 15 Billing Cycles",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 69,
+      "_why": "Cleared values: Cashback Match ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cashback Match",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 70,
+      "_why": "Cleared values: Cashback Match ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cashback Match",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 71,
+      "_why": "Cleared values: Automatic Account Reviews ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Account Reviews",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 72,
+      "_why": "Cleared values: 21-Month 0% Intro APR ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "21-Month 0% Intro APR",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 73,
+      "_why": "Cleared values: No Foreign Transaction Fee ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 74,
+      "_why": "Cleared values: 0% Intro APR for 15 Months ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "0% Intro APR for 15 Months",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 75,
+      "_why": "Cleared values: 2% Cash Back Everywhere ($200); 0% Intro APR for 15 Billing Cycles ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "2% Cash Back Everywhere",
+            "annualValue": null
+          },
+          {
+            "name": "0% Intro APR for 15 Billing Cycles",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 77,
+      "_why": "Cleared values: No Foreign Transaction Fees ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 78,
+      "_why": "Cleared values: No Rewards Caps ($50); Cash Back to PayPal Balance ($30)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Rewards Caps",
+            "annualValue": null
+          },
+          {
+            "name": "Cash Back to PayPal Balance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 81,
+      "_why": "Cleared values: No Foreign Transaction Fees ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 84,
+      "_why": "Cleared values: High Food Earn Rate ($300); No Supplementary Card Fee ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "High Food Earn Rate",
+            "annualValue": null
+          },
+          {
+            "name": "No Supplementary Card Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 85,
+      "_why": "Cleared values: Rogers Redemption Bonus ($100); No Annual Fee ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Rogers Redemption Bonus",
+            "annualValue": null
+          },
+          {
+            "name": "No Annual Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 86,
+      "_why": "Cleared values: Birthday Bonus Points ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Birthday Bonus Points",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 88,
+      "_why": "Cleared values: Broad Travel Rewards ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Broad Travel Rewards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 92,
+      "_why": "Cleared values: Intro APR Focus ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Intro APR Focus",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 93,
+      "_why": "Cleared values: High Base Business Rewards ($300); Pay in Full with Flex Option ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "High Base Business Rewards",
+            "annualValue": null
+          },
+          {
+            "name": "Pay in Full with Flex Option",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 95,
+      "_why": "Cleared values: Discoverist Status ($150); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Discoverist Status",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 98,
+      "_why": "Cleared values: Capital One Travel Tools ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Capital One Travel Tools",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 101,
+      "_why": "Cleared values: No Late Fees ($50); Low Intro APR ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Late Fees",
+            "annualValue": null
+          },
+          {
+            "name": "Low Intro APR",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 102,
+      "_why": "Cleared values: Low Intro APR ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Low Intro APR",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 104,
+      "_why": "Cleared values: Preferred Rewards Boost ($100); Low Intro APR ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Rewards Boost",
+            "annualValue": null
+          },
+          {
+            "name": "Low Intro APR",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 105,
+      "_why": "Cleared values: Long Intro APR ($100); No Penalty APR ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Long Intro APR",
+            "annualValue": null
+          },
+          {
+            "name": "No Penalty APR",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 106,
+      "_why": "Cleared values: 20% Airfare Points Savings ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "20% Airfare Points Savings",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 107,
+      "_why": "Cleared values: Monthly Choice Category ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Monthly Choice Category",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 110,
+      "_why": "Cleared values: Choice Hotel Rewards ($80)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Choice Hotel Rewards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 111,
+      "_why": "Cleared values: Relationship Bonus Tiers ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Relationship Bonus Tiers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 112,
+      "_why": "Cleared values: Quarterly Retailer Choice ($180); Travel Center Bonus ($60)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Quarterly Retailer Choice",
+            "annualValue": null
+          },
+          {
+            "name": "Travel Center Bonus",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 113,
+      "_why": "Cleared values: Long Intro APR ($120); No Annual Fee Protection Card ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Long Intro APR",
+            "annualValue": null
+          },
+          {
+            "name": "No Annual Fee Protection Card",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 114,
+      "_why": "Cleared values: Business Category Cash Back ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Business Category Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 115,
+      "_why": "Cleared values: Automatic Top Categories ($200); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Top Categories",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 116,
+      "_why": "Cleared values: No Annual or Foreign Transaction Fees ($75); Balance Transfer Promo ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual or Foreign Transaction Fees",
+            "annualValue": null
+          },
+          {
+            "name": "Balance Transfer Promo",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 117,
+      "_why": "Cleared values: Everyday Category Coverage ($180)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Everyday Category Coverage",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 119,
+      "_why": "Cleared values: Low Intro APR Offer ($60)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Low Intro APR Offer",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 122,
+      "_why": "Cleared values: Anniversary Bonus Miles ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Anniversary Bonus Miles",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 123,
+      "_why": "Cleared values: Hilton Gold Status ($250); Diamond Status Spend Path ($150); National Executive Status ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Hilton Gold Status",
+            "annualValue": null
+          },
+          {
+            "name": "Diamond Status Spend Path",
+            "annualValue": null
+          },
+          {
+            "name": "National Executive Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 124,
+      "_why": "Cleared values: Marriott Room Rate Discount ($100); Marriott Gold Elite Status ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Marriott Room Rate Discount",
+            "annualValue": null
+          },
+          {
+            "name": "Marriott Gold Elite Status",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 126,
+      "_why": "Cleared values: No Annual or Foreign Transaction Fees ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual or Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 128,
+      "_why": "Cleared values: Everyday Bonus Categories ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Everyday Bonus Categories",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 129,
+      "_why": "Cleared values: Automatic Top Categories ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic Top Categories",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 130,
+      "_why": "Cleared values: Simple Flat Cash Back ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Simple Flat Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 131,
+      "_why": "Cleared values: Unlimited Business Cash Back ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited Business Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 132,
+      "_why": "Cleared values: Automatic One Key Silver ($75); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Automatic One Key Silver",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 136,
+      "_why": "Cleared values: Verizon Dollar Redemption ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Verizon Dollar Redemption",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 137,
+      "_why": "Cleared values: No Annual or Foreign Transaction Fees ($75); High Grocery Earn Rate ($180)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual or Foreign Transaction Fees",
+            "annualValue": null
+          },
+          {
+            "name": "High Grocery Earn Rate",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 138,
+      "_why": "Cleared values: No Annual or Foreign Transaction Fees ($75); High Gas and EV Earn Rate ($160)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual or Foreign Transaction Fees",
+            "annualValue": null
+          },
+          {
+            "name": "High Gas and EV Earn Rate",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 139,
+      "_why": "Cleared values: Unlimited 2% Cash Back ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited 2% Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 140,
+      "_why": "Cleared values: No Foreign Transaction Fee ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 141,
+      "_why": "Cleared values: Honors Advantage Boost ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Honors Advantage Boost",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 142,
+      "_why": "Cleared values: Everyday Bonus Categories ($180)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Everyday Bonus Categories",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 144,
+      "_why": "Cleared values: Quarterly Category Choice ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Quarterly Category Choice",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 145,
+      "_why": "Cleared values: No Interest Model ($75); No Late or Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Interest Model",
+            "annualValue": null
+          },
+          {
+            "name": "No Late or Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 146,
+      "_why": "Cleared values: Category Choice ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Category Choice",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 147,
+      "_why": "Cleared values: Unlimited Business Cash Back ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited Business Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 149,
+      "_why": "Cleared values: Unlimited 2% Cash Back ($200); No Annual or Foreign Transaction Fees ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited 2% Cash Back",
+            "annualValue": null
+          },
+          {
+            "name": "No Annual or Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 150,
+      "_why": "Cleared values: Unlimited 2% Cash Back ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited 2% Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 153,
+      "_why": "Cleared values: MQD Headstart and Boost ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "MQD Headstart and Boost",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 156,
+      "_why": "Cleared values: Unlimited 2% Business Cash Back ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Unlimited 2% Business Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 158,
+      "_why": "Cleared values: IHG Platinum Elite Status ($150); 4th Reward Night Free ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "IHG Platinum Elite Status",
+            "annualValue": null
+          },
+          {
+            "name": "4th Reward Night Free",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 160,
+      "_why": "Cleared values: Business Category Choice ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Business Category Choice",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 161,
+      "_why": "Cleared values: Flat Business Cash Back ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Flat Business Cash Back",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 162,
+      "_why": "Cleared values: No Foreign Transaction Fee ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 165,
+      "_why": "Cleared values: Lowe's Pro Rewards ($180)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Lowe's Pro Rewards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 166,
+      "_why": "Cleared values: Transferable Business Miles ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Transferable Business Miles",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 167,
+      "_why": "Cleared values: Transferable Miles ($100)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Transferable Miles",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 169,
+      "_why": "Cleared values: No Annual or Balance Transfer Fee ($75); No Foreign Transaction Fees ($50)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Annual or Balance Transfer Fee",
+            "annualValue": null
+          },
+          {
+            "name": "No Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 170,
+      "_why": "Cleared values: Low APR Focus ($100); No Annual, Cash Advance, or Foreign Transaction Fees ($75)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Low APR Focus",
+            "annualValue": null
+          },
+          {
+            "name": "No Annual, Cash Advance, or Foreign Transaction Fees",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 171,
+      "_why": "Cleared values: RewardCash Multipliers ($400)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "RewardCash Multipliers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 174,
+      "_why": "Cleared values: +FUN Dollars Offers ($800)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "+FUN Dollars Offers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 175,
+      "_why": "Cleared values: Black Card Mastercard Benefits ($500)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Black Card Mastercard Benefits",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 176,
+      "_why": "Cleared values: Simple Cash Back Structure ($500); Citi Merchant Offers ($500)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Simple Cash Back Structure",
+            "annualValue": null
+          },
+          {
+            "name": "Citi Merchant Offers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 177,
+      "_why": "Cleared values: Online and Contactless Cashback ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Online and Contactless Cashback",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 178,
+      "_why": "Cleared values: Tiered Quarterly Cashback ($300); Campaign Cashback Offers ($200)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Tiered Quarterly Cashback",
+            "annualValue": null
+          },
+          {
+            "name": "Campaign Cashback Offers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 179,
+      "_why": "Cleared values: Everyday Cashback Categories ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Everyday Cashback Categories",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 181,
+      "_why": "Cleared values: High Everyday Cashback ($300); Welcome Cashback ($300)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "High Everyday Cashback",
+            "annualValue": null
+          },
+          {
+            "name": "Welcome Cashback",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 182,
+      "_why": "Cleared values: Smart Card Merchant Offers ($120)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Smart Card Merchant Offers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 183,
+      "_why": "Cleared values: 4th Night Free ($150)",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "4th Night Free",
+            "annualValue": null
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -23,8 +23,10 @@ import { formatAnnualFee, formatCardAmount } from "@/lib/card-format";
 import {
   formatCompactEarnRate,
   formatCompactRewardCategory,
+  rankRewardRows,
 } from "@/lib/reward-display";
 import { cn } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 type CardTypeId =
   | "travel"
@@ -60,6 +62,7 @@ const PAGE_SIZE = 24;
 /** Scroll depth past which the filter panel collapses on its own. */
 const COLLAPSE_SCROLL_THRESHOLD = 24;
 
+// Labels here and below are English keys, translated where they render.
 const CARD_TYPES: Array<{ id: CardTypeId; label: string }> = [
   { id: "travel", label: "Travel" },
   { id: "flight", label: "Flight" },
@@ -448,7 +451,7 @@ function FilterGroup({ label, allLabel, options, selected, onSelect, action }: F
             className={`inline-flex h-7 w-auto max-w-[12rem] flex-none items-center justify-start gap-1.5 overflow-hidden rounded-md border px-2.5 text-xs font-semibold whitespace-nowrap transition-colors sm:max-w-full ${
               showAll
                 ? "border-primary bg-primary text-primary-foreground shadow-[var(--app-shadow-soft)]"
-                : "border-card-border/80 bg-white/70 text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                : "border-card-border/80 bg-card/70 text-muted-foreground hover:border-primary/60 hover:text-foreground"
             }`}
           >
             {showAll ? <Check className="h-3.5 w-3.5 shrink-0" /> : null}
@@ -465,7 +468,7 @@ function FilterGroup({ label, allLabel, options, selected, onSelect, action }: F
                 className={`inline-flex h-7 w-auto max-w-[12rem] flex-none items-center justify-start gap-1.5 overflow-hidden rounded-md border px-2.5 text-xs font-semibold whitespace-nowrap transition-colors sm:max-w-full ${
                   active
                     ? "border-primary bg-primary text-primary-foreground shadow-[var(--app-shadow-soft)]"
-                    : "border-card-border/80 bg-white/70 text-muted-foreground hover:border-primary/60 hover:text-foreground"
+                    : "border-card-border/80 bg-card/70 text-muted-foreground hover:border-primary/60 hover:text-foreground"
                 }`}
               >
                 {active ? <Check className="h-3.5 w-3.5 shrink-0" /> : null}
@@ -502,10 +505,10 @@ export default function Cards() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getListWalletQueryKey() });
-          toast({ title: "Added to Wallet", description: "Card successfully added to your wallet." });
+          toast({ title: t("Added to Wallet"), description: t("Card successfully added to your wallet.") });
         },
         onError: () => {
-          toast({ variant: "destructive", title: "Error", description: "Failed to add card to wallet." });
+          toast({ variant: "destructive", title: t("Error"), description: t("Failed to add card to wallet.") });
         }
       }
     );
@@ -544,7 +547,7 @@ export default function Cards() {
     }
     return CARD_TYPES.map((type) => ({
       id: type.id,
-      label: type.label,
+      label: t(type.label),
       count: counts.get(type.id) ?? 0,
     })).filter((type) => type.count > 0);
   }, [cardMeta]);
@@ -555,7 +558,7 @@ export default function Cards() {
       counts.set(meta.market, (counts.get(meta.market) ?? 0) + 1);
     }
     return Array.from(counts.entries())
-      .map(([id, count]) => ({ id, label: id, count }))
+      .map(([id, count]) => ({ id, label: t(id), count }))
       .sort((a, b) => {
         const orderDelta = (MARKET_ORDER.indexOf(a.id) + 1 || 99) - (MARKET_ORDER.indexOf(b.id) + 1 || 99);
         return orderDelta !== 0 ? orderDelta : a.label.localeCompare(b.label);
@@ -607,12 +610,12 @@ export default function Cards() {
   const activeFilterSummary = [
     selectedType
       ? {
-          label: CARD_TYPES.find((type) => type.id === selectedType)?.label ?? selectedType,
+          label: t(CARD_TYPES.find((type) => type.id === selectedType)?.label ?? selectedType),
           clear: () => setSelectedType(null),
         }
       : null,
     selectedMarket
-      ? { label: selectedMarket, clear: () => setSelectedMarket(null) }
+      ? { label: t(selectedMarket), clear: () => setSelectedMarket(null) }
       : null,
     selectedBank
       ? { label: selectedBank, clear: () => setSelectedBank(null) }
@@ -691,7 +694,7 @@ export default function Cards() {
 
   return (
     <div ref={pageRef} className="flex min-w-0 flex-col gap-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <h2 className="min-w-0 text-2xl font-bold tracking-tight md:text-[28px]">Card Library</h2>
+      <h2 className="min-w-0 text-2xl font-bold tracking-tight md:text-[28px]">{t("Card Library")}</h2>
 
       {!isLoading && !isError && (
         // Negative insets on all four sides so the opaque backdrop covers the
@@ -704,8 +707,8 @@ export default function Cards() {
             <div className="relative w-full min-w-0 sm:max-w-md">
               <Search aria-hidden="true" className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
-                aria-label="Search cards or banks"
-                placeholder="Search cards or banks..."
+                aria-label={t("Search cards or banks")}
+                placeholder={t("Search cards or banks…")}
                 className="pl-9 bg-card"
                 value={search}
                 onChange={(e) => {
@@ -727,14 +730,16 @@ export default function Cards() {
                     setShowDiscontinued((previous) => !previous);
                   }}
                 >
-                  {showDiscontinued ? "Hide retired" : `Show retired (${retiredCount})`}
+                  {showDiscontinued
+                    ? t("Hide retired")
+                    : t("Show retired ({count})", { count: retiredCount })}
                 </Button>
               ) : null}
               <span
                 aria-live="polite"
                 className="text-xs font-medium tabular-nums text-muted-foreground"
               >
-                {filteredCards.length} shown
+                {t("{count} shown", { count: filteredCards.length })}
               </span>
               <Button
                 type="button"
@@ -746,8 +751,7 @@ export default function Cards() {
                 onClick={() => setManualExpanded(!filtersExpanded)}
               >
                 <SlidersHorizontal className="h-3.5 w-3.5" />
-                Filters
-                {activeFilterCount > 0 ? (
+                {t("Filters")}{activeFilterCount > 0 ? (
                   <span className="rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
                     {activeFilterCount}
                   </span>
@@ -769,7 +773,7 @@ export default function Cards() {
                 <button
                   key={entry.label}
                   type="button"
-                  aria-label={`Clear ${entry.label} filter`}
+                  aria-label={t("Clear {filter} filter", { filter: entry.label })}
                   onClick={() => {
                     prepareFilterChange();
                     entry.clear();
@@ -789,8 +793,8 @@ export default function Cards() {
             className="space-y-3 border-t border-card-border/70 pt-2"
           >
           <FilterGroup
-            label="Type"
-            allLabel="All types"
+            label={t("Type")}
+            allLabel={t("All types")}
             options={typeOptions}
             selected={selectedType}
             onSelect={(type) => {
@@ -811,14 +815,13 @@ export default function Cards() {
                 }}
               >
                 <X className="mr-1 h-3 w-3" />
-                Clear
-              </Button>
+                {t("Clear")}</Button>
             ) : null}
           />
           {marketOptions.length > 1 ? (
             <FilterGroup
-              label="Market"
-              allLabel="All markets"
+              label={t("Market")}
+              allLabel={t("All markets")}
               options={marketOptions}
               selected={selectedMarket}
               onSelect={(market) => {
@@ -828,8 +831,8 @@ export default function Cards() {
             />
           ) : null}
           <FilterGroup
-            label="Bank"
-            allLabel="All banks"
+            label={t("Bank")}
+            allLabel={t("All banks")}
             options={bankOptions}
             selected={selectedBank}
             onSelect={(bank) => {
@@ -844,7 +847,7 @@ export default function Cards() {
 
       <div className="min-w-0">
         {isLoading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 @xl:grid-cols-2 @4xl:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Card key={i} className="overflow-hidden">
                 <div className="h-36 bg-muted animate-pulse" />
@@ -856,30 +859,30 @@ export default function Cards() {
         ) : isError ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/40 bg-destructive/5 py-12 text-center shadow-[var(--app-shadow-soft)]">
             <TriangleAlert className="mb-4 h-12 w-12 text-destructive opacity-70" />
-            <h3 className="text-lg font-medium">Couldn't load the card library</h3>
+            <h3 className="text-lg font-medium">{t("Couldn't load the card library")}</h3>
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Your saved cards are safe. Retry to load the catalog again.
-            </p>
+              {t("Your saved cards are safe. Retry to load the catalog again.")}</p>
             <Button type="button" variant="outline" className="mt-4" onClick={() => refetch()}>
-              Try again
-            </Button>
+              {t("Try again")}</Button>
           </div>
         ) : filteredCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center border rounded-lg bg-card/70 border-dashed shadow-[var(--app-shadow-soft)]">
           <CreditCardIcon className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
-          <h3 className="text-lg font-medium">No cards found</h3>
-          <p className="text-muted-foreground">Try adjusting your search or filter.</p>
+          <h3 className="text-lg font-medium">{t("No cards found")}</h3>
+          <p className="text-muted-foreground">{t("Try adjusting your search or filter.")}</p>
           </div>
         ) : (
           <div className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 @xl:grid-cols-2 @4xl:grid-cols-3">
           {visibleCards.map((card) => {
             const inWallet = walletCardIds.has(card.id) || card.inWallet;
             const isAdding = addToWallet.isPending && addToWallet.variables?.data.cardId === card.id;
             const catalogCard = card as CatalogCard;
             const sourceUrl = catalogCard.sourceUrl;
             const availability = getCardAvailability(card);
-            const availabilityLabel = AVAILABILITY_LABELS[availability];
+            const availabilityLabel = AVAILABILITY_LABELS[availability]
+              ? t(AVAILABILITY_LABELS[availability])
+              : undefined;
             return (
               <Card key={card.id} className="overflow-hidden flex flex-col transition-colors hover:border-primary/30">
                 {/* Card visual: actual product image when available, gradient + branded header otherwise. */}
@@ -930,12 +933,16 @@ export default function Cards() {
                   {availabilityLabel ? (
                     <Badge
                       variant="outline"
-                      title={catalogCard.availabilityChangedAt ? `Since ${catalogCard.availabilityChangedAt}` : undefined}
+                      title={
+                        catalogCard.availabilityChangedAt
+                          ? t("Since {date}", { date: catalogCard.availabilityChangedAt })
+                          : undefined
+                      }
                       className={cn(
                         "w-fit text-[11px] font-semibold",
                         availability === "discontinued"
                           ? "border-destructive/40 bg-destructive/10 text-destructive"
-                          : "border-amber-500/40 bg-amber-500/10 text-amber-700",
+                          : "border-amber-500/40 bg-amber-500/10 text-amber-800 dark:text-amber-200",
                       )}
                     >
                       {availabilityLabel}
@@ -946,21 +953,22 @@ export default function Cards() {
                 <CardContent className="flex-1 pb-3 text-sm space-y-3">
                   {card.signupBonus && (
                     <div className="rounded-lg border border-card-border bg-secondary/45 p-3">
-                      <div className="font-semibold text-foreground text-xs mb-1">Signup Bonus</div>
+                      <div className="font-semibold text-foreground text-xs mb-1">{t("Signup Bonus")}</div>
                       <div className="text-muted-foreground text-xs leading-relaxed">{card.signupBonus}</div>
                       {card.signupBonusValue && (
                         <div className="text-xs mt-1 font-semibold tabular-nums text-foreground">
-                          Est. Value: {formatCardAmount(card, card.signupBonusValue)}
+                          {t("Est. Value: {amount}", {
+                            amount: formatCardAmount(card, card.signupBonusValue),
+                          })}
                         </div>
                       )}
                     </div>
                   )}
 
                   <div>
-                    <div className="font-medium text-xs uppercase tracking-wider text-muted-foreground mb-2">Top Rewards</div>
+                    <div className="font-medium text-xs uppercase tracking-wider text-muted-foreground mb-2">{t("Top Rewards")}</div>
                     <div className="flex flex-wrap gap-1.5">
-                      {[...card.cashbackCategories]
-                        .sort((a, b) => b.rate - a.rate)
+                      {rankRewardRows(card.cashbackCategories)
                         .slice(0, 4)
                         .map(cat => (
                           <Badge key={cat.id} variant="secondary" className="bg-secondary/80 font-normal text-xs">
@@ -976,13 +984,17 @@ export default function Cards() {
                     className="w-full font-medium"
                     variant={inWallet ? "secondary" : "default"}
                     disabled={inWallet || isAdding}
-                    aria-label={inWallet ? `${card.name} is already in your wallet` : `Add ${card.name} to wallet`}
+                    aria-label={
+                      inWallet
+                        ? t("{card} is already in your wallet", { card: card.name })
+                        : t("Add {card} to wallet", { card: card.name })
+                    }
                     onClick={() => handleAdd(card.id)}
                   >
                     {inWallet ? (
-                      <><Check className="mr-2 h-4 w-4" /> In Wallet</>
+                      <><Check className="mr-2 h-4 w-4" />{t("In Wallet")}</>
                     ) : (
-                      <><Plus className="mr-2 h-4 w-4" /> Add to Wallet</>
+                      <><Plus className="mr-2 h-4 w-4" />{t("Add to Wallet")}</>
                     )}
                   </Button>
                 </CardFooter>
@@ -998,9 +1010,9 @@ export default function Cards() {
                 className="min-h-11 px-6"
                 onClick={() => setPageState({ key: scrollKey, count: visibleCount + PAGE_SIZE })}
               >
-                Show {Math.min(PAGE_SIZE, remainingCount)} more
+                {t("Show {count} more", { count: Math.min(PAGE_SIZE, remainingCount) })}
                 <span className="ml-2 text-xs font-normal tabular-nums text-muted-foreground">
-                  {remainingCount} left
+                  {t("{count} left", { count: remainingCount })}
                 </span>
               </Button>
             </div>

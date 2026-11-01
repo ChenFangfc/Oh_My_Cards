@@ -1,0 +1,117 @@
+[
+  {
+    "id": 0,
+    "name": "Citi / AAdvantage Globe Mastercard",
+    "issuer": "Citi / American Airlines",
+    "network": "Mastercard",
+    "annualFee": 350,
+    "signupBonus": null,
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #2b3a3f, #4a5d63)",
+    "logoUrl": "https://logo.clearbit.com/citi.com",
+    "cardImageUrl": null,
+    "rewardType": "miles",
+    "rewardProgram": "American Airlines AAdvantage",
+    "rewardUnitName": "Miles",
+    "rewardUnitValueCents": 1.3,
+    "rewardValuationDescription": "American Airlines AAdvantage value varies by itinerary and redemption path; this app uses an estimated 1.30 cents per mile for annual-fee progress while displaying earned miles separately.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Launched 2025-10-19 (Citigroup / American Airlines release; annual fee $350). Rides and Rails covers eligible taxis, rideshares and public transit.",
+      "Former Barclays AAdvantage Aviator Silver accounts were converted to this card on 2026-04-24; their grandfathered Barclays perks ended 2026-10-25."
+    ],
+    "cashbackCategories": [
+      { "id": 0, "cardId": 0, "category": "AAdvantage Hotels bookings", "rate": 0.06, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "American Airlines", "rate": 0.03, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Restaurants (incl. takeout and delivery)", "rate": 0.02, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Rides and Rails (rideshare, taxis and transit)", "rate": 0.02, "isDefault": false },
+      { "id": 0, "cardId": 0, "category": "Other", "rate": 0.01, "isDefault": true }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Turo Credit",
+        "description": "Up to $30 back per eligible completed Turo trip paid with the card (card linked to the Turo account), up to $240 per calendar year.",
+        "annualValue": 240,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Inflight Purchase Credit",
+        "description": "Up to $100 in statement credits each calendar year on inflight purchases on American Airlines flights.",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Annual Splurge Credit",
+        "description": "Up to $100 in statement credits each calendar year on up to 2 of: AAdvantage Hotels bookings, 1stDibs, Future Personal Training and Live Nation (exclusions apply).",
+        "annualValue": 100,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Global Entry / TSA PreCheck Credit",
+        "description": "Up to $120 statement credit for the Global Entry or TSA PreCheck application fee, once every 4 years.",
+        "annualValue": 30,
+        "period": "multi-year",
+        "periodYears": 4
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Admirals Club Globe Passes",
+        "description": "4 Admirals Club Globe Passes (24-hour access each) every calendar year, stored in the AAdvantage wallet.",
+        "annualValue": null,
+        "period": "calendar-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "American Airlines Companion Certificate",
+        "description": "From the second cardmembership year, after renewal: one round-trip domestic Main Cabin companion ticket for a $99 ticketing fee plus taxes and fees. No spend requirement.",
+        "annualValue": null,
+        "period": "cardmember-year"
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "First Checked Bag Free",
+        "description": "First checked bag free on domestic American Airlines itineraries for the cardholder and up to 8 companions on the same reservation.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Preferred Boarding",
+        "description": "Preferred boarding on American Airlines flights for the cardholder and up to 8 companions on the same reservation.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Flight Streak Loyalty Points Bonus",
+        "description": "5,000 bonus Loyalty Points after every 4 qualifying American Airlines flights, up to 15,000 per status qualification year.",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "No foreign transaction fees on purchases.",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "US",
+    "currency": "USD",
+    "sourceUrl": "https://www.citi.com/credit-cards/citi-aadvantage-globe-mastercard",
+    "imageSourceUrl": "https://aemapi.citi.com/content/dam/cfs/uspb/usmkt/cards/en/static/images/citi-aadvantage-globe-mastercard/citi-aadvantage-globe-mastercard_306x192.webp",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official"
+  }
+]

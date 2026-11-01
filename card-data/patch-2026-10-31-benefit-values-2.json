@@ -1,0 +1,838 @@
+{
+  "_note": "Second pass of the allowance-only value rule: insurance and purchase protections, concierge and entertainment access, boarding, in-flight discounts, lounge access, checked bags, employee cards and positioning statements carried invented yearly values. The research agents left such perks unvalued when they added them; this aligns the older entries. Perks stay listed in card details.",
+  "keepReviewDate": true,
+  "patches": [
+    {
+      "cardId": 1,
+      "_why": "Cleared values: Trip Cancellation / Interruption Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Trip Cancellation / Interruption Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 2,
+      "_why": "Cleared values: Premium Travel Protections",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Premium Travel Protections",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 3,
+      "_why": "Cleared values: Extended Warranty",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Extended Warranty",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 4,
+      "_why": "Cleared values: Purchase Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Purchase Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 5,
+      "_why": "Cleared values: Citi Entertainment",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Citi Entertainment",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 6,
+      "_why": "Cleared values: Citi Entertainment Access",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Citi Entertainment Access",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 7,
+      "_why": "Cleared values: Citi Entertainment",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Citi Entertainment",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 10,
+      "_why": "Cleared values: Purchase Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Purchase Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 11,
+      "_why": "Cleared values: Car Rental Loss and Damage Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Car Rental Loss and Damage Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 13,
+      "_why": "Cleared values: Travel Accident Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Accident Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 14,
+      "_why": "Cleared values: Capital One Entertainment Access",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Capital One Entertainment Access",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 15,
+      "_why": "Cleared values: Extended Warranty",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Extended Warranty",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 16,
+      "_why": "Cleared values: Travel Accident Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Accident Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 19,
+      "_why": "Cleared values: Visa Signature Concierge",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Visa Signature Concierge",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 20,
+      "_why": "Cleared values: Visa Signature Concierge",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Visa Signature Concierge",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 23,
+      "_why": "Cleared values: Purchase Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Purchase Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 27,
+      "_why": "Cleared values: Priority Boarding; 25% Back on In-Flight Purchases",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Priority Boarding",
+            "annualValue": null
+          },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 29,
+      "_why": "Cleared values: 25% Back on In-Flight Purchases",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 31,
+      "_why": "Cleared values: Priority Boarding",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Priority Boarding",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 33,
+      "_why": "Cleared values: Delta Sky Club Access; Centurion Lounge Access; Free First and Second Checked Bag",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Delta Sky Club Access",
+            "annualValue": null
+          },
+          {
+            "name": "Centurion Lounge Access",
+            "annualValue": null
+          },
+          {
+            "name": "Free First and Second Checked Bag",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 34,
+      "_why": "Cleared values: Preferred Boarding; 25% Back on In-Flight Purchases",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Boarding",
+            "annualValue": null
+          },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 35,
+      "_why": "Cleared values: Free First Checked Bag",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free First Checked Bag",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 44,
+      "_why": "Cleared values: Damage and Theft Protection; Worldwide Car Rental Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Damage and Theft Protection",
+            "annualValue": null
+          },
+          {
+            "name": "Worldwide Car Rental Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 45,
+      "_why": "Cleared values: Trip Delay & Cancellation Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Trip Delay & Cancellation Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 46,
+      "_why": "Cleared values: Visa Signature Benefits; Family Card Management",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Visa Signature Benefits",
+            "annualValue": null
+          },
+          {
+            "name": "Family Card Management",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 48,
+      "_why": "Cleared values: Free Employee Cards; Extended Warranty",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Employee Cards",
+            "annualValue": null
+          },
+          {
+            "name": "Extended Warranty",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 49,
+      "_why": "Cleared values: Free Employee Cards; Auto Rental Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Employee Cards",
+            "annualValue": null
+          },
+          {
+            "name": "Auto Rental Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 50,
+      "_why": "Cleared values: Purchase Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Purchase Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 52,
+      "_why": "Cleared values: Free Checked Bags; Premier Access Travel Services",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Checked Bags",
+            "annualValue": null
+          },
+          {
+            "name": "Premier Access Travel Services",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 61,
+      "_why": "Cleared values: 25% Inflight Savings",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "25% Inflight Savings",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 62,
+      "_why": "Cleared values: Priority Boarding & Check-In",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Priority Boarding & Check-In",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 64,
+      "_why": "Cleared values: Free First Checked Bag",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free First Checked Bag",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 65,
+      "_why": "Cleared values: Preferred Boarding; 25% Inflight Savings",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Boarding",
+            "annualValue": null
+          },
+          {
+            "name": "25% Inflight Savings",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 73,
+      "_why": "Cleared values: Cell Phone Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cell Phone Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 76,
+      "_why": "Cleared values: Free Shipping at Target.com; Extra 30 Days for Returns",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Shipping at Target.com",
+            "annualValue": null
+          },
+          {
+            "name": "Extra 30 Days for Returns",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 77,
+      "_why": "Cleared values: Special Financing on Big Purchases",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Special Financing on Big Purchases",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 79,
+      "_why": "Cleared values: Travel Insurance; Mobile Device Insurance; Visa Infinite Benefits",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Insurance",
+            "annualValue": null
+          },
+          {
+            "name": "Mobile Device Insurance",
+            "annualValue": null
+          },
+          {
+            "name": "Visa Infinite Benefits",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 80,
+      "_why": "Cleared values: First Checked Bag; Travel Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "First Checked Bag",
+            "annualValue": null
+          },
+          {
+            "name": "Travel Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 81,
+      "_why": "Cleared values: Travel Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 82,
+      "_why": "Cleared values: Visa Infinite Benefits; Travel Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Visa Infinite Benefits",
+            "annualValue": null
+          },
+          {
+            "name": "Travel Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 86,
+      "_why": "Cleared values: Mobile Device Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Mobile Device Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 87,
+      "_why": "Cleared values: Travel Insurance",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Insurance",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 96,
+      "_why": "Cleared values: Seat and Upgrade Benefits",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Seat and Upgrade Benefits",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 97,
+      "_why": "Cleared values: Southwest Travel Benefits",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Southwest Travel Benefits",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 102,
+      "_why": "Cleared values: FICO Score and ID Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "FICO Score and ID Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 108,
+      "_why": "Cleared values: Travel Protections",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel Protections",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 109,
+      "_why": "Cleared values: Cell Phone Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cell Phone Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 110,
+      "_why": "Cleared values: Cell Phone Protection",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cell Phone Protection",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 112,
+      "_why": "Cleared values: Intro First-Year Fee",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Intro First-Year Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 127,
+      "_why": "Cleared values: No SoFi Foreign Exchange Fee",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No SoFi Foreign Exchange Fee",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 134,
+      "_why": "Cleared values: No Preset Spending Limit",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "No Preset Spending Limit",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 135,
+      "_why": "Cleared values: Free Employee Cards",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Employee Cards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 148,
+      "_why": "Cleared values: Preferred Boarding and Inflight Savings",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Preferred Boarding and Inflight Savings",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 151,
+      "_why": "Cleared values: Employee Cards",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Employee Cards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 154,
+      "_why": "Cleared values: Delta Sky Club Access",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Delta Sky Club Access",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 155,
+      "_why": "Cleared values: Free Employee Cards",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Employee Cards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 156,
+      "_why": "Cleared values: Free Employee Cards",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Employee Cards",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 159,
+      "_why": "Cleared values: Free Checked Bags",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Checked Bags",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 163,
+      "_why": "Cleared values: 5% Back or 90-Day Terms",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "5% Back or 90-Day Terms",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 164,
+      "_why": "Cleared values: 3% Back or 60-Day Terms",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "3% Back or 60-Day Terms",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 168,
+      "_why": "Cleared values: Free Checked Bag and Preferred Boarding; 20% Back on In-Flight Purchases",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Free Checked Bag and Preferred Boarding",
+            "annualValue": null
+          },
+          {
+            "name": "20% Back on In-Flight Purchases",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 172,
+      "_why": "Cleared values: Visa Signature Privileges",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Visa Signature Privileges",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 175,
+      "_why": "Cleared values: Travel and Lifestyle Offers",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Travel and Lifestyle Offers",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 177,
+      "_why": "Cleared values: Eco-Positioned Card",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Eco-Positioned Card",
+            "annualValue": null
+          }
+        ]
+      }
+    }
+  ]
+}

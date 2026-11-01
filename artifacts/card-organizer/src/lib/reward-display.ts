@@ -1,4 +1,24 @@
 import { formatCardAmount } from "@/lib/card-format";
+import { t } from "@/lib/i18n";
+
+/** "(through 9/30/2027)" — a promotion with an end date, not a standing rate. */
+const TIME_LIMITED_ROW = /\bthrough\s+\d{1,2}\/\d{1,2}\/\d{2,4}\b/i;
+
+/**
+ * Orders a card's earning rows for a short preview: standing rates by size,
+ * then time-limited promotions. Sorting by rate alone let "10x Peloton
+ * equipment" and "5x Lyft" push a card's 3x dining out of view.
+ */
+export function rankRewardRows<T extends { category: string; rate: number }>(
+  rows: readonly T[],
+): T[] {
+  return [...rows].sort((a, b) => {
+    const aLimited = TIME_LIMITED_ROW.test(a.category);
+    const bLimited = TIME_LIMITED_ROW.test(b.category);
+    if (aLimited !== bLimited) return aLimited ? 1 : -1;
+    return b.rate - a.rate;
+  });
+}
 
 type RewardCard = {
   annualFee: number;
@@ -11,20 +31,20 @@ type RewardCard = {
 export function getCompactRewardUnitName(card: RewardCard): string {
   const unit = card.rewardUnitName?.toLowerCase() ?? "";
 
-  if (card.rewardType === "cashback") return "Cash Back";
-  if (card.rewardType === "miles" || unit.includes("mile")) return "Miles";
-  if (card.rewardType === "points" || unit.includes("point")) return "Points";
-  if (unit.includes("cash back")) return "Cash Back";
-  if (unit.includes("daily cash") || unit.includes("rewardcash")) return "Cash";
-  if (unit.includes("cash dollar")) return "Cash";
-  if (unit.includes("dollar")) return "Dollars";
+  if (card.rewardType === "cashback") return t("Cash Back");
+  if (card.rewardType === "miles" || unit.includes("mile")) return t("Miles");
+  if (card.rewardType === "points" || unit.includes("point")) return t("Points");
+  if (unit.includes("cash back")) return t("Cash Back");
+  if (unit.includes("daily cash") || unit.includes("rewardcash")) return t("Cash");
+  if (unit.includes("cash dollar")) return t("Cash");
+  if (unit.includes("dollar")) return t("Dollars");
 
-  return card.rewardUnitName ?? "Rewards";
+  return card.rewardUnitName ?? t("Rewards");
 }
 
 export function formatCompactRewardTotal(card: RewardCard, rewardValue: number): string {
   if (card.rewardType === "cashback") {
-    return `${formatCardAmount(card, rewardValue)} Cash Back`;
+    return t("{amount} Cash Back", { amount: formatCardAmount(card, rewardValue) });
   }
 
   const valueCents = card.rewardUnitValueCents && card.rewardUnitValueCents > 0
@@ -62,6 +82,7 @@ function toTitleCase(value: string): string {
 const SPEND_CAP_PATTERN = /\b(?:up to|first)\s+([A-Za-z]{0,3}\$)\s*([\d,]+)\s*(?:\/|\s+per\s+)?(month|monthly|quarter|quarterly|yr|year|annual|annually)?/i;
 
 const CAP_PERIOD_LABELS: Array<[RegExp, string]> = [
+  // Translated where they are used.
   [/^month/i, "/mo"],
   [/^quarter/i, "/qtr"],
   [/^(?:yr|year|annual)/i, "/yr"],
@@ -84,12 +105,17 @@ function extractSpendCap(category: string): string {
   if (!amount) return "";
 
   const period = CAP_PERIOD_LABELS.find(([pattern]) => pattern.test(match[3] ?? ""))?.[1] ?? "";
-  return `${amount}${period}`;
+  return `${amount}${period ? t(period) : ""}`;
 }
 
+/**
+ * Common category names are translated; the long tail of issuer-specific
+ * ones ("Peloton Equipment") falls back to English.
+ */
 function withSpendCap(label: string, cap: string): string {
-  if (!cap || label.includes("$")) return label;
-  return `${label} · to ${cap}`;
+  const translated = t(label);
+  if (!cap || label.includes("$")) return translated;
+  return t("{category} · to {cap}", { category: translated, cap });
 }
 
 export function formatCompactRewardCategory(category: string): string {
@@ -133,7 +159,7 @@ export function formatCompactRewardCategory(category: string): string {
     [/prepaid hotels.*rental cars|prepaid rental cars/i, "Hotels & Cars"],
     [/citi travel/i, "Citi Travel"],
     [/amex travel/i, "Amex Travel"],
-    [/chase travel/i, "Chase Travel"],
+    [/chase travel|travel via chase/i, "Chase Travel"],
     [/bank of america travel center/i, "Travel Center"],
     [/travel via .*rewards centre/i, "Travel Portal"],
     [/capital one business travel/i, "Business Travel"],

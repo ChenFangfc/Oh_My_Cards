@@ -1,6 +1,6 @@
 # Card data freshness tooling
 
-Keeps `lib/api-client-react/src/local/catalog.ts` (182 cards) honest over time.
+Keeps `lib/api-client-react/src/local/catalog.ts` (188 cards) honest over time.
 
 ## Why it is not a plain scraper
 
@@ -58,8 +58,19 @@ pnpm --dir scripts cards:matching -- --card=8
 # How the cardholder-picked / issuer-assigned bonus rows resolve
 pnpm --dir scripts cards:choices
 
+# Which logged categories a proposed bonus-row label would be credited for
+pnpm --dir scripts cards:labels -- "Gas and EV Charging" "Groceries (up to $6,000/year)"
+
+# Structural checks (duplicate ids, bad choices, unparseable caps, stale
+# rotating calendars, credits missing a renewal period). Errors fail CI and
+# block publishing.
+pnpm --dir scripts cards:lint
+
 # Apply a reviewed patch file to catalog.ts (see apply-updates.ts for the format)
 pnpm --dir scripts cards:apply -- --patch=card-data/patch-2026-08-06.json --dry-run
+
+# Add reviewed new products (assigns ids, downloads official art)
+pnpm --dir scripts cards:add -- --file=card-data/new-cards-2026-10-31-us-other.json --dry-run
 
 # Emit the rules feed installed apps can pull
 pnpm --dir scripts cards:publish
@@ -83,10 +94,12 @@ turns red on real problems and stays green on routine churn.
 
 ## Automation
 
-`.github/workflows/card-data-freshness.yml` runs on the 1st and 15th of each
-month (≈ every two weeks) and on demand. It commits the refreshed snapshot and
-opens/updates a single tracking issue with the report body. It never opens a PR
-against `catalog.ts` — a human or an agent decides what the findings mean.
+`.github/workflows/card-data-freshness.yml` watches the feeds **daily** (a feed
+only carries its latest 10–20 posts, so anything slower misses announcements),
+lints the catalog, and crawls every source page **weekly** (Mondays) and on
+demand. It commits the refreshed snapshot and updates a single tracking issue;
+it only comments (and so notifies) when there is something new. It never opens
+a PR against `catalog.ts` — a human or an agent decides what the findings mean.
 
 To act on a report:
 
@@ -98,7 +111,32 @@ To act on a report:
    `BUILTIN_RULESET_VERSION` for you, and allocates fresh category/benefit ids
    so stored benefit-usage rows are never re-pointed at a different benefit.
 4. Run `pnpm --dir scripts cards:publish` so installed apps pick the rules up
-   without a redeploy.
+   without a redeploy (the Pages deploy does this; it lints first).
+
+Patch features worth knowing:
+
+- **Benefit renewal periods.** `{ "name": "…", "annualValue": 300, "period":
+  "monthly" }` — one of `monthly`, `quarterly`, `semiannual`, `calendar-year`,
+  `cardmember-year` (the default), `multi-year` (+ `periodYears`, e.g. 4 for a
+  Global Entry credit, whose `annualValue` is stored amortized: $120/4 = 30) or
+  `one-time`. The app resets "used" at each period boundary and counts value
+  captured per period toward the annual fee.
+- **Values are for allowances only.** Give `annualValue` to things a
+  cardholder spends (statement credits, free nights, memberships, anniversary
+  point deposits). Fee waivers, intro APRs, elite status, redemption discounts
+  and restated earn rates get `null`, or they pad the wallet's "unused
+  benefits" with things that cannot be used.
+- **Renames keep history.** `"benefits": { "rename": [{ "from": "…", "to": "…" }] }`
+  keeps the benefit id, so usage people logged stays attached. Remove-and-add
+  would orphan it.
+- **`"keepReviewDate": true`** (file or card level) for maintenance patches
+  that change modelling without re-checking the issuer's terms; otherwise the
+  applier stamps `lastReviewedAt` and would hide stale cards.
+- **Rows that earn less than the base rate** (Bilt Palladium: 2x everywhere,
+  1x rent) are honoured as exceptions, and a non-default "all purchases (up to
+  $50,000/yr)" row is a capped base rate that applies to every purchase.
+- **Merchant-specific rows** ("United purchases", "Chase Travel", "Lyft") are
+  reached when the user types the merchant on a logged purchase.
 
 ## Bonus rows that name no fixed kind of spend
 

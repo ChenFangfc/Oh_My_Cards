@@ -17,10 +17,16 @@ const KIND_HEADING: Record<string, string> = {
   MISSING_CARD_IMAGE: "Card image missing",
   STALE_REVIEW: "Past the review budget",
   LOW_CONFIDENCE: "Never confirmed against an issuer source",
+  CATALOG_ERROR: "Catalog structure error (blocks publishing)",
+  STALE_CALENDAR: "Rotating-category calendar out of date",
+  MISSING_BENEFIT_PERIOD: "Credit renewal period not recorded",
+  UNPARSED_CAP: "Spend cap the engine cannot enforce",
 };
 
 /** Ordered so a reader hits the cards that can produce wrong advice first. */
 const KIND_ORDER = [
+  "CATALOG_ERROR",
+  "STALE_CALENDAR",
   "PRODUCT_DISCONTINUED",
   "ANNUAL_FEE_MISMATCH",
   "PAGE_GONE",
@@ -30,6 +36,8 @@ const KIND_ORDER = [
   "MISSING_CARD_IMAGE",
   "LOW_CONFIDENCE",
   "PAGE_BLOCKED",
+  "UNPARSED_CAP",
+  "MISSING_BENEFIT_PERIOD",
   "STALE_REVIEW",
 ];
 

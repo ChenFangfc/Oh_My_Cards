@@ -19,8 +19,21 @@ import {
   getCompactRewardUnitName,
 } from "@/lib/reward-display";
 import { formatCardAmount } from "@/lib/card-format";
+import { getLocale, t } from "@/lib/i18n";
 
 const STORAGE_KEY = "smart-suggest:show-upgrades";
+
+// Purchases the engine understands in either language.
+const EXAMPLES_ZH = [
+  "星巴克咖啡",
+  "Costco 加油和买菜",
+  "直接在 United 官网订去东京的机票",
+  "在 Expedia 订凯悦酒店",
+  "Uber Eats 外卖晚餐",
+  "Shell 加油",
+  "用 Apple Pay 在 Apple Store 买 iPad",
+  "Netflix 订阅",
+];
 
 const EXAMPLES = [
   "Coffee at Starbucks",
@@ -123,13 +136,12 @@ function CardResult({
               variant="outline"
               className="rounded-full bg-card px-2.5 text-[11px] font-medium"
             >
-              Not in wallet
-            </Badge>
+              {t("Not in wallet")}</Badge>
           )}
         </div>
       </CardHeader>
       <CardContent className="p-4">
-        <div className="grid gap-4 md:grid-cols-[144px_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 gap-4 @md:grid-cols-[144px_minmax(0,1fr)]">
           <SuggestedCardArt
             card={card}
             className="aspect-[1.586/1] w-full max-w-[170px] rounded-xl md:max-w-none"
@@ -149,18 +161,19 @@ function CardResult({
             <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                  {card.isDefaultRate ? "Base Earning" : "Reward Match"}
+                  {card.isDefaultRate ? t("Base Earning") : t("Reward Match")}
                 </div>
                 <div className="mt-1 text-sm font-semibold text-foreground">
-                  {formatRewardRate(card)} on{" "}
-                  {formatCompactRewardCategory(card.matchedCategory)}
+                  {t("{rate} on {category}", {
+                    rate: formatRewardRate(card),
+                    category: formatCompactRewardCategory(card.matchedCategory),
+                  })}
                 </div>
               </div>
               {amount != null && card.expectedCashback != null ? (
-                <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-right text-emerald-900">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-emerald-700">
-                    Expected Value
-                  </div>
+                <div className="rounded-2xl bg-emerald-50 px-3 py-2 text-right text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.08em] text-emerald-700 dark:text-emerald-300">
+                    {t("Expected Value")}</div>
                   <div className="text-xl font-semibold tabular-nums">
                     {formatSuggestedAmount(card, card.expectedCashback)}
                   </div>
@@ -170,14 +183,14 @@ function CardResult({
 
             {amount != null && card.expectedCashback != null && (
               <div className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {card.rewardEstimate ? (
-                  <span>{card.rewardEstimate}</span>
-                ) : (
-                  <span>
-                    {formatSuggestedAmount(card, card.expectedCashback)} estimated value
-                  </span>
-                )}
-                <span> on {formatSuggestedAmount(card, amount)}</span>
+                {t("{reward} on {amount}", {
+                  reward:
+                    card.rewardEstimate ??
+                    t("{amount} estimated value", {
+                      amount: formatSuggestedAmount(card, card.expectedCashback),
+                    }),
+                  amount: formatSuggestedAmount(card, amount),
+                })}
               </div>
             )}
             {card.rulesApplied?.length ? (
@@ -215,17 +228,15 @@ function BetterCardsPanel({
         <div className="flex items-center justify-between gap-3">
           <CardTitle as="h2" className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <CreditCard className="h-4 w-4" />
-            Better Card
-          </CardTitle>
+            {t("Better Card")}</CardTitle>
           <Badge
             variant="outline"
             className="rounded-full bg-card px-2.5 text-[11px] font-medium"
           >
-            Not in wallet
-          </Badge>
+            {t("Not in wallet")}</Badge>
         </div>
       </CardHeader>
-      <CardContent className="grid gap-3 p-4 md:grid-cols-3">
+      <CardContent className="grid grid-cols-1 gap-3 p-4 @xl:grid-cols-3">
         {cards.map((card) => (
           <div
             key={`better-card-${card.cardId}`}
@@ -243,18 +254,83 @@ function BetterCardsPanel({
             </div>
             <div className="mt-3 text-xs font-semibold text-foreground">
               <span className="text-muted-foreground">
-                {card.isDefaultRate ? "Base earning: " : "Reward match: "}
+                {card.isDefaultRate ? t("Base earning: ") : t("Reward match: ")}
               </span>
-              {formatRewardRate(card)} on{" "}
-              {formatCompactRewardCategory(card.matchedCategory)}
+              {t("{rate} on {category}", {
+                rate: formatRewardRate(card),
+                category: formatCompactRewardCategory(card.matchedCategory),
+              })}
             </div>
             {amount != null && card.expectedCashback != null ? (
-              <div className="mt-2 text-sm font-semibold tabular-nums text-emerald-800">
-                {formatSuggestedAmount(card, card.expectedCashback)} value
+              <div className="mt-2 text-sm font-semibold tabular-nums text-emerald-800 dark:text-emerald-300">
+                {t("{amount} value", {
+                  amount: formatSuggestedAmount(card, card.expectedCashback),
+                })}
               </div>
             ) : null}
           </div>
         ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * The rest of the wallet, ranked for this purchase. The engine always worked
+ * these out; showing them answers "and if I'd rather not use that card?".
+ */
+function WalletRankingPanel({
+  cards,
+  amount,
+}: {
+  cards: SuggestedCard[];
+  amount: number | null;
+}) {
+  if (!cards.length) return null;
+
+  return (
+    <Card className="overflow-hidden rounded-[22px] border-card-border bg-card">
+      <CardHeader className="border-b border-card-border/70 bg-secondary/25 p-4 pb-3">
+        <CardTitle
+          as="h2"
+          className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
+        >
+          <Wallet className="h-4 w-4" />
+          {t("Rest of your wallet")}</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <ol className="divide-y divide-card-border/70">
+          {cards.map((card, index) => (
+            <li
+              key={`wallet-rank-${card.cardId}`}
+              className="flex items-center gap-3 px-4 py-3"
+            >
+              <span className="w-5 shrink-0 text-right text-xs font-semibold tabular-nums text-muted-foreground">
+                {index + 2}
+              </span>
+              <SuggestedCardArt
+                card={card}
+                className="aspect-[1.586/1] w-14 shrink-0 rounded-md"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-semibold text-foreground">
+                  {card.cardName}
+                </div>
+                <div className="truncate text-xs text-muted-foreground">
+                  {t("{rate} on {category}", {
+                    rate: formatRewardRate(card),
+                    category: formatCompactRewardCategory(card.matchedCategory),
+                  })}
+                </div>
+              </div>
+              {amount != null && card.expectedCashback != null ? (
+                <div className="shrink-0 text-right text-sm font-semibold tabular-nums text-foreground">
+                  {formatSuggestedAmount(card, card.expectedCashback)}
+                </div>
+              ) : null}
+            </li>
+          ))}
+        </ol>
       </CardContent>
     </Card>
   );
@@ -281,7 +357,7 @@ function ResultDisplay({
           className="gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
         >
           <Sparkles className="h-3.5 w-3.5" />
-          {result.detectedCategory}
+          {t(result.detectedCategory)}
         </Badge>
       </div>
 
@@ -295,7 +371,7 @@ function ResultDisplay({
 
       {result.bestWalletCard ? (
         <CardResult
-          title="Best in your wallet"
+          title={t("Best in your wallet")}
           card={result.bestWalletCard}
           amount={result.amount ?? null}
           icon={<Wallet className="w-4 h-4" />}
@@ -306,8 +382,7 @@ function ResultDisplay({
           <CardContent className="flex flex-col items-start gap-3 p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
               <Wallet className="h-4 w-4" />
-              Nothing in your wallet to compare
-            </div>
+              {t("Nothing in your wallet to compare")}</div>
             <p className="text-sm leading-relaxed text-muted-foreground">
               {result.reasoning}
             </p>
@@ -315,11 +390,15 @@ function ResultDisplay({
               href="/cards"
               className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              Browse Card Library
-            </Link>
+              {t("Browse Card Library")}</Link>
           </CardContent>
         </Card>
       )}
+
+      <WalletRankingPanel
+        cards={result.walletAlternatives ?? []}
+        amount={result.amount ?? null}
+      />
 
       <BetterCardsPanel cards={betterCards} amount={result.amount ?? null} />
     </div>
@@ -333,12 +412,20 @@ export default function Suggest() {
   const [result, setResult] = useState<CardSuggestion | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored != null) setShowUpgrades(stored === "true");
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored != null) setShowUpgrades(stored === "true");
+    } catch {
+      // A preference only; the default is fine.
+    }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, String(showUpgrades));
+    try {
+      localStorage.setItem(STORAGE_KEY, String(showUpgrades));
+    } catch {
+      // Private browsing can refuse writes.
+    }
   }, [showUpgrades]);
 
   const suggest = useSuggestCard();
@@ -365,11 +452,9 @@ export default function Suggest() {
       <div className="mb-5">
         <h2 className="flex items-center gap-2 text-2xl font-bold tracking-tight md:text-[28px]">
           <Sparkles aria-hidden="true" className="h-6 w-6 text-foreground" />
-          Smart Suggest
-        </h2>
+          {t("Smart Suggest")}</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Pick the highest-value card for the next purchase.
-        </p>
+          {t("Pick the highest-value card for the next purchase.")}</p>
       </div>
 
       <div className="overflow-hidden rounded-[30px] border border-card-border bg-card/95 shadow-[0_18px_48px_rgba(17,24,32,0.07)]">
@@ -377,25 +462,23 @@ export default function Suggest() {
           <section className="border-b border-card-border bg-card/70 p-5 lg:sticky lg:top-0 lg:border-b-0 lg:border-r">
             <div className="mb-4 flex items-center gap-2 text-base font-semibold">
               <ReceiptText className="h-4 w-4" />
-              Purchase
-            </div>
+              {t("Purchase")}</div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label
                   htmlFor="description"
                   className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
                 >
-                  Description
-                </Label>
+                  {t("Description")}</Label>
                 <Input
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="e.g. coffee, Costco grocery, United flight..."
+                  placeholder={t("e.g. coffee, Costco groceries, United flight…")}
                   className="mt-2 h-11 rounded-2xl border-card-border bg-background px-4"
                 />
                 <div className="mt-3 flex flex-wrap gap-1.5">
-                  {EXAMPLES.map((ex) => (
+                  {(getLocale() === "zh-CN" ? EXAMPLES_ZH : EXAMPLES).map((ex) => (
                     <button
                       key={ex}
                       type="button"
@@ -413,8 +496,7 @@ export default function Suggest() {
                   htmlFor="amount"
                   className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground"
                 >
-                  Amount
-                </Label>
+                  {t("Amount")}</Label>
                 <Input
                   id="amount"
                   type="number"
@@ -439,8 +521,7 @@ export default function Suggest() {
                     htmlFor="show-upgrades"
                     className="cursor-pointer text-sm font-medium"
                   >
-                    Compare cards I don't own
-                  </Label>
+                    {t("Compare cards I don't own")}</Label>
                 </div>
               </div>
 
@@ -450,17 +531,16 @@ export default function Suggest() {
                 className="h-11 w-full rounded-full"
               >
                 <CreditCard className="h-4 w-4" />
-                {suggest.isPending ? "Thinking..." : "Suggest Card"}
+                {suggest.isPending ? t("Comparing cards…") : t("Suggest Card")}
               </Button>
             </form>
           </section>
 
-          <section className="min-w-0 space-y-4 p-5">
+          <section className="@container min-w-0 space-y-4 p-5">
             {suggest.isError && (
               <Card className="rounded-[20px] border-destructive">
                 <CardContent className="py-4 text-sm text-destructive">
-                  Couldn't get a suggestion. Please try again.
-                </CardContent>
+                  {t("Couldn't get a suggestion. Please try again.")}</CardContent>
               </Card>
             )}
 
@@ -473,12 +553,9 @@ export default function Suggest() {
                     <Sparkles className="h-5 w-5" />
                   </div>
                   <div className="text-lg font-semibold text-foreground">
-                    Ready for a purchase
-                  </div>
+                    {t("Ready for a purchase")}</div>
                   <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
-                    Enter a merchant, category, travel provider, or payment
-                    method to compare your wallet against the card library.
-                  </p>
+                    {t("Enter a merchant, category, travel provider, or payment method to compare your wallet against the card library.")}</p>
                 </CardContent>
               </Card>
             )}

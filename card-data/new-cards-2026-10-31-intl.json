@@ -1,0 +1,83 @@
+[
+  {
+    "id": 0,
+    "name": "DBS Chromo Card",
+    "issuer": "DBS Singapore",
+    "network": "Visa",
+    "annualFee": 196.2,
+    "signupBonus": "See issuer page for current welcome gift (new-to-DBS/POSB cardholders aged 21-29)",
+    "signupBonusValue": null,
+    "color": "linear-gradient(135deg, #b91c1c, #f87171)",
+    "logoUrl": "https://logo.clearbit.com/dbs.com.sg",
+    "cardImageUrl": null,
+    "rewardType": "cashback",
+    "rewardProgram": "DBS Cashback",
+    "rewardUnitName": "Cash Back",
+    "rewardUnitValueCents": 1,
+    "rewardValuationDescription": "Cash-back and cash-equivalent rewards are valued at face value for annual-fee progress.",
+    "rewardRuleNotes": [
+      "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+      "Only for applicants aged 21-29. Each calendar month the two local spend categories with the highest eligible spend (Dining, Travel, Shopping, Transport, Entertainment, Wellness) automatically earn an extra 4% (5% in total) once S$500 of eligible spend is reached. Bonus cashback is capped at S$30 per category (S$750 of spend each) and total cashback at S$150 a month including the base.",
+      "1% base cashback on other local (SGD) spend, with no minimum. Foreign-currency transactions earn no cashback but carry no FX fee; overseas purchases converted to SGD by the merchant (DCC) still earn.",
+      "Cardholders can switch to miles once a month: 1.3 miles per S$1, paid as DBS Points (1 point = 2 miles), uncapped.",
+      "From the fourth month after the cardholder's 30th birthday month the card earns a flat 1.7% cashback (or 1.3 miles per S$1) with no cap or minimum spend.",
+      "Annual fee S$196.20, waived for the first five years."
+    ],
+    "cashbackCategories": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Top 2 local spend categories each month, picked automatically (up to $1,500/month combined)",
+        "rate": 0.05,
+        "isDefault": false
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "category": "Other",
+        "rate": 0.01,
+        "isDefault": true
+      }
+    ],
+    "categoryChoices": [
+      {
+        "categoryId": 0,
+        "mode": "automatic-top-spend",
+        "picks": 2,
+        "resets": "month",
+        "options": [
+          "Dining",
+          "Travel",
+          "Shopping, including online retail",
+          "Transport: public transit, taxis and rideshare",
+          "Entertainment, streaming and telco phone plans",
+          "Wellness: groceries, drugstores, beauty and gyms"
+        ]
+      }
+    ],
+    "benefits": [
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "No Foreign Transaction Fees",
+        "description": "No FX fee on foreign-currency spending online or in-store (such spending earns no cashback).",
+        "annualValue": null
+      },
+      {
+        "id": 0,
+        "cardId": 0,
+        "name": "Complimentary Basic Travel Insurance",
+        "description": "Complimentary basic travel insurance underwritten by Chubb, redeemable once a month until 31 Aug 2027 (cardholders 18 and above).",
+        "annualValue": null
+      }
+    ],
+    "inWallet": false,
+    "market": "Singapore",
+    "currency": "SGD",
+    "sourceUrl": "https://www.dbs.com.sg/personal/cards/credit-cards/dbs-chromo-card",
+    "imageSourceUrl": "https://www.dbs.com.sg/iwov-resources/media/images/cards/credit-cards/dbs-chromo-card/dbs-chromo-card-220x140.png",
+    "lastReviewedAt": "2026-10-31",
+    "dataConfidence": "official",
+    "availability": "open"
+  }
+]

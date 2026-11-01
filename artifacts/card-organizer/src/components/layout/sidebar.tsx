@@ -1,29 +1,18 @@
-import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { useTheme } from "next-themes";
 import {
   Activity,
   CreditCard,
   Database,
-  Download,
-  Monitor,
-  Moon,
-  Sun,
-  Wallet,
+  Settings,
   Sparkles,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AppIcon } from "@/components/app-icon";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useToast } from "@/hooks/use-toast";
+import { t } from "@/lib/i18n";
+import { useAppUpdate } from "@/lib/app-update";
 
+// Labels are English keys, translated where they render.
 const NAV_ITEMS = [
   { href: "/wallet", label: "My Wallet", icon: Wallet },
   { href: "/suggest", label: "Smart Suggest", icon: Sparkles },
@@ -32,93 +21,30 @@ const NAV_ITEMS = [
   { href: "/data", label: "Data", icon: Database },
 ];
 
-const THEME_OPTIONS = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Monitor },
-] as const;
-
 interface SidebarProps {
   mobile?: boolean;
   onNavigate?: () => void;
 }
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
-};
-
-function isStandaloneApp() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches ||
-    ("standalone" in window.navigator &&
-      Boolean(
-        (window.navigator as Navigator & { standalone?: boolean }).standalone,
-      ))
+function navItemClass(isActive: boolean) {
+  return cn(
+    "flex min-h-11 items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+    isActive
+      ? "bg-primary text-primary-foreground shadow-[var(--app-shadow-soft)]"
+      : "text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
   );
 }
 
 export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
   const [location] = useLocation();
-  const { toast } = useToast();
-  const { theme, setTheme } = useTheme();
-  const [installPrompt, setInstallPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isThemeReady, setIsThemeReady] = useState(false);
   const pathname = location.split("?")[0];
-
-  useEffect(() => {
-    setIsThemeReady(true);
-    setIsStandalone(isStandaloneApp());
-
-    const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event as BeforeInstallPromptEvent);
-    };
-    const handleInstalled = () => {
-      setInstallPrompt(null);
-      setIsStandalone(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleInstalled);
-
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt,
-      );
-      window.removeEventListener("appinstalled", handleInstalled);
-    };
-  }, []);
-
-  const handleInstall = async () => {
-    if (isStandalone) return;
-
-    if (!installPrompt) {
-      toast({
-        title: "Install from your browser",
-        description:
-          "Use the install icon in the address bar if it is available.",
-      });
-      return;
-    }
-
-    await installPrompt.prompt();
-    const choice = await installPrompt.userChoice;
-    if (choice.outcome === "accepted") {
-      setInstallPrompt(null);
-      setIsStandalone(true);
-    }
-  };
-
-  // `theme` is undefined until next-themes has read storage on the client, so
-  // hold the neutral System option until then rather than flashing the wrong one.
-  const activeTheme = isThemeReady ? (theme ?? "system") : "system";
-  const activeThemeOption =
-    THEME_OPTIONS.find((option) => option.value === activeTheme) ??
-    THEME_OPTIONS[2];
+  const { phase } = useAppUpdate();
+  // A quiet dot on the gear while an update waits for the user.
+  const updateWaiting =
+    phase.kind === "available" ||
+    phase.kind === "ready" ||
+    phase.kind === "web-ready";
+  const settingsActive = pathname === "/settings";
 
   return (
     <aside
@@ -127,13 +53,13 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
         mobile ? "flex" : "hidden md:flex",
       )}
     >
-      <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <h1 className="font-semibold text-lg text-sidebar-foreground flex items-center gap-2">
+      <div className="flex h-16 items-center border-b border-sidebar-border px-6">
+        <h1 className="flex items-center gap-2 text-lg font-semibold text-sidebar-foreground">
           <AppIcon className="h-7 w-7 shadow-[var(--app-shadow-soft)]" />
           <span className="tracking-tight">Oh My Cards</span>
         </h1>
       </div>
-      <nav className="flex-1 p-3 space-y-1">
+      <nav className="flex-1 space-y-1 p-3">
         {NAV_ITEMS.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -144,55 +70,38 @@ export function Sidebar({ mobile = false, onNavigate }: SidebarProps) {
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               onClick={onNavigate}
-              className={cn(
-                "flex min-h-11 items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-[var(--app-shadow-soft)]"
-                  : "text-sidebar-foreground/68 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              )}
+              className={navItemClass(isActive)}
             >
-              <item.icon className="w-4 h-4" />
-              {item.label}
+              <item.icon className="h-4 w-4" />
+              {t(item.label)}
             </Link>
           );
         })}
       </nav>
-      <div className="space-y-2 border-t border-sidebar-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full min-h-11 justify-start gap-2 rounded-xl"
-            >
-              <activeThemeOption.icon className="h-4 w-4" />
-              Theme: {activeThemeOption.label}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56">
-            <DropdownMenuRadioGroup
-              value={activeTheme}
-              onValueChange={setTheme}
-            >
-              {THEME_OPTIONS.map((option) => (
-                <DropdownMenuRadioItem key={option.value} value={option.value}>
-                  <option.icon className="mr-2 h-4 w-4" />
-                  {option.label}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Button
-          type="button"
-          variant={isStandalone ? "secondary" : "outline"}
-          onClick={() => void handleInstall()}
-          disabled={isStandalone}
-          className="w-full min-h-11 justify-start gap-2 rounded-xl"
+      <div className="border-t border-sidebar-border p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <Link
+          href="/settings"
+          aria-current={settingsActive ? "page" : undefined}
+          onClick={onNavigate}
+          className={navItemClass(settingsActive)}
         >
-          <Download className="h-4 w-4" />
-          {isStandalone ? "Installed" : "Install App"}
-        </Button>
+          <span className="relative flex">
+            <Settings className="h-4 w-4" />
+            {updateWaiting ? (
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute -right-1 -top-1 h-2 w-2 rounded-full bg-emerald-500 ring-2",
+                  settingsActive ? "ring-primary" : "ring-sidebar",
+                )}
+              />
+            ) : null}
+          </span>
+          {t("Settings")}
+          {updateWaiting ? (
+            <span className="sr-only">{t("(update available)")}</span>
+          ) : null}
+        </Link>
       </div>
     </aside>
   );

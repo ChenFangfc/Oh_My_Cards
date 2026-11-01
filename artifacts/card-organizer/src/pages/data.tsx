@@ -1,18 +1,22 @@
 import { useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "wouter";
 import {
-  getCurrentRuleSetVersion,
+  clearLocalData,
   getLocalDataStorageSummary,
   importLocalDataBackup,
   serializeLocalDataBackup,
-  useListCards,
+  serializeTransactionsCsv,
   type LocalDataBackup,
 } from "@workspace/api-client-react";
 import {
+  ArrowRight,
   Database,
   Download,
+  FileSpreadsheet,
   HardDrive,
   ShieldCheck,
+  Trash2,
   Undo2,
   Upload,
 } from "lucide-react";
@@ -25,32 +29,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ToastAction } from "@/components/ui/toast";
+import { DetailRows, SectionCard } from "@/components/section-card";
 import { useToast } from "@/hooks/use-toast";
-
-type SaveFileHandle = {
-  createWritable: () => Promise<{
-    write: (data: Blob | string) => Promise<void>;
-    close: () => Promise<void>;
-  }>;
-};
+import { deviceNoun, isDesktopApp, saveTextFile } from "@/lib/desktop";
+import { formatFullDate, t, tn } from "@/lib/i18n";
 
 type OpenFileHandle = {
   getFile: () => Promise<File>;
 };
 
 type FilePickerWindow = Window & {
-  showSaveFilePicker?: (options?: {
-    suggestedName?: string;
-    types?: Array<{
-      description: string;
-      accept: Record<string, string[]>;
-    }>;
-  }) => Promise<SaveFileHandle>;
   showOpenFilePicker?: (options?: {
     multiple?: boolean;
     types?: Array<{
@@ -67,21 +59,10 @@ type PendingImport = {
   transactionCount: number | null;
 };
 
-function backupFileName(): string {
-  return `oh-my-cards-backup-${new Date().toISOString().slice(0, 10)}.json`;
-}
-
-function filePickerOptions() {
-  return {
-    types: [
-      {
-        description: "Oh My Cards Backup",
-        accept: {
-          "application/json": [".json"],
-        },
-      },
-    ],
-  };
+function todayStamp(): string {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
 }
 
 function parseBackupDate(value: unknown): Date | null {
@@ -99,7 +80,7 @@ function readBackupPreview(text: string): PendingImport {
   try {
     parsed = JSON.parse(text);
   } catch {
-    throw new Error("Backup file is not valid JSON.");
+    throw new Error(t("Backup file is not valid JSON."));
   }
 
   const backup = parsed as Partial<LocalDataBackup> | null;
@@ -114,15 +95,22 @@ function readBackupPreview(text: string): PendingImport {
   };
 }
 
+/** "3 cards · 120 transactions", or "3 cards and 120 transactions" in a sentence. */
 function formatCounts(
   cards: number | null,
   transactions: number | null,
-  separator = " · ",
+  style: "list" | "sentence" = "list",
 ): string {
-  if (cards === null || transactions === null) return "Unknown contents";
-  const cardLabel = cards === 1 ? "card" : "cards";
-  const transactionLabel = transactions === 1 ? "transaction" : "transactions";
-  return `${cards} ${cardLabel}${separator}${transactions.toLocaleString("en-US")} ${transactionLabel}`;
+  if (cards === null || transactions === null) return t("Unknown contents");
+  const vars = {
+    cards: tn(cards, "{count} card", "{count} cards"),
+    transactions: tn(transactions, "{count} transaction", "{count} transactions", {
+      count: transactions.toLocaleString("en-US"),
+    }),
+  };
+  return style === "sentence"
+    ? t("{cards} and {transactions}", vars)
+    : `${vars.cards} · ${vars.transactions}`;
 }
 
 export default function Data() {
@@ -132,30 +120,11 @@ export default function Data() {
   const [summary, setSummary] = useState(() => getLocalDataStorageSummary());
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
   const [undoSnapshot, setUndoSnapshot] = useState<string | null>(null);
-
-  const catalogQuery = useListCards();
-  const ruleSetVersion = getCurrentRuleSetVersion();
+  const device = deviceNoun();
 
   const refreshData = () => {
     setSummary(getLocalDataStorageSummary());
     void queryClient.invalidateQueries();
-  };
-
-  const downloadBackupFile = () => {
-    const backup = serializeLocalDataBackup();
-    const blob = new Blob([backup], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = backupFileName();
-    document.body.append(anchor);
-    anchor.click();
-    // Firefox/Safari start the transfer after the click handler returns, so the
-    // object URL has to outlive this tick or the download is cancelled.
-    window.setTimeout(() => {
-      anchor.remove();
-      URL.revokeObjectURL(url);
-    }, 60_000);
   };
 
   const restoreSnapshot = (snapshot: string) => {
@@ -164,17 +133,19 @@ export default function Data() {
       setUndoSnapshot(null);
       refreshData();
       toast({
-        title: "Import undone",
-        description: "The data from before the import is back in this browser.",
+        title: t("Restored"),
+        description: t("The data from before the change is back on {device}.", {
+          device,
+        }),
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Undo failed",
+        title: t("Undo failed"),
         description:
           error instanceof Error
             ? error.message
-            : "Could not restore the previous data.",
+            : t("Could not restore the previous data."),
       });
     }
   };
@@ -191,28 +162,30 @@ export default function Data() {
       const counts = formatCounts(
         backup.state.walletCards.length,
         backup.state.transactions.length,
-        " and ",
+        "sentence",
       );
       toast({
-        title: "Backup imported",
+        title: t("Backup imported"),
         description: exportedAt
-          ? `Restored ${counts}, exported on ${exportedAt.toLocaleDateString()}.`
-          : `Restored ${counts}.`,
+          ? t("Restored {counts}, exported on {date}.", {
+              counts,
+              date: formatFullDate(exportedAt),
+            })
+          : t("Restored {counts}.", { counts }),
         action: (
           <ToastAction
-            altText="Undo this import"
+            altText={t("Undo this import")}
             onClick={() => restoreSnapshot(snapshot)}
           >
-            Undo
-          </ToastAction>
+            {t("Undo")}</ToastAction>
         ),
       });
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Import failed",
+        title: t("Import failed"),
         description:
-          error instanceof Error ? error.message : "Could not read backup file.",
+          error instanceof Error ? error.message : t("Could not read backup file."),
       });
     } finally {
       setPendingImport(null);
@@ -227,43 +200,52 @@ export default function Data() {
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Import failed",
+        title: t("Import failed"),
         description:
           error instanceof Error
             ? error.message
-            : "Could not read backup file.",
+            : t("Could not read backup file."),
       });
     } finally {
       if (inputRef.current) inputRef.current.value = "";
     }
   };
 
-  const handleExportBackup = async () => {
-    const picker = window as FilePickerWindow;
-    if (!picker.showSaveFilePicker) {
-      downloadBackupFile();
-      toast({ title: "Backup exported" });
-      return;
-    }
-
+  const handleSave = async (
+    kind: "backup" | "csv",
+  ): Promise<void> => {
     try {
-      const handle = await picker.showSaveFilePicker({
-        suggestedName: backupFileName(),
-        ...filePickerOptions(),
-      });
-      const writable = await handle.createWritable();
-      await writable.write(
-        new Blob([serializeLocalDataBackup()], { type: "application/json" }),
+      const outcome = await saveTextFile(
+        kind === "backup"
+          ? {
+              suggestedName: `oh-my-cards-backup-${todayStamp()}.json`,
+              contents: serializeLocalDataBackup(),
+              mimeType: "application/json",
+              description: t("Oh My Cards Backup"),
+              extensions: ["json"],
+            }
+          : {
+              suggestedName: `oh-my-cards-transactions-${todayStamp()}.csv`,
+              contents: serializeTransactionsCsv(),
+              mimeType: "text/csv",
+              description: t("CSV Spreadsheet"),
+              extensions: ["csv"],
+            },
       );
-      await writable.close();
-      toast({ title: "Backup exported" });
+      if (outcome === "saved") {
+        toast({
+          title:
+            kind === "backup"
+              ? t("Backup exported")
+              : t("Transactions exported"),
+        });
+      }
     } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
       toast({
         variant: "destructive",
-        title: "Save failed",
+        title: t("Save failed"),
         description:
-          error instanceof Error ? error.message : "Could not save local file.",
+          error instanceof Error ? error.message : t("Could not save the file."),
       });
     }
   };
@@ -278,7 +260,12 @@ export default function Data() {
     try {
       const [handle] = await picker.showOpenFilePicker({
         multiple: false,
-        ...filePickerOptions(),
+        types: [
+          {
+            description: t("Oh My Cards Backup"),
+            accept: { "application/json": [".json"] },
+          },
+        ],
       });
       const file = await handle.getFile();
       setPendingImport(readBackupPreview(await file.text()));
@@ -286,156 +273,196 @@ export default function Data() {
       if (error instanceof DOMException && error.name === "AbortError") return;
       toast({
         variant: "destructive",
-        title: "Load failed",
+        title: t("Load failed"),
         description:
-          error instanceof Error ? error.message : "Could not load local file.",
+          error instanceof Error ? error.message : t("Could not load local file."),
       });
     }
   };
 
-  const catalogCount = catalogQuery.isError ? (
-    "Unavailable"
-  ) : catalogQuery.data ? (
-    `${catalogQuery.data.length.toLocaleString("en-US")} cards`
-  ) : (
-    <Skeleton className="h-4 w-20" />
-  );
+  const handleDeleteAll = () => {
+    const snapshot = serializeLocalDataBackup();
+    clearLocalData();
+    setUndoSnapshot(snapshot);
+    refreshData();
+    toast({
+      title: t("All data deleted"),
+      description: t("Nothing from your wallet is stored on {device} now.", {
+        device,
+      }),
+      action: (
+        <ToastAction
+          altText={t("Undo deleting all data")}
+          onClick={() => restoreSnapshot(snapshot)}
+        >
+          {t("Undo")}</ToastAction>
+      ),
+    });
+  };
 
   const storageRows: Array<{ label: string; value: React.ReactNode }> = [
     {
-      label: "Card rules version",
-      value: summary.hasCatalogOverride
-        ? `${ruleSetVersion} (updated rules)`
-        : `${ruleSetVersion} (built-in rules)`,
-    },
-    { label: "Card catalog", value: catalogCount },
-    {
-      label: "Wallet cards",
+      label: t("Wallet cards"),
       value: summary.walletCardCount.toLocaleString("en-US"),
     },
     {
-      label: "Transactions",
+      label: t("Transactions"),
       value: summary.transactionCount.toLocaleString("en-US"),
     },
     {
-      label: "Benefits marked used",
-      value: `${summary.usedBenefitCount.toLocaleString("en-US")} of ${summary.benefitUsageCount.toLocaleString("en-US")}`,
+      label: t("Benefit records"),
+      value: summary.benefitUsageCount.toLocaleString("en-US"),
     },
     {
-      label: "Storage",
-      value: `${summary.storageKey} · IndexedDB ${summary.databaseName}`,
+      label: t("Stored in"),
+      value: isDesktopApp()
+        ? t("App storage on this Mac")
+        : t("This browser's local storage"),
     },
   ];
 
   return (
     <div className="max-w-3xl space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="flex items-center gap-3 text-2xl font-bold tracking-tight md:text-[28px]">
-            <Database className="h-6 w-6 text-foreground" />
-            Data
-          </h2>
-          <p className="mt-1 text-muted-foreground">
-            Manage the private data saved in this browser.
-          </p>
-        </div>
+      <div>
+        <h2 className="flex items-center gap-3 text-2xl font-bold tracking-tight text-balance md:text-[28px]">
+          <Database aria-hidden="true" className="h-6 w-6 text-foreground" />
+          {t("Data")}</h2>
+        <p className="mt-1 text-muted-foreground">
+          {t("Your wallet and transactions are saved on {device} and nowhere else.", {
+            device,
+          })}
+        </p>
       </div>
 
-      <Card className="shadow-[var(--app-shadow-soft)]">
-        <CardContent className="p-5 md:p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-primary/20 text-primary">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-base font-semibold text-foreground">
-                Backup & Restore
-              </div>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">
-                Export a local JSON backup, or import one you saved earlier.
-                Your app data stays in this browser unless you export it.
-              </p>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <Button
-                  onClick={handleExportBackup}
-                  className="justify-start gap-2"
-                >
-                  <Download className="h-4 w-4" />
-                  Export Data
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => void handleImportBackup()}
-                  className="justify-start gap-2"
-                >
-                  <Upload className="h-4 w-4" />
-                  Import Data
-                </Button>
-              </div>
-            </div>
+      <SectionCard
+        icon={<ShieldCheck className="h-5 w-5" />}
+        iconClassName="bg-primary/20 text-primary"
+        title={t("Backup & Restore")}
+        description={t(
+          "Export a backup file to move to another device, or import one you saved earlier. Nothing leaves {device} unless you export it.",
+          { device },
+        )}
+      >
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <Button
+            onClick={() => void handleSave("backup")}
+            className="justify-start gap-2"
+          >
+            <Download className="h-4 w-4" />
+            {t("Export Backup")}</Button>
+          <Button
+            variant="outline"
+            onClick={() => void handleImportBackup()}
+            className="justify-start gap-2"
+          >
+            <Upload className="h-4 w-4" />
+            {t("Import Backup")}</Button>
+          <Button
+            variant="outline"
+            onClick={() => void handleSave("csv")}
+            disabled={summary.transactionCount === 0}
+            className="justify-start gap-2"
+          >
+            <FileSpreadsheet className="h-4 w-4" />
+            {t("Export CSV")}</Button>
+        </div>
+        <input
+          ref={inputRef}
+          type="file"
+          accept="application/json,.json"
+          className="hidden"
+          onChange={(event) =>
+            void handleImportUpload(event.target.files?.[0])
+          }
+        />
+        <p className="mt-4 rounded-2xl bg-secondary/60 px-4 py-3 text-sm leading-6 text-muted-foreground">
+          {t(
+            "Importing a backup replaces the data currently stored on {device}. The CSV export lists every transaction for a spreadsheet; it can't be imported back.",
+            { device },
+          )}
+        </p>
+        {undoSnapshot ? (
+          <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-card-border bg-card px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-6 text-muted-foreground">
+              {t("The data replaced by your last change is still available until you leave this page.")}</p>
+            <Button
+              variant="outline"
+              onClick={() => restoreSnapshot(undoSnapshot)}
+              className="shrink-0 justify-start gap-2"
+            >
+              <Undo2 className="h-4 w-4" />
+              {t("Undo")}</Button>
           </div>
-          <input
-            ref={inputRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(event) =>
-              void handleImportUpload(event.target.files?.[0])
-            }
-          />
-          <div className="mt-5 rounded-2xl bg-secondary/60 px-4 py-3 text-sm leading-6 text-muted-foreground">
-            Data is saved locally through browser storage. Importing a backup
-            replaces the data currently stored in this browser.
-          </div>
-          {undoSnapshot ? (
-            <div className="mt-3 flex flex-col gap-3 rounded-2xl border border-card-border bg-card px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm leading-6 text-muted-foreground">
-                The data replaced by the last import is still available until
-                you leave this page.
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => restoreSnapshot(undoSnapshot)}
-                className="shrink-0 justify-start gap-2"
-              >
-                <Undo2 className="h-4 w-4" />
-                Undo import
-              </Button>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+        ) : null}
+      </SectionCard>
 
-      <Card className="shadow-[var(--app-shadow-soft)]">
-        <CardContent className="p-5 md:p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-secondary text-foreground">
-              <HardDrive className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-base font-semibold text-foreground">
-                What is stored here
-              </div>
-              <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">
-                The card rules and the data this browser holds right now.
-              </p>
-              <dl className="mt-5 divide-y divide-card-border text-sm">
-                {storageRows.map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2"
-                  >
-                    <dt className="text-muted-foreground">{row.label}</dt>
-                    <dd className="min-w-0 break-words text-right font-medium tabular-nums text-foreground">
-                      {row.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <SectionCard
+        icon={<HardDrive className="h-5 w-5" />}
+        iconClassName="bg-secondary text-foreground"
+        title={t("What is stored here")}
+        description={t("Everything below lives only on {device}.", { device })}
+      >
+        <DetailRows rows={storageRows} />
+        <Link
+          href="/settings#card-rules"
+          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          {t("Card rules and app updates are in Settings")}
+          <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" />
+        </Link>
+      </SectionCard>
+
+      <SectionCard
+        icon={<Trash2 className="h-5 w-5" />}
+        iconClassName="bg-destructive/10 text-destructive"
+        title={t("Delete All Data")}
+        description={t(
+          "Removes every wallet card, transaction and benefit record from {device}. Export a backup first if you might want it back.",
+          { device },
+        )}
+      >
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="outline"
+              className="mt-4 gap-2 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+              disabled={
+                summary.walletCardCount === 0 &&
+                summary.transactionCount === 0 &&
+                summary.benefitUsageCount === 0
+              }
+            >
+              <Trash2 className="h-4 w-4" />
+              {t("Delete All Data…")}</Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("Delete everything on {device}?", { device })}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t(
+                  "{counts} will be removed. You can undo right after, but once you leave this page only an exported backup can bring them back.",
+                  {
+                    counts: formatCounts(
+                      summary.walletCardCount,
+                      summary.transactionCount,
+                    ),
+                  },
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("Keep My Data")}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleDeleteAll}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {t("Delete Everything")}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </SectionCard>
 
       <AlertDialog
         open={pendingImport !== null}
@@ -446,17 +473,14 @@ export default function Data() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Replace the data in this browser?
+              {t("Replace the data on {device}?", { device })}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Importing overwrites every wallet card, transaction, nickname,
-              credit limit and benefit record saved here. A copy of the current
-              data is kept for this visit so you can undo straight after.
-            </AlertDialogDescription>
+              {t("Importing overwrites every wallet card, transaction, nickname, credit limit and benefit record saved here. A copy of the current data is kept for this visit so you can undo straight after.")}</AlertDialogDescription>
           </AlertDialogHeader>
           <dl className="grid gap-2 rounded-2xl bg-secondary/60 px-4 py-3 text-sm">
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-              <dt className="text-muted-foreground">Replacing</dt>
+              <dt className="text-muted-foreground">{t("Replacing")}</dt>
               <dd className="font-medium text-foreground">
                 {formatCounts(
                   summary.walletCardCount,
@@ -465,7 +489,7 @@ export default function Data() {
               </dd>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-              <dt className="text-muted-foreground">With backup</dt>
+              <dt className="text-muted-foreground">{t("With backup")}</dt>
               <dd className="font-medium text-foreground">
                 {formatCounts(
                   pendingImport?.walletCardCount ?? null,
@@ -474,24 +498,23 @@ export default function Data() {
               </dd>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
-              <dt className="text-muted-foreground">Backup exported</dt>
+              <dt className="text-muted-foreground">{t("Backup exported")}</dt>
               <dd className="font-medium text-foreground">
                 {pendingImport?.exportedAt
-                  ? pendingImport.exportedAt.toLocaleDateString()
-                  : "Unknown date"}
+                  ? formatFullDate(pendingImport.exportedAt)
+                  : t("Unknown date")}
               </dd>
             </div>
           </dl>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (pendingImport) runImport(pendingImport);
               }}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Replace Data
-            </AlertDialogAction>
+              {t("Replace Data")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

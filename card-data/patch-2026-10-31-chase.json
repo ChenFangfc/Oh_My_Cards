@@ -1,0 +1,1311 @@
+{
+  "_note": "Chase group refresh, 2026-10-31. Works the still-valid 2026-08-06 queue items for Chase cards, adds issuer-confirmed changes since 2026-08-01 (Freedom Flex 9/2026 update and Q4 2026/Q1 2027 calendar, Aeroplan 9/10/2026 refresh, IHG portfolio refresh 10/1/2026, co-brand DashPass promo moving to monthly for enrollees from 9/1/2026, Sapphire Reserve DoorDash $15 promo from 10/1/2026), and backfills benefit `period`. Every value comes from the Chase product page named in `source` (fetched 2026-10-31) or the media.chase.com release cited in `_why`. Rows labelled '(through 12/31/2026)' encode terms Chase has already scheduled to change on 2027-01-01 and need a follow-up patch then. Signup bonuses are deliberately untouched.",
+  "patches": [
+    {
+      "cardId": 1,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5x total on Lyft rides through 9/30/2027; 5x total on Peloton equipment/accessory purchases over $150 through 12/31/2027 (capped at $5,000 of purchases over 4/1/2025-12/31/2027, recorded in rewardRuleNotes because the engine has no lifetime cap); complimentary Apple TV for at least 12 months if activated by 12/31/2026, which Chase now values at $180 (the queue's $156 predates the price change). Period backfill: the $100 Chase Travel hotel credit runs per account anniversary year; the Global Entry/TSA/NEXUS credit is up to $120 once every four years; the DashPass $10 non-restaurant promo is per calendar month, and Chase's terms now run DashPass through 12/31/2029 (value stated 'as of 10/1/2026').",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "The Peloton bonus applies only to equipment and accessory purchases over $150 made directly with Peloton, on up to $5,000 in total purchases from 4/1/2025 through 12/31/2027; this app does not enforce that lifetime cap."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          { "category": "Lyft (through 9/30/2027)", "rate": 0.05 },
+          { "category": "Peloton Equipment and Accessories (through 12/31/2027)", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          { "name": "Annual Hotel Credit", "period": "cardmember-year" },
+          { "name": "Global Entry / TSA PreCheck / NEXUS Credit", "period": "multi-year", "periodYears": 4 },
+          {
+            "name": "DashPass Membership",
+            "description": "Complimentary DashPass when activated by 12/31/2029 (through 12/31/2029 or 12 months, whichever is longer), plus a $10 promo each calendar month on one non-restaurant DoorDash order.",
+            "period": "monthly"
+          },
+          {
+            "name": "Complimentary Apple TV Subscription (1 year)",
+            "description": "At least 12 months of complimentary Apple TV (Chase values it at $180) after a one-time activation on chase.com or the Chase Mobile app by 12/31/2026.",
+            "annualValue": 180,
+            "period": "one-time"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 2,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve",
+      "confidence": "official",
+      "_why": "Queue benefits re-confirmed on the product page and its offer terms: The Edit credit (since 1/1/2026 up to $250 per prepaid 2+ night booking, max $500 per calendar year, not the 2025 half-year split the queue described); $300 Exclusive Tables dining credit and $300 StubHub/viagogo credit ($150 Jan-Jun + $150 Jul-Dec, StubHub through 12/31/2027); Apple TV + Apple Music now valued at $324 a year (activate by 6/22/2027); DoorDash promos now $35/month ($15 on any order replaced the $5 restaurant promo on 10/1/2026, plus two $10 non-restaurant promos) = $420, through 12/31/2029; $10/month Lyft credit through 9/30/2027; $10/month Peloton membership credit through 12/31/2027; IHG Platinum Elite through 12/31/2027. The page also lists 5x Lyft (through 9/30/2027) and 10x Peloton equipment (through 12/31/2027) earn, added as rows to match Sapphire Preferred. Global Entry credit corrected to the per-year convention ($120 every 4 years = 30). Dropped queue item '$250 Select Chase Travel Hotels Credit': it no longer appears on the Reserve page or terms and was a 2026-only credit.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "The Peloton bonus applies only to equipment and accessory purchases over $150 made directly with Peloton, on up to $5,000 in total purchases from 4/1/2025 through 12/31/2027; this app does not enforce that lifetime cap."
+        ]
+      },
+      "categories": {
+        "upsert": [
+          { "category": "Lyft (through 9/30/2027)", "rate": 0.05 },
+          { "category": "Peloton Equipment and Accessories (through 12/31/2027)", "rate": 0.1 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          { "name": "Annual Travel Credit", "period": "cardmember-year" },
+          {
+            "name": "Global Entry, TSA PreCheck or NEXUS Credit",
+            "description": "One statement credit of up to $120 every four years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "The Edit Hotel Credit",
+            "description": "Up to $250 back per prepaid ('Pay Now') stay of two or more nights booked with The Edit through Chase Travel, up to $500 per calendar year.",
+            "annualValue": 500,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Sapphire Exclusive Tables Dining Credit",
+            "description": "Up to $150 in statement credits January-June and up to $150 July-December at Sapphire Reserve Exclusive Tables restaurants on OpenTable.",
+            "annualValue": 300,
+            "period": "semiannual"
+          },
+          {
+            "name": "StubHub / viagogo Credits",
+            "description": "Up to $150 in statement credits January-June and up to $150 July-December on StubHub and viagogo purchases, through 12/31/2027. One-time activation required.",
+            "annualValue": 300,
+            "period": "semiannual"
+          },
+          {
+            "name": "Apple TV and Apple Music Subscriptions",
+            "description": "At least 12 months each of complimentary Apple TV and Apple Music after a one-time activation by 6/22/2027; Chase values them at $324 a year.",
+            "annualValue": 324,
+            "period": "one-time"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "Complimentary DashPass (activate by 12/31/2029) plus up to $35 in DoorDash promos each calendar month through 12/31/2029: $15 off one qualifying order and two $10 promos on non-restaurant orders.",
+            "annualValue": 420,
+            "period": "monthly"
+          },
+          {
+            "name": "Lyft Credits",
+            "description": "$10 in-app Lyft ride credit each calendar month through 9/30/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Peloton Membership Credits",
+            "description": "Up to $10 in statement credits each month on an eligible Peloton membership through 12/31/2027. One-time activation required.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "IHG One Rewards Platinum Elite Status",
+            "description": "Complimentary IHG One Rewards Platinum Elite status through 12/31/2027 after linking an IHG One Rewards account.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 3,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed in the product page's offer details: 2% total cash back on qualifying Lyft purchases through 09/30/2027. No monetary credits to backfill (Purchase Protection and Extended Warranty are insurance).",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.02 }]
+      }
+    },
+    {
+      "cardId": 4,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/cash-back-credit-cards/freedom/flex",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed: 2% total on Lyft through 09/30/2027. Since 2026-08-01: no foreign transaction fees ('Starting today', https://media.chase.com/news/chase-freedom-flex-more-travel-value, 2026-09-21; the product page now shows 'NEW No foreign transaction fees'); Cell Phone Protection was discontinued 2026-09-20 (losses through 2026-09-19 covered, per Chase's cardholder notice as reported by AwardWallet and InsideFlyer) and is gone from the page's protection list and from the release's 'complete list of Freedom Flex card benefits' - this is the scheduled change the 2026-08-06 verifier held back. Rotating calendar (coordinator request) from the product page calendar plus https://media.chase.com/news/chase-freedom-2026-q4-categories (2026-09-15): Q4 2026 = grocery stores (excluding Walmart and Target), dining and American Red Cross donations, 10/1-12/31/2026, $1,500 combined cap, activate by 12/14/2026; Q1 2027 = grocery stores (excluding Walmart and Target) and top streaming services. Options keep the last four quarters (Q1 2026 dropped); 'Walmart/Target' is left out of the labels because those words add merchant tags. Q2 2026 stays merchant-only (Amazon, Chase Travel) and resolves to no logged category; Whole Foods is omitted so it does not credit all groceries.",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.02 }]
+      },
+      "benefits": {
+        "remove": ["Cell Phone Protection"],
+        "upsert": [
+          {
+            "name": "No Foreign Transaction Fees",
+            "description": "No foreign transaction fees on purchases abroad or with international online merchants since September 2026 (previously 3%).",
+            "annualValue": null
+          }
+        ]
+      },
+      "choices": [
+        {
+          "category": "Rotating Categories (up to $1,500/quarter)",
+          "mode": "rotating-calendar",
+          "picks": 1,
+          "resets": "quarter",
+          "options": [
+            "Q2 2026: Amazon and Chase Travel",
+            "Q3 2026: Gas, public transit, EV charging and select live entertainment",
+            "Q4 2026: Grocery stores, dining and American Red Cross donations",
+            "Q1 2027: Grocery stores and top streaming services"
+          ]
+        }
+      ]
+    },
+    {
+      "cardId": 27,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/united/united-explorer",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page (2025-03-24 United refresh): Global Entry/TSA/NEXUS credit is now up to $120 every 4 years (old '$100' entry replaced; benefits cannot be renamed in place); partner credits with Chase's cadences: United Hotels $50 x2 per anniversary year, rideshare up to $5/month ($60 per calendar year, yearly opt-in), Avis/Budget $25 TravelBank cash x2 per anniversary year, Instacart $10/month through 12/31/2027, JSX up to $100 per anniversary year, $100 TravelBank cash after $10,000 calendar-year spend, and a 10,000-mile award discount after $20,000 calendar-year spend (left unvalued: it is spend-gated and has no dollar figure). Not changed: the page's '$0 intro annual fee, then $150' has no catalog field; annualFee stays 150.",
+      "benefits": {
+        "remove": ["$100 Global Entry / TSA PreCheck Credit"],
+        "upsert": [
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "United Hotels Credit",
+            "description": "$50 back on each of the first two prepaid United Hotels stays per account anniversary year (up to $100).",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Rideshare Credit",
+            "description": "Up to $5 back each month on rideshare purchases, up to $60 per calendar year. Yearly opt-in required.",
+            "annualValue": 60,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis/Budget Travel Credit",
+            "description": "$25 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $50).",
+            "annualValue": 50,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month (up to $120 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "JSX Credit",
+            "description": "Up to $100 back each account anniversary year on flights booked directly with JSX.",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$100 United Travel Credit (after $10,000 spend)",
+            "description": "$100 in United TravelBank cash after $10,000 in card purchases each calendar year.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "10,000-Mile Award Flight Discount (after $20,000 spend)",
+            "description": "A 10,000-mile discount on an eligible United award flight after $20,000 in card purchases each calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 28,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/united/united-quest",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page (2025-03-24 refresh): the two 5,000-mile anniversary rebates are now one 10,000-mile award discount each anniversary (valued 120 at the catalog's 1.2c/mile) plus a second after $20,000 calendar-year spend; partner credits: Renowned Hotels up to $150 and JSX up to $150 per anniversary year, Avis/Budget $40 TravelBank cash x2 per anniversary year, rideshare $8/month Jan-Nov + $12 Dec ($100 per calendar year, opt-in), Instacart $10 + $5 monthly ($180 per calendar year, through 12/31/2027), Global Entry/TSA/NEXUS up to $120 every 4 years, 1,000 Card Bonus PQP each year. The $200 travel credit is TravelBank cash issued after opening and each anniversary (description corrected). The page lists no United Club passes for this card, so 'Priority Boarding & Lounge Passes' is corrected to the Group 2 boarding perk and unvalued. Queue's 'two Economy Plus upgrade certificates' skipped: the page now ties them to $40,000 calendar-year spend.",
+      "benefits": {
+        "remove": ["5,000-Mile Anniversary Award Flight Credit"],
+        "upsert": [
+          {
+            "name": "$200 United Travel Credit",
+            "description": "$200 in United TravelBank cash after account opening and on each account anniversary, for a future United- or United Express-operated flight.",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "10,000-Mile Anniversary Award Flight Discount",
+            "description": "A 10,000-mile discount toward an eligible United award flight on each account anniversary, plus a second 10,000-mile discount after $20,000 in card purchases in a calendar year.",
+            "annualValue": 120,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Priority Boarding & Lounge Passes",
+            "description": "Group 2 priority boarding on United-operated flights for the primary cardmember and companions on the same reservation (Chase values it at $48 per person per roundtrip). The Quest card does not include United Club one-time passes.",
+            "annualValue": null
+          },
+          {
+            "name": "Renowned Hotels and Resorts Credit",
+            "description": "Up to $150 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+            "annualValue": 150,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Rideshare Credit",
+            "description": "Up to $8 back each month January-November and $12 in December on rideshare purchases (up to $100 per calendar year). Yearly opt-in required.",
+            "annualValue": 100,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis/Budget Travel Credit",
+            "description": "$40 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $80).",
+            "annualValue": 80,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "One $10 and one $5 Instacart credit each month (up to $180 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+            "annualValue": 180,
+            "period": "monthly"
+          },
+          {
+            "name": "JSX Credit",
+            "description": "Up to $150 back each account anniversary year on flights booked directly with JSX.",
+            "annualValue": 150,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "1,000 Card Bonus PQP",
+            "description": "1,000 Premier qualifying points each year, posted within 8 weeks of February 1 starting the calendar year after account opening.",
+            "annualValue": null,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 29,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/southwest/plus",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed on the product page (refresh announced at https://media.chase.com/news/chase-southwest-introduce-new-card-benefits; legacy 2x categories ended 12/31/2025): earn is 2x Southwest, 2x on the first $5,000 of combined gas-station and grocery-store purchases per anniversary year, 2x total on Lyft through 12/31/2027, 1x else. EarlyBird removed. Added the page's first-bag, 10% anniversary promo code, Standard seat + Group 5 boarding perks. DashPass: Chase's terms now give $10 off a non-restaurant order each calendar month to memberships activated on or after 9/1/2026 (quarterly before), through 12/31/2027. Instacart $10/month through 12/31/2027. Dropped queue item '10,000 Companion Pass qualifying points boost': no longer on the page. Anniversary points are per account anniversary year.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 2x gas-station and grocery-store rate covers the first $5,000 in combined purchases per account anniversary year, then 1x; this app resets that cap each calendar year."
+        ]
+      },
+      "categories": {
+        "remove": [
+          "Streaming",
+          "Local Transit and Rideshare",
+          "Internet, Cable, and Phone Services",
+          "Rapid Rewards Hotels and Rental Cars"
+        ],
+        "upsert": [
+          { "category": "Gas Stations and Grocery Stores (first $5,000/year combined)", "rate": 0.02 },
+          { "category": "Lyft (through 12/31/2027)", "rate": 0.02 }
+        ]
+      },
+      "benefits": {
+        "remove": ["2 EarlyBird Check-In"],
+        "upsert": [
+          { "name": "3,000 Anniversary Points", "period": "cardmember-year" },
+          {
+            "name": "Free First Checked Bag",
+            "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+            "annualValue": null
+          },
+          {
+            "name": "10% Flight Discount Promo Code",
+            "description": "A 10% promo code each cardmember anniversary (excludes Basic fares).",
+            "annualValue": null,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Standard Seat Selection and Group 5 Boarding",
+            "description": "Select a Standard seat within 48 hours of departure when available; the cardmember and up to 8 companions on the reservation board in Group 5.",
+            "annualValue": null
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 30,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/southwest/priority",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page (legacy 2x categories, $75 travel credit and upgraded boardings ended 12/31/2025): earn is 4x Southwest, 2x gas stations and restaurants, 5x total on Lyft through 12/31/2027, 1x else. Inflight rebate is 25%, not 20% (entry replaced; unvalued like other new rebate rows). Added first bag, Preferred seat at booking + unlimited Extra Legroom upgrades + Group 5 boarding, 2,500 TQPs per $5,000 spent, DashPass ($10/month for memberships activated on or after 9/1/2026, through 12/31/2027) and Instacart ($10/month through 12/31/2027). Dropped queue item '10,000 Companion Pass qualifying points boost': no longer on the page. Anniversary points are per account anniversary year.",
+      "categories": {
+        "remove": [
+          "Hotels",
+          "Rental Cars",
+          "Streaming",
+          "Local Transit and Rideshare",
+          "Internet, Cable, and Phone Services"
+        ],
+        "upsert": [{ "category": "Lyft (through 12/31/2027)", "rate": 0.05 }]
+      },
+      "benefits": {
+        "remove": [
+          "$75 Southwest Travel Credit",
+          "4 Upgraded Boardings per Year",
+          "20% Back on In-Flight Purchases"
+        ],
+        "upsert": [
+          { "name": "7,500 Anniversary Points", "period": "cardmember-year" },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "description": "25% back as a statement credit on inflight purchases.",
+            "annualValue": null
+          },
+          {
+            "name": "Free First Checked Bag",
+            "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+            "annualValue": null
+          },
+          {
+            "name": "Preferred Seat, Extra Legroom Upgrades and Group 5 Boarding",
+            "description": "Select a Preferred seat at booking and get unlimited upgrades to an Extra Legroom seat within 48 hours of departure when available; the cardmember and up to 8 companions board in Group 5.",
+            "annualValue": null
+          },
+          {
+            "name": "2,500 Tier Qualifying Points per $5,000 Spent",
+            "description": "2,500 A-List tier qualifying points for each $5,000 in purchases each year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 36,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page with current terms: the airline credit is two $50 credits after $250 of direct airline spend in each of two windows - existing cardmembers (by 1/7/2026, one-time activation) Jan-Jun and Jul-Dec 2026; new cardmembers applying 6/4-12/31/2026 get 6/4-12/31/2026 and 1/1-6/30/2027. DashPass: 12 months complimentary (activate by 12/31/2027) plus $10 off a non-restaurant order each calendar quarter, so the recurring credit is $40/yr rather than the queue's 120 (which counted the DashPass subscription itself). Dropped queue item 'Instacart Credit' (two secondary sources): the Boundless page lists no Instacart benefit. Free Night Award period: issued after each account anniversary.",
+      "benefits": {
+        "upsert": [
+          { "name": "Annual Free Night Award", "period": "cardmember-year" },
+          {
+            "name": "Airline Statement Credit",
+            "description": "Limited-time: $50 back after $250 in purchases directly with airlines in each of two windows (up to $100). Existing cardmembers (by 1/7/2026, one-time activation): Jan-Jun and Jul-Dec 2026. New cardmembers applying 6/4/2026-12/31/2026: 6/4-12/31/2026 and 1/1-6/30/2027.",
+            "annualValue": 100,
+            "period": "semiannual"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar quarter through 12/31/2027.",
+            "annualValue": 40,
+            "period": "quarterly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 37,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/world-of-hyatt-credit-card",
+      "confidence": "official",
+      "_why": "Period backfill only: the Category 1-4 free night is issued every year after the cardmember anniversary. Source moved from the World of Hyatt brand listing page to the product page. Dropped queue item 'Instacart Credit' (two secondary sources from May 2025): the product page lists no Instacart benefit (DashPass only), consistent with the refuted World of Hyatt Business proposal.",
+      "benefits": {
+        "upsert": [{ "name": "Free Night at Category 1-4 Hyatt", "period": "cardmember-year" }]
+      }
+    },
+    {
+      "cardId": 38,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier",
+      "confidence": "official",
+      "_why": "IHG portfolio refresh announced 2026-10-01 (https://media.chase.com/news/ihg-premier-select-card-portfolio-updates) and live on the product page: annual fee $150 (was $99; Chase says existing cardmembers' fees adjust in 2027); 5x now covers grocery stores, and 5x on all travel lasts only for purchases posted through 12/31/2026, after which only flights bought directly from the airline and car rental agencies earn 5x (rows added now; 'Travel (through 12/31/2026)' must be removed on 2027-01-01); automatic status drops from Platinum to Gold (Platinum after $15,000, Diamond after $40,000 calendar-year spend); Anniversary Free Night cap rises to 50,000 points (valued 250 at the catalog's 0.5c); new $25 quarterly Food & Beverage reward, $100 airline credit after $250 of direct airline spend per calendar year (through 12/31/2027), 15 Elite Night Credits a year, 15,000 bonus points after $15,000 calendar-year spend (replaces the queue's '$100 credit + 10,000 points at $20,000', which the refresh eliminated). Queue items re-confirmed: Global Entry/TSA/NEXUS up to $120 every 4 years (old '$100' entry replaced); United TravelBank cash is $25 Jan-Jun + $25 Jul-Dec after registering, no spend requirement; Instacart $10/month through 12/31/2027; DashPass $10/month for memberships activated on or after 9/1/2026. Existing cardmembers were told each change's effective date in October 2026 notices; this records the product as Chase now offers it.",
+      "set": {
+        "annualFee": 150,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+          "5x on all travel applies only to purchases posted through 12/31/2026; from 1/1/2027 only airline tickets bought directly from the airline and car rental agencies earn 5x and other travel earns 3x.",
+          "Chase's 10/1/2026 refresh set the annual fee at $150 (was $99); existing cardmembers move to the new fee in 2027 and were notified in October 2026 of the effective date of each benefit change."
+        ]
+      },
+      "categories": {
+        "rename": [{ "from": "Travel", "to": "Travel (through 12/31/2026)" }],
+        "upsert": [
+          { "category": "Flights Booked Directly with Airlines", "rate": 0.05 },
+          { "category": "Car Rentals", "rate": 0.05 },
+          { "category": "Grocery Stores", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "remove": ["Automatic Platinum Elite Status", "$100 Global Entry / TSA PreCheck Credit"],
+        "upsert": [
+          {
+            "name": "Anniversary Free Night",
+            "description": "A Free Night after each card anniversary at an IHG hotel with a redemption cap of 50,000 points; points can be added for pricier nights.",
+            "annualValue": 250,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "$50 United TravelBank Cash",
+            "description": "After registering the card with a MileagePlus account: $25 in United TravelBank cash for January-June and another $25 for July-December, up to $50 each calendar year. No spend requirement.",
+            "period": "semiannual"
+          },
+          {
+            "name": "Automatic Gold Elite Status",
+            "description": "Automatic IHG One Rewards Gold Elite status; Platinum Elite after $15,000 and Diamond Elite after $40,000 in purchases in a calendar year.",
+            "annualValue": null
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Food and Beverage Rewards",
+            "description": "A $25 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $100 a year).",
+            "annualValue": 100,
+            "period": "quarterly"
+          },
+          {
+            "name": "Airline Statement Credit",
+            "description": "$100 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month (up to $120 per calendar year) while an Instacart+ member (3 months complimentary); ends 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "15 Elite Night Credits",
+            "description": "15 Elite Night Credits at account opening and each January, plus 2 more for every $5,000 spent and 5 more after $15,000 in a calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "15,000 Bonus Points After $15,000 Annual Spend",
+            "description": "15,000 bonus points after $15,000 in purchases each calendar year.",
+            "annualValue": 75,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 47,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/ink/business-preferred",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5x total on Lyft through 9/30/2027 (outside the $150,000 3x cap); complimentary DashPass for at least a year (activate by 12/31/2027) plus $10 off a non-restaurant DoorDash order each calendar month. No other monetary credits to backfill.",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.05 }]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "DashPass Membership",
+            "description": "Complimentary DashPass for at least one year when activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month while enrolled.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 48,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/ink/cash",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5% total on Lyft through 9/30/2027; Instacart benefit is a complimentary 3-month Instacart+ membership plus a $20 Instacart credit every month while an Instacart+ member, ending 12/31/2027. Valued at the monthly cadence (12 x $20 = 240) like the co-brand Instacart credits; the queue's 60 counted only the free quarter.",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.05 }]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Instacart Credit",
+            "description": "Complimentary 3-month Instacart+ membership (then $99/year unless cancelled) and a $20 Instacart credit each month while an Instacart+ member; benefits end 12/31/2027.",
+            "annualValue": 240,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 49,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/ink/unlimited",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5% total on Lyft through 9/30/2027 (base 1.5% unchanged); complimentary 3-month Instacart+ plus a $20 Instacart credit each month while an Instacart+ member, ending 12/31/2027 (valued 12 x $20, see card 48).",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.05 }]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Instacart Credit",
+            "description": "Complimentary 3-month Instacart+ membership (then $99/year unless cancelled) and a $20 Instacart credit each month while an Instacart+ member; benefits end 12/31/2027.",
+            "annualValue": 240,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 50,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/cash-back-credit-cards/amazon-prime-rewards",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed: 2% on local transit and commuting including rideshare. The product page lists 5% at Amazon.com, Audible.com, Whole Foods Market and on Chase Travel purchases (with Prime), 2% at gas stations, restaurants and local transit/commuting, 1% else - there is no 2% general-travel tier, so the 'Travel' 2% row is renamed to the transit category and Chase Travel is added at 5%.",
+      "categories": {
+        "rename": [{ "from": "Travel", "to": "Local Transit and Commuting (including rideshare)" }],
+        "upsert": [{ "category": "Chase Travel", "rate": 0.05 }]
+      }
+    },
+    {
+      "cardId": 51,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/united/united-gateway",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 25% back on United inflight and Club premium drinks; two checked bags and 10%-or-more off award flights each unlocked by $10,000 of calendar-year spend; trip cancellation/interruption is up to $1,500 per traveler and $6,000 per trip; purchase protection $500 per item for 120 days. All non-monetary, so unvalued.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Trip Cancellation Insurance",
+            "description": "Trip cancellation/interruption coverage up to $1,500 per covered traveler and $6,000 per trip for prepaid, non-refundable passenger fares."
+          },
+          {
+            "name": "25% Back on United Inflight and Club Premium Drink Purchases",
+            "description": "25% back as a statement credit on food, beverages and Wi-Fi on United-operated flights and on United Club premium drinks.",
+            "annualValue": null
+          },
+          {
+            "name": "Two Checked Bags Annually",
+            "description": "Two first-standard-checked-bag benefits after $10,000 in card purchases in a calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "10% or More Off Award Flights",
+            "description": "Save 10% or more on United flights booked with miles after $10,000 in card purchases in a calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Purchase Protection",
+            "description": "Covers eligible new purchases for 120 days against damage or theft, up to $500 per item.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 52,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/united/club-infinite",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page (2025-03-24 refresh): product name is 'United Club Card'; United Club membership valued by Chase at '$750+' a year; partner credits - Renowned Hotels up to $200, Avis/Budget $50 TravelBank cash x2 and JSX up to $200 per anniversary year, rideshare $12/month Jan-Nov + $18 Dec ($150 per calendar year, enrollment required), Instacart two $10 credits monthly ($240 per calendar year, through 12/31/2027); 1,500 Card Bonus PQP a year; 10,000-mile award discount per $20,000 spent (up to two per calendar year); 25% back on inflight and Club drinks. Global Entry credit corrected to the per-year convention ($120 every 4 years = 30). Not applied: the queue's checked-bag value (Chase's '$440 per roundtrip' is a per-trip figure, not an annual value) and the 4 Club passes (the page now ties them to All Access membership plus an authorized user).",
+      "set": { "name": "United Club Card" },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "United Club Membership",
+            "description": "United Club membership for the primary cardmember and one guest (Chase: $750+ value per year); All Access membership after Premier Gold status or $50,000 in annual card spend.",
+            "annualValue": 750
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Renowned Hotels and Resorts Credit",
+            "description": "Up to $200 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+            "annualValue": 200,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Rideshare Credit",
+            "description": "Up to $12 back each month January-November and $18 in December on rideshare purchases (up to $150 per calendar year). Enrollment required.",
+            "annualValue": 150,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis/Budget Travel Credit",
+            "description": "$50 in United TravelBank cash on each of the first two Avis or Budget rentals booked through MileagePlus Travel per account anniversary year (up to $100).",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "Two $10 Instacart credits each month while an Instacart+ member (up to $240 per calendar year); ends 12/31/2027.",
+            "annualValue": 240,
+            "period": "monthly"
+          },
+          {
+            "name": "JSX Credit",
+            "description": "Up to $200 back each account anniversary year on purchases made directly with JSX.",
+            "annualValue": 200,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "1,500 Card Bonus PQP",
+            "description": "1,500 Premier qualifying points each year, posted within 8 weeks of February 1 starting the calendar year after account opening.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "10,000-Mile Award Flight Discount (per $20,000 spend)",
+            "description": "A 10,000-mile award flight discount for every $20,000 in card purchases, up to two per calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "25% Back on United Inflight and Club Premium Drink Purchases",
+            "description": "25% back as a statement credit on food, beverages and Wi-Fi on United-operated flights and on United Club premium drinks.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 53,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/southwest/premier",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page (legacy 2x categories and EarlyBird ended 12/31/2025): earn is 3x Southwest, 2x on the first $8,000 of combined grocery-store and restaurant purchases per anniversary year, 3x total on Lyft through 12/31/2027 (page lists it; not in the queue), 1x else. Added first bag, 15% anniversary promo code, Preferred seat + Group 5 boarding, 25% inflight rebate, DashPass ($10/month for memberships activated on or after 9/1/2026, through 12/31/2027), Instacart ($10/month through 12/31/2027). Dropped queue item '10,000 Companion Pass qualifying points boost': no longer on the page. Anniversary points are per account anniversary year.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "The 2x grocery-store and restaurant rate covers the first $8,000 in combined purchases per account anniversary year, then 1x; this app resets that cap each calendar year."
+        ]
+      },
+      "categories": {
+        "remove": [
+          "Hotels Via Southwest",
+          "Local Transit and Rideshare",
+          "Internet, Cable, and Phone Services",
+          "Streaming",
+          "Rapid Rewards Rental Cars"
+        ],
+        "upsert": [
+          { "category": "Grocery Stores and Restaurants (first $8,000/year combined)", "rate": 0.02 },
+          { "category": "Lyft (through 12/31/2027)", "rate": 0.03 }
+        ]
+      },
+      "benefits": {
+        "remove": ["2 EarlyBird Check-Ins per Year"],
+        "upsert": [
+          { "name": "6,000 Anniversary Points", "period": "cardmember-year" },
+          {
+            "name": "Free First Checked Bag",
+            "description": "First checked bag free for the cardmember and up to 8 other passengers on the same reservation (Chase: saves up to $90 round trip).",
+            "annualValue": null
+          },
+          {
+            "name": "15% Flight Discount Promo Code",
+            "description": "A 15% promo code each cardmember anniversary (excludes Basic fares).",
+            "annualValue": null,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Preferred Seat Selection and Group 5 Boarding",
+            "description": "Select a Preferred seat within 48 hours of departure when available; the cardmember and up to 8 companions board in Group 5.",
+            "annualValue": null
+          },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "description": "25% back as a statement credit on inflight purchases.",
+            "annualValue": null
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month while an Instacart+ member (3 months of Instacart+ complimentary), through 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 54,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed on the product page: 12 months of complimentary DashPass (activate by 12/31/2027) plus $10 off a non-restaurant DoorDash order each calendar quarter, valued at the recurring $40 rather than the queue's 120 (which counted the subscription). Dropped queue item 'Instacart Credit' (two secondary sources): the Bold page lists no Instacart benefit. No other monetary credits to backfill.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar quarter through 12/31/2027.",
+            "annualValue": 40,
+            "period": "quarterly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 55,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/one-rewards",
+      "confidence": "official",
+      "_why": "IHG portfolio refresh announced 2026-10-01 (https://media.chase.com/news/ihg-premier-select-card-portfolio-updates): the no-fee Traveler card is now the 'IHG One Rewards Credit Card'; 3x now includes grocery stores; 3x on utilities, internet/cable/phone and select streaming ends with purchases posted 12/31/2026 (2x after; row relabelled and must be removed on 2027-01-01); 5 Elite Night Credits a year; Gold Elite after $15,000 (was $20,000); 10,000 bonus points after $15,000 calendar-year spend (the refuted 2026-08-06 item had $10,000 - the refreshed page now says $15,000); from 2027 the 4th Reward Night Free needs $5,000 of calendar-year spend. Queue items re-confirmed: Instacart $10/month through 12/31/2027; DashPass $10/month for memberships activated on or after 9/1/2026 (quarterly before), through 12/31/2027.",
+      "set": {
+        "name": "IHG One Rewards Credit Card",
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+          "3x on utilities, internet/cable/phone and select streaming applies only to purchases posted through 12/31/2026; from 1/1/2027 they earn 2x.",
+          "Formerly the IHG One Rewards Traveler Credit Card, renamed in Chase's 10/1/2026 refresh; existing cardmembers were notified in October 2026 of each change's effective date."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Monthly Bills",
+            "to": "Utilities, Internet, Cable, Phone and Select Streaming (through 12/31/2026)"
+          }
+        ],
+        "upsert": [{ "category": "Grocery Stores", "rate": 0.03 }]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "4th Reward Night Free",
+            "description": "Redeem points for four consecutive nights and the fourth is free. From 2027 it requires $5,000 in purchases in a calendar year (then valid for the rest of that year and the next)."
+          },
+          {
+            "name": "IHG Silver Elite Status",
+            "description": "Automatic Silver Elite status; Gold Elite after $15,000 in purchases in a calendar year."
+          },
+          {
+            "name": "5 Elite Night Credits",
+            "description": "5 Elite Night Credits at account opening and each January.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "10,000 Bonus Points After $15,000 Annual Spend",
+            "description": "10,000 bonus points after $15,000 in purchases each calendar year.",
+            "annualValue": 50,
+            "period": "calendar-year"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month (up to $120 a year) while an Instacart+ member (3 months complimentary, then $99/year); ends 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 66,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan",
+      "confidence": "official",
+      "_why": "Refresh effective 2026-09-10 for new and existing cardmembers (https://media.chase.com/news/the-chase-air-canada-aeroplan-credit-card-refresh), confirmed on the product page: annual fee $195 (was $95); new 3x on travel and 2x at gas stations; dining and grocery stores fall to 2x but keep 3x on purchases through 12/31/2026 (rows relabelled; set them to 0.02 on 2027-01-01); Air Canada stays 3x on the card (Chase's 'up to 5x' adds 2x from Air Canada for 25K members); automatic Aeroplan 25K status with no spend requirement; up to $100 a year in Air Canada credits ($50 Jan-Jun + $50 Jul-Dec); 15% off eligible Air Canada flight rewards. Queue items re-confirmed: Global Entry/TSA/NEXUS up to $120 every 4 years; DashPass (now $10/month for memberships activated on or after 9/1/2026, through 12/31/2027). Dropped queue item 'Monthly Spend Bonus' (500 points per $2,000): no longer on the page after the refresh.",
+      "set": {
+        "annualFee": 195,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Dining and grocery stores earn 3x on purchases through 12/31/2026 and 2x from 1/1/2027.",
+          "The card earns 3x on Air Canada purchases; Chase's 'up to 5x' adds 2x that Air Canada awards Aeroplan 25K members on eligible flights, which this app does not count."
+        ]
+      },
+      "categories": {
+        "rename": [
+          { "from": "Dining", "to": "Dining (3x through 12/31/2026, then 2x)" },
+          { "from": "Groceries", "to": "Grocery Stores (3x through 12/31/2026, then 2x)" }
+        ],
+        "upsert": [
+          { "category": "Travel", "rate": 0.03 },
+          { "category": "Gas Stations", "rate": 0.02 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "25K Aeroplan Status",
+            "description": "Automatic Aeroplan 25K status with no spending requirement: priority check-in, Zone 2 boarding, 5 eUpgrade credits a year and Star Alliance recognition."
+          },
+          {
+            "name": "Air Canada Statement Credit",
+            "description": "Up to $50 in statement credits January-June and up to $50 July-December on purchases made directly with Air Canada.",
+            "annualValue": 100,
+            "period": "semiannual"
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "15% Off Air Canada Flight Redemptions",
+            "description": "Save 15% on eligible Air Canada flight rewards booked with Aeroplan points.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 91,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/cash-back-credit-cards/freedom/rise",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed in the product page's offer details: 2% total cash back on qualifying Lyft purchases through 09/30/2027 (base 1.5% unchanged).",
+      "categories": {
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.02 }]
+      }
+    },
+    {
+      "cardId": 93,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/ink/premier",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5% total cash back on travel purchased through Chase Travel; cell phone protection up to $1,000 per claim (3 claims per 12 months, $100 deductible) when the phone bill is paid with the card - insurance, so unvalued rather than the queue's suggested 150.",
+      "categories": {
+        "upsert": [{ "category": "Chase Travel", "rate": 0.05 }]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Cell Phone Protection",
+            "description": "Up to $1,000 per claim against covered theft or damage for phones on a monthly bill paid with the card; up to 3 claims per 12 months with a $100 deductible.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 94,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/united/united-business-card",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed on the product page: the lumped 'Partner Credits' ($600) is replaced by Chase's itemized credits and cadences - $125 TravelBank cash after 5 United flight purchases of $100+ per calendar year; United Hotels $50 x2, Avis/Budget $25 x2, JSX up to $100 and FareLock up to $25 per anniversary year; rideshare $8/month Jan-Nov + $12 Dec ($100 per calendar year, opt-in); Instacart $10/month through 12/31/2027. Economy Plus upgrades skipped: now earned only after $25,000 calendar-year spend.",
+      "benefits": {
+        "remove": ["Partner Credits"],
+        "upsert": [
+          {
+            "name": "$125 United Travel Credit",
+            "description": "$125 in United TravelBank cash after 5 United flight purchases of $100 or more in a calendar year.",
+            "annualValue": 125,
+            "period": "calendar-year"
+          },
+          {
+            "name": "United Hotels Credit",
+            "description": "$50 back on each of the first two prepaid United Hotels stays per account anniversary year (up to $100).",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Rideshare Credit",
+            "description": "Up to $8 back each month January-November and $12 in December on rideshare purchases (up to $100 per calendar year). Yearly opt-in required.",
+            "annualValue": 100,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis/Budget Travel Credit",
+            "description": "$25 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $50).",
+            "annualValue": 50,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month (up to $120 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "JSX Credit",
+            "description": "Up to $100 back each account anniversary year on flights booked directly with JSX.",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "FareLock Credit",
+            "description": "Up to $25 back each account anniversary year on United FareLock purchases.",
+            "annualValue": 25,
+            "period": "cardmember-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 95,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: Hyatt credits are $50 per qualifying Hyatt purchase of $50+, up to twice per account anniversary year ($100); 5 tier-qualifying night credits per $10,000 of calendar-year purchases (status perk, unvalued rather than the queue's 50). sourceUrl corrected from the dead /world-of-hyatt-business path, so confidence returns to official. Instacart was refuted on 2026-08-06 and is still absent.",
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Hyatt Statement Credits",
+            "description": "$50 statement credit per qualifying Hyatt purchase of $50 or more, up to 2 times each account anniversary year ($100 total).",
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Tier-Qualifying Night Credits",
+            "description": "5 World of Hyatt tier-qualifying night credits for every $10,000 in purchases each calendar year.",
+            "annualValue": null,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 96,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/southwest/performance-business",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed on the product page: the lumped 'Business Travel Perks' ($150) is replaced by itemized benefits - Global Entry/TSA/NEXUS up to $120 every 4 years, 9,000 anniversary points each account anniversary year (valued 117 at the catalog's 1.3c), 25% inflight rebate. Not added: the '10,000 Companion Pass points boost' (no longer on the page) and the 2,500-TQP-per-$5,000 perk, which the page says ends 12/31/2026 (1 TQP per $1 from 1/1/2027).",
+      "benefits": {
+        "remove": ["Business Travel Perks"],
+        "upsert": [
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "9,000 Anniversary Points",
+            "description": "9,000 bonus points each account anniversary year.",
+            "annualValue": 117,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "description": "25% back as a statement credit on inflight purchases.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 97,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/southwest/premier-business",
+      "confidence": "official",
+      "_why": "Queue item re-confirmed on the product page: 15% promo code each cardmember anniversary and 25% inflight rebate added; anniversary points are per account anniversary year. Not added: the '10,000 Companion Pass points boost' (no longer on the page) and the 2,000-TQP-per-$5,000 perk, which the page says ends 12/31/2026.",
+      "benefits": {
+        "upsert": [
+          { "name": "6,000 Anniversary Points", "period": "cardmember-year" },
+          {
+            "name": "15% Flight Discount Promo Code",
+            "description": "A 15% promo code each cardmember anniversary (excludes Basic fares).",
+            "annualValue": null,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "25% Back on In-Flight Purchases",
+            "description": "25% back as a statement credit on inflight purchases.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 125,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/sapphire/reserve",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: 5x total on Lyft through 9/30/2027; Global Entry/TSA/NEXUS up to $120 every 4 years (30/yr, not the queue's 120); DoorDash = complimentary DashPass plus $25/month in promos ($5 restaurant + two $10 non-restaurant) through 12/31/2027, counted as the $300 of promos; $10/month Lyft credit through 9/30/2027; $250 Select Chase Travel Hotels credit (calendar 2026 only - remove on 2027-01-01). The lumped 'Business Travel Credits' ($1,000) is replaced by the page's itemized credits to avoid double counting: Google Workspace $200 per calendar year and ZipRecruiter $200 + $200 semiannual (both through 12/31/2027), curated gift cards $50 + $50 semiannual (through 10/31/2028). New since 2026-08-01 on the page: 3x advertising is capped at $1,000,000 per anniversary year starting 11/15/2026, and The Edit credit doubles to $1,000 a year from 1/1/2027 (recorded in notes; value stays 500 until then). Travel credit is per anniversary year; The Edit is per calendar year.",
+      "set": {
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "Travel bonus rates require the booking channel named in the category; direct bookings and portal bookings may earn different rates.",
+          "From 11/15/2026, 3x on social media and search engine advertising covers the first $1,000,000 per account anniversary year, then 1x; this app resets that cap each calendar year.",
+          "Chase says The Edit credit rises to up to $1,000 a year (two more $250 credits) from 1/1/2027."
+        ]
+      },
+      "categories": {
+        "rename": [
+          {
+            "from": "Social media and search advertising",
+            "to": "Social media and search advertising (up to $1,000,000/year)"
+          }
+        ],
+        "upsert": [{ "category": "Lyft (through 9/30/2027)", "rate": 0.05 }]
+      },
+      "benefits": {
+        "remove": ["Business Travel Credits"],
+        "upsert": [
+          { "name": "$300 Annual Travel Credit", "period": "cardmember-year" },
+          {
+            "name": "The Edit Credits",
+            "description": "Up to $500 in statement credits each calendar year on prepaid stays of two or more nights booked with The Edit through Chase Travel, at most $250 per transaction (Chase: rising to $1,000 a year from 1/1/2027).",
+            "period": "calendar-year"
+          },
+          {
+            "name": "Global Entry, TSA PreCheck or NEXUS Credit",
+            "description": "One statement credit of up to $120 every four years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Google Workspace Credit",
+            "description": "Up to $200 in statement credits each calendar year on purchases made directly with Google Workspace, through 12/31/2027.",
+            "annualValue": 200,
+            "period": "calendar-year"
+          },
+          {
+            "name": "ZipRecruiter Credit",
+            "description": "Up to $200 in statement credits January-June and up to $200 July-December on ZipRecruiter purchases, through 12/31/2027.",
+            "annualValue": 400,
+            "period": "semiannual"
+          },
+          {
+            "name": "Curated Gift Card Credit",
+            "description": "Up to $50 January-June and up to $50 July-December on gift cards bought at giftcards.com/reservebusiness, through 10/31/2028.",
+            "annualValue": 100,
+            "period": "semiannual"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "Complimentary DashPass when activated by 12/31/2027, plus up to $25 in DoorDash promos each month ($5 on a restaurant order and two $10 non-restaurant promos) through 12/31/2027.",
+            "annualValue": 300,
+            "period": "monthly"
+          },
+          {
+            "name": "Lyft Credit",
+            "description": "$10 in-app Lyft ride credit each calendar month through 9/30/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "$250 Select Chase Travel Hotels Credit",
+            "description": "Up to $250 in statement credits in calendar 2026 only on prepaid 2+ night Chase Travel bookings at IHG, Montage, Pendry, Omni, Virgin, Minor and Pan Pacific hotels; ends 12/31/2026.",
+            "annualValue": 250,
+            "period": "one-time"
+          },
+          {
+            "name": "IHG One Rewards Platinum Elite Status",
+            "description": "Complimentary IHG One Rewards Platinum Elite status through 12/31/2027 for the authorizing officer after linking an IHG One Rewards account.",
+            "annualValue": null
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 158,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/IHG/business",
+      "confidence": "official",
+      "_why": "IHG portfolio refresh announced 2026-10-01 (https://media.chase.com/news/ihg-premier-select-card-portfolio-updates) and live on the product page: renamed 'IHG One Rewards Business Credit Card' (formerly Premier Business); annual fee $200 (was $99; existing cardmembers adjust in 2027); 5x on all travel and office supply stores lasts only for purchases posted through 12/31/2026, then only flights bought directly and car rental agencies keep 5x (rows added; remove the two '(through 12/31/2026)' rows on 2027-01-01) - this also settles the queue's office-supply item (two secondary sources) via the issuer's terms; Anniversary Free Night cap 50,000 points (valued 250); new $25 quarterly Food & Beverage reward, $100 airline credit after $250 of direct airline spend per calendar year (through 12/31/2027), up to $100 Expensify credit per calendar year, 15 Elite Night Credits, 20,000 bonus points after $25,000 calendar-year spend. Queue items re-confirmed: 4th Reward Night Free; Global Entry/TSA/NEXUS up to $120 every 4 years; Instacart $10/month through 12/31/2027 (now issuer-confirmed); DashPass $10/month for memberships activated on or after 9/1/2026. Dropped: '$50 United TravelBank Cash' (not on the refreshed Business page) and '$100 Statement Credit + 10,000 Bonus Points' at $20,000 (replaced in the refresh by the 20,000-point bonus).",
+      "set": {
+        "name": "IHG One Rewards Business Credit Card",
+        "annualFee": 200,
+        "rewardRuleNotes": [
+          "Issuer merchant coding and current product terms control whether a purchase qualifies for the listed bonus category.",
+          "IHG's official marketing may show a higher total hotel earn rate by adding base IHG One Rewards points and elite-status bonus points; this app calculates only the credit-card earn rate.",
+          "5x on all travel and at office supply stores applies only to purchases posted through 12/31/2026; from 1/1/2027 only airline tickets bought directly and car rental agencies keep 5x, and other travel and office supplies earn 3x.",
+          "Formerly the IHG One Rewards Premier Business Credit Card; Chase's 10/1/2026 refresh set the annual fee at $200 (was $99), with existing cardmembers' fees adjusted in 2027."
+        ]
+      },
+      "categories": {
+        "rename": [{ "from": "Travel", "to": "Travel (through 12/31/2026)" }],
+        "upsert": [
+          { "category": "Office Supplies (through 12/31/2026)", "rate": 0.05 },
+          { "category": "Flights Booked Directly with Airlines", "rate": 0.05 },
+          { "category": "Car Rentals", "rate": 0.05 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "Anniversary Free Night",
+            "description": "A Free Night after each account anniversary at an IHG hotel with a redemption cap of 50,000 points; points can be added for pricier nights.",
+            "annualValue": 250,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "4th Reward Night Free",
+            "description": "When you redeem points for a consecutive four-night IHG stay, the fourth night is free.",
+            "annualValue": 150
+          },
+          {
+            "name": "Global Entry / TSA PreCheck / NEXUS Credit",
+            "description": "Up to $120 statement credit every 4 years for a Global Entry, TSA PreCheck or NEXUS application fee charged to the card.",
+            "annualValue": 30,
+            "period": "multi-year",
+            "periodYears": 4
+          },
+          {
+            "name": "Food and Beverage Rewards",
+            "description": "A $25 Food and Beverage Reward voucher each quarter to use at IHG hotels (up to $100 a year).",
+            "annualValue": 100,
+            "period": "quarterly"
+          },
+          {
+            "name": "Airline Statement Credit",
+            "description": "$100 statement credit after $250 on flights purchased directly with an airline each calendar year, through 12/31/2027.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "Expensify Credit",
+            "description": "Up to $100 in statement credits on Expensify purchases each calendar year.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          },
+          {
+            "name": "DashPass Membership",
+            "description": "12 months of complimentary DashPass when first activated by 12/31/2027, plus $10 off one non-restaurant DoorDash order each calendar month through 12/31/2027 for memberships activated on or after 9/1/2026 (earlier activations get $10 per calendar quarter).",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "$10 Instacart credit each month (up to $120 per calendar year) while an Instacart+ member (3 months complimentary); ends 12/31/2027.",
+            "annualValue": 120,
+            "period": "monthly"
+          },
+          {
+            "name": "15 Elite Night Credits",
+            "description": "15 Elite Night Credits each calendar year, plus 2 more for every $5,000 spent.",
+            "annualValue": null,
+            "period": "calendar-year"
+          },
+          {
+            "name": "20,000 Bonus Points After $25,000 Annual Spend",
+            "description": "20,000 bonus points after $25,000 in purchases each calendar year.",
+            "annualValue": 100,
+            "period": "calendar-year"
+          }
+        ]
+      }
+    },
+    {
+      "cardId": 159,
+      "reviewedAt": "2026-10-31",
+      "source": "https://creditcards.chase.com/business-credit-cards/united/united-club-business",
+      "confidence": "official",
+      "_why": "Queue items re-confirmed on the product page: the business card earns 2x on United purchases (not 5x), 5x on prepaid Renowned Hotels stays and 1.5x on everything else, with no dining or general-travel bonus, so United 0.05 -> 0.02, Other 0.01 -> 0.015 and the Travel/Dining rows go. United Club membership valued by Chase at '$750+' a year. Partner credits: Renowned Hotels up to $200, Avis/Budget $50 TravelBank cash x2, JSX up to $200 and FareLock up to $50 per anniversary year; rideshare $12/month Jan-Nov + $18 Dec ($150 per calendar year, opt-in); Instacart two $10 credits monthly ($240 per calendar year, through 12/31/2027); Premier Access. Not applied: checked-bag value (Chase's $440 is per roundtrip, not annual), the 4 Club passes (now need All Access plus an employee card) and Economy Plus upgrades (need $40,000 calendar-year spend).",
+      "categories": {
+        "remove": ["Travel", "Dining"],
+        "upsert": [
+          { "category": "United", "rate": 0.02 },
+          { "category": "Other", "rate": 0.015 }
+        ]
+      },
+      "benefits": {
+        "upsert": [
+          {
+            "name": "United Club Membership",
+            "description": "United Club membership for the primary cardmember and one guest (Chase: $750+ value per year); All Access membership after Premier Gold status or $50,000 in annual card spend.",
+            "annualValue": 750
+          },
+          {
+            "name": "Renowned Hotels and Resorts Credit",
+            "description": "Up to $200 in statement credits each account anniversary year on prepaid stays booked through Renowned Hotels and Resorts for United Cardmembers.",
+            "annualValue": 200,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Rideshare Credit",
+            "description": "Up to $12 back each month January-November and $18 in December on rideshare purchases (up to $150 per calendar year). Yearly opt-in required.",
+            "annualValue": 150,
+            "period": "monthly"
+          },
+          {
+            "name": "Avis/Budget Travel Credit",
+            "description": "$50 in United TravelBank cash on each of the first two Avis or Budget rentals booked through mileageplustravel.united.com per account anniversary year (up to $100).",
+            "annualValue": 100,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Instacart Credit",
+            "description": "Two $10 Instacart credits each month (up to $240 per calendar year) on purchases made directly through Instacart; ends 12/31/2027.",
+            "annualValue": 240,
+            "period": "monthly"
+          },
+          {
+            "name": "JSX Credit",
+            "description": "Up to $200 back each account anniversary year on flights booked directly with JSX.",
+            "annualValue": 200,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "FareLock Credit",
+            "description": "Up to $50 back each account anniversary year on United FareLock purchases.",
+            "annualValue": 50,
+            "period": "cardmember-year"
+          },
+          {
+            "name": "Premier Access Travel Services",
+            "description": "Priority check-in, security screening, boarding and baggage handling where available.",
+            "annualValue": null
+          }
+        ]
+      }
+    }
+  ]
+}

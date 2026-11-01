@@ -1,3 +1,5 @@
+import { t } from "@/lib/i18n";
+
 type CardFeeFields = {
   annualFee: number;
   currency?: string | null;
@@ -14,7 +16,7 @@ export function formatAnnualFee(
   card: CardFeeFields,
   options: { includePeriod?: boolean } = {},
 ) {
-  if (card.annualFee === 0) return "No Fee";
+  if (card.annualFee === 0) return t("No Fee");
 
   const hasFraction = !Number.isInteger(card.annualFee);
   const formatted = new Intl.NumberFormat("en-US", {
@@ -24,7 +26,7 @@ export function formatAnnualFee(
     maximumFractionDigits: hasFraction ? 2 : 0,
   }).format(card.annualFee);
 
-  return options.includePeriod ? `${formatted}/yr` : formatted;
+  return options.includePeriod ? t("{amount}/yr", { amount: formatted }) : formatted;
 }
 
 export function formatCardAmount(card: CardFeeFields, amount: number) {

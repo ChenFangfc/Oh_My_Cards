@@ -5,8 +5,11 @@ name: Card Data Freshness
 # It never edits catalog.ts — extracted values are signals, not truth.
 on:
   schedule:
-    # 07:00 UTC on the 1st and 15th — roughly every two weeks.
-    - cron: "0 7 1,15 * *"
+    # Daily: newsroom/blog headlines. Feeds only hold their most recent posts,
+    # so anything slower than daily silently misses announcements.
+    - cron: "30 6 * * *"
+    # Weekly (Mondays): the full crawl of every card's source page.
+    - cron: "0 7 * * 1"
   workflow_dispatch:
     inputs:
       stale_days:
@@ -55,8 +58,16 @@ jobs:
         continue-on-error: true
         run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:watch
 
+      # Structural errors would be published to every installed app. The job
+      # still files the review issue first and fails at the end.
+      - name: Lint card catalog
+        id: lint
+        continue-on-error: true
+        run: COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:lint
+
       - name: Crawl card source pages
         id: crawl
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 7 * * 1'
         continue-on-error: true
         run: |
           COREPACK_ENABLE_AUTO_PIN=0 corepack pnpm --dir scripts cards:check -- \
@@ -86,9 +97,11 @@ jobs:
             printf '\n\n_Report truncated. See `card-data/freshness-report.md` in the repo for the full list._\n' >> /tmp/issue-body-trimmed.md
           fi
           mv /tmp/issue-body-trimmed.md /tmp/issue-body.md
+          NEWS_HITS=$(grep -oE '^[0-9]+ feed items' card-data/newsroom-report.md 2>/dev/null | grep -oE '^[0-9]+' || echo 0)
           {
             echo "high_count=$(jq '.stats.bySeverity.high // 0' card-data/freshness-report.json)"
             echo "total_count=$(jq '.findings | length' card-data/freshness-report.json)"
+            echo "news_hits=${NEWS_HITS:-0}"
           } >> "$GITHUB_OUTPUT"
 
       # A single rolling issue instead of one per run: the review queue is a
@@ -98,6 +111,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           HIGH: ${{ steps.body.outputs.high_count }}
           TOTAL: ${{ steps.body.outputs.total_count }}
+          NEWS: ${{ steps.body.outputs.news_hits }}
+          CRAWLED: ${{ steps.crawl.outcome != 'skipped' }}
         run: |
           TITLE="Card data review queue"
           EXISTING=$(gh issue list --state open --search "$TITLE in:title" --json number,title \
@@ -105,8 +120,12 @@ jobs:
           NEW_TITLE="$TITLE — $HIGH high / $TOTAL total ($(date -u +%Y-%m-%d))"
 
           if [ -n "$EXISTING" ]; then
+            # Editing the body is silent; a comment notifies watchers, so one
+            # is only added when there is something new to look at.
             gh issue edit "$EXISTING" --title "$NEW_TITLE" --body-file /tmp/issue-body.md
-            gh issue comment "$EXISTING" --body "Refreshed $(date -u +%Y-%m-%d): $HIGH high-severity, $TOTAL total findings."
+            if [ "${NEWS:-0}" -gt 0 ] || [ "${HIGH:-0}" -gt 0 ] || [ "$CRAWLED" = "true" ]; then
+              gh issue comment "$EXISTING" --body "Refreshed $(date -u +%Y-%m-%d): $HIGH high-severity, $TOTAL total findings, $NEWS new headline(s)."
+            fi
           else
             gh issue create --title "$NEW_TITLE" --body-file /tmp/issue-body.md --label "card-data" || \
             gh issue create --title "$NEW_TITLE" --body-file /tmp/issue-body.md
@@ -127,7 +146,7 @@ jobs:
           fi
 
       - name: Fail when high-severity findings exist
-        if: steps.crawl.outcome == 'failure'
+        if: steps.crawl.outcome == 'failure' || steps.lint.outcome == 'failure'
         run: |
-          echo "::error::Card data check reported high-severity findings. See the review queue issue."
+          echo "::error::Card data check reported high-severity findings or catalog lint errors. See the review queue issue."
           exit 1

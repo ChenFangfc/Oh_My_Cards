@@ -30,6 +30,7 @@ import {
   htmlToText,
   stableText,
 } from "./extract";
+import { lintCatalog } from "./lint-catalog";
 import type {
   CardSnapshot,
   CatalogCard,
@@ -188,6 +189,33 @@ async function main(): Promise<void> {
 
     const imageFinding = await checkCardImage(card);
     if (imageFinding) findings.push(imageFinding);
+  }
+
+  // Rule-level checks: the same ones `cards:lint` runs before publishing,
+  // reported here so a stale rotating calendar shows up in the review queue.
+  for (const issue of await lintCatalog(targets, now)) {
+    if (issue.code === "MISSING_IMAGE") continue; // reported above
+    const kind =
+      issue.level === "error"
+        ? "CATALOG_ERROR"
+        : issue.code === "STALE_CALENDAR"
+          ? "STALE_CALENDAR"
+          : issue.code === "MISSING_BENEFIT_PERIOD"
+            ? "MISSING_BENEFIT_PERIOD"
+            : issue.code === "UNPARSED_CAP"
+              ? "UNPARSED_CAP"
+              : null;
+    if (!kind) continue;
+    const card = targets.find((entry) => entry.id === issue.cardId);
+    findings.push({
+      kind,
+      severity:
+        kind === "CATALOG_ERROR" ? "high" : kind === "STALE_CALENDAR" ? "medium" : "low",
+      cardId: issue.cardId,
+      cardName: issue.cardName,
+      issuer: card?.issuer ?? "",
+      detail: issue.detail,
+    });
   }
 
   // ---- Crawl -------------------------------------------------------------

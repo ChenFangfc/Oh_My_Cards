@@ -9,6 +9,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { AppIcon } from "@/components/app-icon";
+import { t } from "@/lib/i18n";
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false);
@@ -24,7 +25,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                aria-label="Open navigation"
+                aria-label={t("Open navigation")}
               >
                 <Menu className="h-5 w-5" />
               </Button>
@@ -34,17 +35,18 @@ export function AppLayout({ children }: { children: ReactNode }) {
               className="p-0 w-64"
               aria-describedby={undefined}
             >
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
+              <SheetTitle className="sr-only">{t("Navigation")}</SheetTitle>
               <Sidebar mobile onNavigate={() => setNavOpen(false)} />
             </SheetContent>
           </Sheet>
           <h1 className="font-semibold text-lg ml-4 flex items-center gap-2">
             <AppIcon className="h-7 w-7" />
-            Oh My Cards
-          </h1>
+            Oh My Cards</h1>
         </header>
         <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:p-6 md:pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
-          <div className="max-w-7xl mx-auto space-y-6">
+          {/* A size container: pages lay out by the room they actually have,
+              which the sidebar takes a quarter of from 768px up. */}
+          <div className="@container mx-auto max-w-7xl space-y-6">
             {children}
           </div>
         </main>

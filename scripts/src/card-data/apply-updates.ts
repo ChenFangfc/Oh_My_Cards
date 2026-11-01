@@ -21,7 +21,9 @@
  *         "rename": [{ "from": "X", "to": "Y" }]
  *       },
  *       "benefits": {
- *         "upsert": [{ "name": "Annual Hotel Credit", "description": "...", "annualValue": 100 }],
+ *         "rename": [{ "from": "Old Credit Name", "to": "New Credit Name" }],  // keeps id + usage
+ *         "upsert": [{ "name": "Annual Hotel Credit", "description": "...", "annualValue": 100,
+ *                      "period": "cardmember-year" }],   // period: see CardBenefitPeriod
  *         "remove": ["10% Anniversary Points Boost"]
  *       }
  *     }
@@ -39,7 +41,12 @@ import {
   readCatalog,
   writeCatalog,
 } from "./catalog-io";
-import type { CardBenefit, CashbackCategory, CatalogCard } from "./types";
+import type {
+  CardBenefit,
+  CardBenefitPeriod,
+  CashbackCategory,
+  CatalogCard,
+} from "./types";
 
 interface CategoryPatch {
   category: string;
@@ -51,7 +58,20 @@ interface BenefitPatch {
   name: string;
   description?: string;
   annualValue?: number | null;
+  /** Renewal cadence; omit to leave an existing benefit's period unchanged. */
+  period?: CardBenefitPeriod;
+  periodYears?: number;
 }
+
+const BENEFIT_PERIODS: readonly CardBenefitPeriod[] = [
+  "monthly",
+  "quarterly",
+  "semiannual",
+  "calendar-year",
+  "cardmember-year",
+  "multi-year",
+  "one-time",
+];
 
 /**
  * Declares how a bonus row that names no fixed kind of spend gets filled in.
@@ -69,6 +89,7 @@ interface ChoicePatch {
 interface CardPatch {
   cardId: number;
   reviewedAt?: string;
+  keepReviewDate?: boolean;
   source?: string;
   confidence?: "official" | "needs-review";
   set?: Partial<CatalogCard>;
@@ -80,12 +101,23 @@ interface CardPatch {
   benefits?: {
     upsert?: BenefitPatch[];
     remove?: string[];
+    /**
+     * Renames keep the benefit's id, so usage people already logged against it
+     * stays attached. Remove-and-add would orphan that history.
+     */
+    rename?: Array<{ from: string; to: string }>;
   };
   choices?: ChoicePatch[];
 }
 
 interface PatchFile {
   rulesetVersion?: string;
+  /**
+   * For maintenance patches (value clean-ups, relabels) that change data
+   * without anyone re-checking the issuer's terms. Bumping lastReviewedAt for
+   * those would hide genuinely stale cards from the freshness report.
+   */
+  keepReviewDate?: boolean;
   patches: CardPatch[];
 }
 
@@ -185,6 +217,16 @@ function applyCardPatch(
     log(`  category added: "${added.category}" @ ${added.rate}`);
   }
 
+  for (const rename of patch.benefits?.rename ?? []) {
+    const target = card.benefits.find((entry) => sameLabel(entry.name, rename.from));
+    if (!target) {
+      log(`  ! benefit rename skipped, "${rename.from}" not found`);
+      continue;
+    }
+    log(`  benefit renamed: "${target.name}" -> "${rename.to}"`);
+    target.name = rename.to;
+  }
+
   for (const remove of patch.benefits?.remove ?? []) {
     const before = card.benefits.length;
     card.benefits = card.benefits.filter((entry) => !sameLabel(entry.name, remove));
@@ -196,9 +238,21 @@ function applyCardPatch(
   }
 
   for (const upsert of patch.benefits?.upsert ?? []) {
+    if (upsert.period !== undefined && !BENEFIT_PERIODS.includes(upsert.period)) {
+      log(`  ! benefit "${upsert.name}" skipped, unknown period "${upsert.period}"`);
+      continue;
+    }
+
     const existing = card.benefits.find((entry) => sameLabel(entry.name, upsert.name));
 
     if (existing) {
+      if (upsert.period !== undefined && existing.period !== upsert.period) {
+        log(`  benefit "${existing.name}": period ${existing.period ?? "(default)"} -> ${upsert.period}`);
+        existing.period = upsert.period;
+      }
+      if (upsert.periodYears !== undefined && existing.periodYears !== upsert.periodYears) {
+        existing.periodYears = upsert.periodYears;
+      }
       if (upsert.description !== undefined && existing.description !== upsert.description) {
         existing.description = upsert.description;
         log(`  benefit "${existing.name}": description updated`);
@@ -218,6 +272,8 @@ function applyCardPatch(
       name: upsert.name,
       description: upsert.description ?? "",
       annualValue: upsert.annualValue ?? null,
+      ...(upsert.period ? { period: upsert.period } : {}),
+      ...(upsert.periodYears ? { periodYears: upsert.periodYears } : {}),
     };
     card.benefits.push(added);
     log(`  benefit added: "${added.name}" ($${added.annualValue ?? 0})`);
@@ -254,7 +310,7 @@ function applyCardPatch(
 
   if (patch.source) card.sourceUrl = patch.source;
   if (patch.confidence) card.dataConfidence = patch.confidence;
-  card.lastReviewedAt = patch.reviewedAt ?? today;
+  if (!patch.keepReviewDate) card.lastReviewedAt = patch.reviewedAt ?? today;
 }
 
 async function resolveExisting(candidate: string): Promise<string | null> {
@@ -315,7 +371,13 @@ async function main(): Promise<void> {
     }
 
     lines.push(`#${card.id} ${card.name}`);
-    applyCardPatch(card, patch, allocate, today, (message) => lines.push(message));
+    applyCardPatch(
+      card,
+      { ...patch, keepReviewDate: patch.keepReviewDate ?? patchFile.keepReviewDate },
+      allocate,
+      today,
+      (message) => lines.push(message),
+    );
     applied += 1;
   }
 

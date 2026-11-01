@@ -1,6 +1,6 @@
 [package]
 name = "oh-my-card"
-version = "0.1.0"
+version = "1.2.0"
 description = "Local-first credit card optimizer"
 authors = ["Oh My Cards"]
 edition = "2021"
@@ -13,6 +13,25 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2", features = [] }
+# tray-icon: the menu bar extra. image-png: its template icon.
+# macos-private-api: transparent panel window so the system popover material shows.
+tauri = { version = "2", features = ["tray-icon", "image-png", "macos-private-api"] }
+# Opens issuer pages in the user's browser instead of inside the app window.
+tauri-plugin-opener = "2"
+# Native save panel for backups and CSV exports; WKWebView ignores <a download>.
+tauri-plugin-dialog = "2"
+# System-wide shortcut that opens the menu bar quick-log panel.
+tauri-plugin-global-shortcut = "2"
+# "Open at login": starts quietly in the menu bar.
+tauri-plugin-autostart = "2"
+# In-app updates from GitHub Releases (signed; no update server needed).
+tauri-plugin-updater = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

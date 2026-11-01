@@ -1,0 +1,12 @@
+{
+  "name": "oh-my-cards-film",
+  "private": true,
+  "type": "module",
+  "description": "The Oh My Cards film, written as code. See README.md.",
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "devDependencies": {
+    "playwright-core": "1.48.2"
+  }
+}

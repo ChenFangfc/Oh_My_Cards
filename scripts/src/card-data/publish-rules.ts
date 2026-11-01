@@ -19,6 +19,14 @@ import { createHash } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { REPO_ROOT, readCatalog } from "./catalog-io";
+import { lintCatalog } from "./lint-catalog";
+
+/**
+ * Bumped when the payload gains a field whose meaning an older app would get
+ * wrong if it ignored it. 2 = benefits carry a renewal `period`. Apps refuse
+ * a schema newer than the one they were built for and keep their rules.
+ */
+const RULES_SCHEMA = 2;
 
 const OUTPUT_DIR = path.join(
   REPO_ROOT,
@@ -36,12 +44,24 @@ async function main(): Promise<void> {
     .join("=");
 
   const { cards, rulesetVersion } = await readCatalog();
+
+  // Every installed app swaps its whole rulebook for this file, so a broken
+  // catalog must never get this far.
+  const errors = (await lintCatalog(cards)).filter((issue) => issue.level === "error");
+  if (errors.length) {
+    for (const issue of errors) {
+      process.stderr.write(`#${issue.cardId} ${issue.cardName}: ${issue.detail}\n`);
+    }
+    throw new Error(`Refusing to publish: ${errors.length} catalog error(s). Run cards:lint.`);
+  }
+
   const publishedAt = new Date().toISOString();
 
   // `inWallet` is per-device state; publishing it would leak a default into
   // every client and it is recomputed on load anyway.
   const payload = {
     version: rulesetVersion,
+    schema: RULES_SCHEMA,
     publishedAt,
     cards: cards.map(({ inWallet: _inWallet, ...card }) => card),
   };
@@ -51,6 +71,7 @@ async function main(): Promise<void> {
 
   const manifest = {
     version: rulesetVersion,
+    schema: RULES_SCHEMA,
     url: `./${rulesetVersion}.json`,
     notes: notes ?? `Card rules ${rulesetVersion} (${cards.length} cards).`,
     publishedAt,

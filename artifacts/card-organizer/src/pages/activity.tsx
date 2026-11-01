@@ -1,5 +1,6 @@
 import { Activity as ActivityIcon } from "lucide-react";
 import Analytics from "@/pages/analytics";
+import { t } from "@/lib/i18n";
 
 export default function Activity() {
   return (
@@ -7,8 +8,7 @@ export default function Activity() {
       <div>
         <h2 className="text-2xl font-bold tracking-tight flex items-center gap-3 md:text-[28px]">
           <ActivityIcon className="h-6 w-6 text-foreground" />
-          Activity
-        </h2>
+          {t("Activity")}</h2>
       </div>
 
       <Analytics embedded />
