@@ -12,7 +12,7 @@
 
 <br><br>
 
-<a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.en.mp4"><picture><source type="image/avif" srcset="docs/promo/preview.en.avif"><img src="docs/promo/preview.en.webp" width="100%" alt="Oh My Cards in 30 seconds: five cards, which one pays most; a purchase typed in the menu bar picks the best card; Smart Suggest, the wallet's due dates and fees; your data stays on your device"></picture></a>
+<a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.en.mp4"><picture><source type="image/avif" srcset="docs/promo/preview.en.avif"><img src="docs/promo/preview.en.webp" width="100%" alt="Oh My Cards in 30 seconds: a wallet full of cards, which one pays most; a purchase typed in the menu bar picks the best card; Smart Suggest, the wallet's due dates and fees; your data stays on your device"></picture></a>
 
 <sub><a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.en.mp4"><b>▶ Watch with sound (0:32)</b></a> · <a href="https://github.com/ChenFangfc/Oh_My_Cards/releases/download/v1.2.0/Oh-My-Cards-film-4K.en.mp4"><b>4K</b></a> · <a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.zh.mp4"><b>中文版</b></a></sub>
 

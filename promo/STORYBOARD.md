@@ -5,7 +5,7 @@ one line, the app behind it, and why it can be trusted with a wallet.
 
 | Time | Picture | Words (en / zh) |
 |---|---|---|
-| 0–2.4 | Five popular cards rise into a neat stack: Chase Freedom Unlimited, Chase Sapphire Reserve, Amex Gold, Amex Platinum, Capital One Venture X. | Five cards in your wallet. / 钱包里有五张卡。 |
+| 0–2.4 | Five popular cards rise into a neat stack: Chase Freedom Unlimited, Chase Sapphire Reserve, Amex Gold, Amex Platinum, Capital One Venture X. | A wallet full of cards. / 卡越办越多， |
 | 2.0–4.5 | They fan out like a hand, Chase on the left, Capital One on the right; Amex Gold, on top in the middle, lifts: "4× on groceries" (twice what the next card pays). The others fall out of focus. | Which one pays you most? / 这一笔，刷哪张最划算？ |
 | 4.5–5.5 | That card flies to the menu bar and becomes its icon. | — |
 | 5.5–11 | The pointer clicks the icon; the panel opens; "86 groceries at whole foods" is typed and ranked; Amex Gold comes first and is logged, +$3.44. | Type what you bought. / It picks the card that pays the most. · 写下买了什么，/ 自动选出回报最高的卡。 |

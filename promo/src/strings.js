@@ -1,7 +1,7 @@
 /* strings.js — every word on screen. [[...]] marks the accent colour. */
 window.STR = {
   en: {
-    a: "Five cards in your wallet.",
+    a: "A wallet full of cards.",
     b: "Which one [[pays you most]]?",
     chip: "4× on groceries",
     c: "Type what you bought.",
@@ -20,7 +20,7 @@ window.STR = {
     plus: "+$3.44",
   },
   zh: {
-    a: "钱包里有五张卡。",
+    a: "卡越办越多，",
     b: "这一笔，刷[[哪张最划算]]？",
     chip: "超市 4 倍",
     c: "写下买了什么，",
