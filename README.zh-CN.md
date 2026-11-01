@@ -12,9 +12,9 @@
 
 <br><br>
 
-<a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.zh.mp4"><img src="docs/promo/preview.zh.webp" width="100%" alt="30 秒看懂 Oh My Cards：五张卡，这一笔刷哪张；在菜单栏写一句话自动选卡；智能推荐、钱包里的还款日和年费；数据只留在自己的设备上"></a>
+<a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.zh.mp4"><picture><source type="image/avif" srcset="docs/promo/preview.zh.avif"><img src="docs/promo/preview.zh.webp" width="100%" alt="30 秒看懂 Oh My Cards：五张卡，这一笔刷哪张；在菜单栏写一句话自动选卡；智能推荐、钱包里的还款日和年费；数据只留在自己的设备上"></picture></a>
 
-<sub><a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.zh.mp4"><b>▶ 有声版 (0:32)</b></a> · <a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.en.mp4"><b>English</b></a></sub>
+<sub><a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.zh.mp4"><b>▶ 有声版 (0:32)</b></a> · <a href="https://github.com/ChenFangfc/Oh_My_Cards/releases/download/v1.2.0/Oh-My-Cards-film-4K.zh.mp4"><b>4K</b></a> · <a href="https://chenfangfc.github.io/Oh_My_Cards/video/oh-my-cards.en.mp4"><b>English</b></a></sub>
 
 </div>
 

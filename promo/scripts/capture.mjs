@@ -25,16 +25,21 @@ const SCRIPT = {
   zh: { quick: "在 Nopa 吃晚饭 45", suggest: "直接在 United 官网订去东京的机票", quarter: "本季度" },
 };
 
+// The box (CSS px) and corner radius of an element, so a ring drawn around
+// it can follow its corners.
 const boxOf = async (locator) => {
-  const b = await locator.first().boundingBox();
+  const el = locator.first();
+  const b = await el.boundingBox();
   if (!b) throw new Error(`no box for ${locator}`);
-  return { x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height) };
+  const r = await el.evaluate((node) => parseFloat(getComputedStyle(node).borderTopLeftRadius) || 0);
+  return { x: Math.round(b.x), y: Math.round(b.y), w: Math.round(b.width), h: Math.round(b.height), r };
 };
 
 async function context(browser, lang, viewport) {
   const ctx = await browser.newContext({
     viewport,
-    deviceScaleFactor: 2,
+    // 3x, so the film can zoom in 1.5x and still render at 4K without upscaling.
+    deviceScaleFactor: 3,
     colorScheme: "light",
     locale: lang === "zh" ? "zh-CN" : "en-US",
     reducedMotion: "reduce",
@@ -99,15 +104,18 @@ async function capture(browser, lang) {
     });
     await page.waitForTimeout(300);
     const full = await boxOf(page.locator("main"));
+    // The camera never scrolls past ~1,600 px; a full 5,000 px library at 3x
+    // would only cost memory in every render worker.
+    const height = Math.min(full.h, 2400);
     await page.screenshot({
       path: path.join(out, `${name}-main.png`),
       fullPage: true,
-      clip: { x: full.x, y: full.y, width: full.w, height: full.h },
+      clip: { x: full.x, y: full.y, width: full.w, height },
     });
-    const box = { main, height: full.h };
+    const box = { main, height };
     for (const [key, locator] of Object.entries(marks)) {
       const b = await boxOf(locator);
-      box[key] = { x: b.x - full.x, y: b.y - full.y, w: b.w, h: b.h };
+      box[key] = { x: b.x - full.x, y: b.y - full.y, w: b.w, h: b.h, r: b.r };
     }
     return box;
   };

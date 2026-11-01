@@ -15,7 +15,9 @@ window.STR = {
     k: "No account. No bank login.",
     l: "Your data [[stays on your device]].",
     name: "Oh My Cards",
-    sub: "Free · macOS & web · English / 中文",
+    sub: "Free · macOS & web · English & Chinese",
+    // The rule printed on each card in the opening, left to right.
+    rules: ["5× flights", "3× dining", "5× top category", "1.5% everything", "3% gas"],
     url: "github.com/ChenFangfc/Oh_My_Cards",
     plus: "+$2.25",
   },
@@ -35,6 +37,7 @@ window.STR = {
     l: "数据[[只留在你自己的设备上]]。",
     name: "Oh My Cards",
     sub: "免费 · macOS 与网页版 · 中文 / English",
+    rules: ["机票 5 倍", "餐饮 3 倍", "最高消费类别 5 倍", "所有消费 1.5%", "加油 3%"],
     url: "github.com/ChenFangfc/Oh_My_Cards",
     plus: "+$2.25",
   },

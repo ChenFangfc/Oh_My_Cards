@@ -96,14 +96,14 @@
 
   /* ── assets ────────────────────────────────────────────────────────── */
   const REPO = "../../";
-  const ART = REPO + "artifacts/card-organizer/public/card-images/";
-  // Left to right once fanned; the middle one is the answer.
+  // The opening's cards, left to right once fanned; the middle one is the
+  // answer. Drawn as vectors so they stay sharp at 4K.
   const CARDS = [
-    "09-american-express-platinum.png",
-    "01-chase-sapphire-preferred.png",
-    "07-citi-custom-cash.webp",
-    "03-chase-freedom-unlimited.png",
-    "23-bank-of-america-customized-cash-rewards.png",
+    { bg: "linear-gradient(135deg,#eef0f3 0%,#c9ced6 32%,#f6f7f8 52%,#aab1bc 100%)", light: true, num: "4821" },
+    { bg: "radial-gradient(130% 120% at 15% 10%,#3a6fc4 0%,#16387a 45%,#0a1838 100%)", num: "0937" },
+    { bg: "linear-gradient(135deg,#22c3d4 0%,#0f93c4 45%,#0a5ea6 100%)", num: "2290" },
+    { bg: "linear-gradient(135deg,#7a67dc 0%,#4f41b8 50%,#2c2774 100%)", num: "6614" },
+    { bg: "linear-gradient(135deg,#ef5a5f 0%,#c7303a 55%,#8a1b27 100%)", num: "3058" },
   ];
   const CAP = `captures/${LANG}/`;
 
@@ -155,10 +155,15 @@
   const desktop = h("div", "full", stage); desktop.id = "desktop";
 
   // Scene 1: the cards.
-  const cards = CARDS.map((file, i) => {
-    const c = h("div", "card abs");
+  const cards = CARDS.map((spec, i) => {
+    const c = h("div", "card vcard abs" + (spec.light ? " light" : ""));
     c.style.zIndex = [1, 2, 10, 4, 5][i];
-    img(ART + file, null, c);
+    c.style.background = spec.bg;
+    c.innerHTML = `<div class="sheen"></div>
+      <svg class="chip" viewBox="0 0 72 54"><defs><linearGradient id="chip${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4df92"/><stop offset=".5" stop-color="#d6ae57"/><stop offset="1" stop-color="#a87e2f"/></linearGradient></defs><rect x="1" y="1" width="70" height="52" rx="10" fill="url(#chip${i})" stroke="rgba(0,0,0,.22)"/><path d="M24 1v52M48 1v52M1 18h23M48 18h23M1 36h23M48 36h23M24 27h24" stroke="rgba(90,62,12,.42)" stroke-width="2" fill="none"/></svg>
+      <svg class="nfc" viewBox="0 0 28 38"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M4 13a9 9 0 0 1 0 12"/><path d="M11 8a16 16 0 0 1 0 22"/><path d="M18 3a23 23 0 0 1 0 32"/></g></svg>
+      <div class="num">•••• ${spec.num}</div>
+      <div class="rule">${S.rules[i]}</div>`;
     return c;
   });
   const chip = h("div", "chip abs", stage, S.chip);
@@ -170,7 +175,8 @@
   const tray = h("div", "item", menubar);
   tray.id = "tray";
   const trayHi = h("div", null, tray); trayHi.id = "trayHi";
-  img(REPO + "artifacts/card-organizer/src-tauri/icons/tray-template.png", null, tray);
+  // The app's menu bar glyph (icons/tray-template.png), redrawn as a vector.
+  h("span", "glyph", tray, `<svg viewBox="0 0 22 16"><rect x="1.2" y="1.2" width="19.6" height="13.6" rx="2.6" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="1.2" y="4.6" width="19.6" height="2.6" fill="currentColor"/><rect x="4" y="9.8" width="5.2" height="1.8" rx=".9" fill="currentColor"/></svg>`);
   h("span", "count", tray, "1");
   h("div", "item", menubar, `<svg width="22" height="16" viewBox="0 0 22 16"><path d="M11 15.2 7.6 11.7a4.8 4.8 0 0 1 6.8 0z" fill="currentColor"/><path d="M4.4 8.5a9.3 9.3 0 0 1 13.2 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M1.2 5.2a13.8 13.8 0 0 1 19.6 0" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/></svg>`);
   h("div", "item", menubar, `<svg width="30" height="15" viewBox="0 0 30 15"><rect x="0.8" y="0.8" width="25" height="13.4" rx="3.6" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.4"/><rect x="2.9" y="2.9" width="17.5" height="9.2" rx="2" fill="currentColor"/><rect x="27.3" y="5" width="1.9" height="5" rx="1" fill="currentColor" fill-opacity=".45"/></svg>`);
@@ -275,8 +281,7 @@
       const im = img(CAP + key + "-main.png", null, strip);
       im.style.width = box.main.w + "px";
       im.style.height = box.height + "px";
-      const ring = h("div", "ring abs", page);
-      pages[key] = { page, strip: im, ring, box };
+      pages[key] = { page, strip: im, box, rings: {} };
     }
     for (let i = 0; i < B.panel.frames; i++) {
       panelFrames.push(img(`${CAP}panel-${String(i).padStart(2, "0")}.png`, null, panel));
@@ -305,16 +310,28 @@
     pg.strip.style.top = f2(-cam.s) + "px";
   }
   /** A box from the page's <main> strip, in viewport CSS px at scroll s. */
-  const inMain = (pg, b, s) => ({ x: pg.box.main.x + b.x, y: b.y - s, w: b.w, h: b.h });
+  const inMain = (pg, b, s) => ({ x: pg.box.main.x + b.x, y: b.y - s, w: b.w, h: b.h, r: b.r });
   const centre = (b) => ({ fx: b.x + b.w / 2, fy: b.y + b.h / 2 });
-  function ringAt(el, b, o, s = 1, pad = 8) {
+  function ringAt(el, b, o, s = 1, pad = 8, radius = null) {
     el.style.left = f2(b.x - pad) + "px";
     el.style.top = f2(b.y - pad) + "px";
     el.style.width = f2(b.w + pad * 2) + "px";
     el.style.height = f2(b.h + pad * 2) + "px";
+    // Concentric with the element's own corners.
+    el.style.borderRadius = f2(radius ?? Math.max(6, (b.r || 0) + pad)) + "px";
     put(el, { s, o });
   }
-  const mixBox = (a, b, p) => ({ x: lerp(a.x, b.x, p), y: lerp(a.y, b.y, p), w: lerp(a.w, b.w, p), h: lerp(a.h, b.h, p) });
+  /**
+   * A ring that settles on one element and leaves again — never sliding to the
+   * next, which would cross whatever lies between. `pad` < 0 draws it inside
+   * an element that runs edge to edge in its card.
+   */
+  function ringOn(pg, key, box, t, a, b, pad = 8, radius = null) {
+    const el = pg.rings[key] || (pg.rings[key] = h("div", "ring abs", pg.page));
+    const o = seg(t, a, a + 0.16) * (1 - seg(t, b - 0.16, b));
+    if (o <= 0) { hide(el); return; }
+    ringAt(el, box, o, 1 + 0.045 * (1 - ease.outBack(seg(t, a, a + 0.35))), pad, radius);
+  }
   const union = (a, b) => {
     const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
     return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
@@ -358,11 +375,17 @@
         o = rise * (1 - seg(t, 5.3, 5.48));
         put(card, { ...cardPos(cx, cy), r: r * (1 - fly), s, o });
         card.style.borderRadius = f2(24 + fly * 120) + "px";
+        card.style.filter = "";
         return;
       }
       dy += 22 * pick;
       s = 1 - 0.04 * pick;
-      o = rise * (1 - 0.5 * pick);
+      o = rise;
+      // Out of focus rather than see-through: fading them would let the
+      // cards beneath show through each other.
+      card.style.filter = pick > 0.005
+        ? `blur(${f2(2.4 * pick)}px) saturate(${f2(1 - 0.45 * pick)}) brightness(${f2(1 + 0.1 * pick)})`
+        : "";
       // Gather behind the chosen card and fade.
       dx = lerp(dx, 0, gather);
       dy = lerp(dy, -40, gather);
@@ -383,7 +406,7 @@
     {
       const o = seg(t, 5.05, 5.55) * (1 - seg(t, 11.0, 11.5));
       put(menubar, { y: (1 - ease.outCubic(seg(t, 5.05, 5.55))) * -44, o });
-      const trayIcon = tray.querySelector("img");
+      const trayIcon = tray.querySelector(".glyph");
       trayIcon.style.opacity = f2(0.85 * seg(t, 5.32, 5.5));
       trayHi.style.opacity = f2(seg(t, 6.48, 6.55) * (1 - seg(t, 10.9, 11.1)));
     }
@@ -401,7 +424,8 @@
 
     {
       const o = span(t, 8.75, 10.05, 0.18) * (1 - seg(t, 9.95, 10.05));
-      if (o > 0) ringAt(pring, panelBox(boxes.panel.best), o, 1 + 0.06 * (1 - ease.outBack(seg(t, 8.75, 9.1))), 7);
+      const best = boxes.panel.best;
+      if (o > 0) ringAt(pring, panelBox(best), o, 1 + 0.06 * (1 - ease.outBack(seg(t, 8.75, 9.1))), 7, ((best.r || 10) + 5) * PS);
       else hide(pring);
     }
     {
@@ -466,13 +490,8 @@
       ], t);
       camera(sug, camS);
       fade(sug.page, 1 - seg(t, 16.0, 16.3));
-      {
-        const p = ease.inOutCubic(seg(t, 14.0, 14.75));
-        const b = mixBox(inMain(sug, sb.best, camS.s), inMain(sug, sb.better, camS.s), p);
-        const o = span(t, 13.2, 15.75, 0.2);
-        if (o > 0) ringAt(sug.ring, b, o, 1 + 0.05 * (1 - ease.outBack(seg(t, 13.2, 13.55))));
-        else hide(sug.ring);
-      }
+      ringOn(sug, "best", inMain(sug, sb.best, camS.s), t, 13.42, 14.02);
+      ringOn(sug, "better", inMain(sug, sb.better, camS.s), t, 14.78, 15.85);
 
       // Wallet.
       const wal = P.wallet, wb = wal.box;
@@ -489,27 +508,18 @@
       ], t);
       camera(wal, camW);
       fade(wal.page, seg(t, 16.0, 16.3) * (1 - seg(t, 20.0, 20.3)));
-      {
-        const a = inMain(wal, wb.comingUp, camW.s);
-        const b = inMain(wal, wb.due, camW.s);
-        const c = inMain(wal, wb.fee, camW.s);
-        let box = a;
-        if (t > 17.55) box = mixBox(a, b, ease.inOutCubic(seg(t, 17.55, 18.3)));
-        if (t > 18.75) box = mixBox(b, c, ease.inOutCubic(seg(t, 18.75, 19.2)));
-        const o = span(t, 16.85, 19.85, 0.2);
-        if (o > 0) ringAt(wal.ring, box, o, 1 + 0.05 * (1 - ease.outBack(seg(t, 16.85, 17.2))));
-        else hide(wal.ring);
-      }
+      ringOn(wal, "comingUp", inMain(wal, wb.comingUp, camW.s), t, 16.95, 17.48);
+      // The due banner runs edge to edge in its card: ring it from inside.
+      ringOn(wal, "due", inMain(wal, wb.due, camW.s), t, 18.27, 18.95, -7, 12);
+      ringOn(wal, "fee", inMain(wal, wb.fee, camW.s), t, 18.98, 19.9, 6);
 
       // Activity, then the library.
       const act = P.activity;
       camera(act, track([[20.0, { z: 1, fx: 720, fy: 450, s: 0 }], [21.8, { z: 1.12, fx: 700, fy: 360, s: 0 }]], t, ease.outCubic));
       fade(act.page, seg(t, 20.0, 20.3) * (1 - seg(t, 21.5, 21.8)));
-      hide(act.ring);
       const lib = P.cards;
       camera(lib, track([[21.5, { z: 1, fx: 720, fy: 450, s: 0 }], [23.3, { z: 1, fx: 720, fy: 450, s: 640 }]], t, ease.inOutCubic));
       fade(lib.page, seg(t, 21.5, 21.8));
-      hide(lib.ring);
     } else hide(win);
 
     showCaption(C.e, t, 12.35, 14.0);

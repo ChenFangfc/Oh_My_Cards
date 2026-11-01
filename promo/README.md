@@ -6,10 +6,14 @@ app running on a demo wallet; the soundtrack is synthesised with numpy; headless
 Chrome and ffmpeg turn both into an MP4. No stock footage, no editing timeline.
 
 ```
-../docs/promo/oh-my-cards.<lang>.mp4   1920×1080, 30 fps, H.264 + AAC (en, zh)
-../docs/promo/preview.<lang>.webp      960×540, 15 fps, silent, for the README
+out/oh-my-cards.<lang>.mp4             3840×2160 master, 30 fps, H.264 + AAC (en, zh; not in git)
+../docs/promo/oh-my-cards.<lang>.mp4   1080p web copy (< 10 MB), played from GitHub Pages
+../docs/promo/preview.<lang>.avif      1080p, 30 fps, silent, the README preview (~3 MB)
+../docs/promo/preview.<lang>.webp      720p fallback for browsers without animated AVIF
 STORYBOARD.md                          the script, scene by scene
 ```
+
+The masters are attached to the v1.2.0 release (`Oh-My-Cards-film-4K.<lang>.mp4`).
 
 ## Preview and edit
 
@@ -35,13 +39,19 @@ moment moves its sound with it.
 ```sh
 npm install                      # playwright-core
 # in another terminal, the app:  PORT=19957 BASE_PATH=/ pnpm --dir ../artifacts/card-organizer dev
-./build.sh                       # both languages, about a minute each
+./build.sh                       # both languages, a few minutes each
 ```
 
-`node scripts/render.mjs --lang en --stills 3,9.4` writes single frames to
-`out/stills/` for checking by eye.
+`node scripts/render.mjs --lang en --stills 3,9.4` writes single 4K frames to
+`out/stills/` for checking by eye (`--dsf 1` for 1080p, faster).
+
+The app is captured at 3× so the film can zoom in 1.5× and still render 4K
+without upscaling. The opening's cards are drawn as vectors: the issuers' own
+art is only 250–480 px wide.
 
 Requirements: Node 18+, Google Chrome (`CHROME=` to point elsewhere), ffmpeg
 with libx264, `img2webp` (libwebp), Python 3 with numpy and scipy.
 
-The cards in the opening are the issuers' card art the app already ships.
+Rings are drawn concentric with the element they mark (corner radius measured
+at capture), and fade off one element before appearing on the next: a ring
+that slid between targets crossed whatever lay in between.
