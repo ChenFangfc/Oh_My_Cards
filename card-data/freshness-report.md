@@ -1,21 +1,434 @@
 # Card data freshness report
 
-Generated 2026-11-01T04:31:50.837Z · ruleset `2026.11.01.13`
+Generated 2026-11-02T16:43:18.744Z · ruleset `2026.11.01.13`
 
 | Metric | Value |
 | --- | --- |
 | Cards in catalog | 189 |
-| Source pages crawled | 0 |
-| Pages reachable (HTTP 200) | 0 |
-| Findings | 50 (0 high / 22 medium / 28 low) |
-| Median review age | 1 days |
+| Source pages crawled | 189 |
+| Pages reachable (HTTP 200) | 176 |
+| Findings | 160 (8 high / 116 medium / 36 low) |
+| Median review age | 2 days |
 | Oldest review date | 2026-05-17 |
 
-> No high-severity findings.
+> **8 high-severity findings need a human decision before the next release.**
 
 Extracted values are *signals, not truth*. Issuer pages list other cards'
 fees in comparison tables and vary offers by region, so every proposed
 change must be confirmed against the issuer page before editing `catalog.ts`.
+
+### Product may be discontinued (1)
+
+- **#122 Hawaiian Airlines Business Mastercard** (Barclays / Hawaiian Airlines) — 🔴 High
+  - Page contains "no longer accepting applications" style language. Confirm and mark the card closed.
+  - https://frequentmiler.com/hawaiian-airlines-cards-issued-by-barclays-still-available-for-now/
+
+### Annual fee disagrees with issuer page (10)
+
+- **#8 American Express Gold Card** (American Express) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `325` · page: `0`
+  - https://www.americanexpress.com/us/credit-cards/card/gold-card/
+- **#112 U.S. Bank Shopper Cash Rewards Visa Signature** (U.S. Bank) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `95` · page: `0`
+  - https://www.usbank.com/credit-cards.html
+- **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `49` · page: `95`
+  - https://www.navyfederal.org/about/press-releases/2026-press-releases/Flagship-Premier-Launch.html
+- **#145 TD Clear Visa Platinum** (TD Bank) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `120` · page: `0`
+  - https://www.td.com/us/en/personal-banking/credit-cards/prequal-option-1/clear
+- **#151 American Express Business Green Rewards** (American Express) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `95` · page: `0`
+  - https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-green-card-amex/
+- **#180 HSBC Revolution Credit Card** (HSBC Singapore) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `0` · page: `2.5`
+  - https://www.hsbc.com.sg/credit-cards/products/revolution/
+- **#182 Standard Chartered Smart Credit Card** (Standard Chartered Singapore) — 🔴 High
+  - The page states a single annual fee and it does not match the catalog.
+  - catalog: `99.19` · page: `91`
+  - https://www.sc.com/sg/credit-cards/smart-credit-card/
+- **#62 Citi / AAdvantage Executive World Legend Mastercard** (Citi / American Airlines) — 🟡 Medium
+  - Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.
+  - catalog: `695` · page: `0, 175`
+  - https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card
+- **#115 U.S. Bank Business Leverage Visa Signature** (U.S. Bank) — 🟡 Medium
+  - Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.
+  - catalog: `95` · page: `0, 295`
+  - https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html
+- **#133 Wells Fargo One Key+ Card** (Wells Fargo) — 🟡 Medium
+  - Several fee figures on the page, none matching the catalog. Likely a comparison rail — confirm manually.
+  - catalog: `99` · page: `0, 95`
+  - https://creditcards.wellsfargo.com/
+
+### Source page unreachable (5)
+
+- **#26 PNC Cash Unlimited** (PNC Bank) — 🟡 Medium
+  - Request failed after retries: AbortError: This operation was aborted
+  - https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-unlimited-visa-credit-card.html
+- **#74 PNC Cash Rewards Visa** (PNC Bank) — 🟡 Medium
+  - Request failed after retries: AbortError: This operation was aborted
+  - https://www.pnc.com/en/personal-banking/banking/credit-cards/pnc-cash-rewards-visa-credit-card.html
+- **#82 BMO eclipse Visa Infinite** (BMO) — 🟡 Medium
+  - Request failed after retries: AbortError: This operation was aborted
+  - https://www.bmo.com/main/personal/credit-cards/bmo-eclipse-visa-infinite/
+- **#88 American Express Classic Green Card** (American Express) — 🟡 Medium
+  - Request failed after retries: TypeError: fetch failed
+  - https://www.americanexpress.com/en-us/company/legal/cardmember-agreements/
+- **#149 Bread Cashback American Express** (Bread Financial / Comenity Capital Bank) — 🟡 Medium
+  - Request failed after retries: TypeError: fetch failed
+  - https://www.americanexpress.com/en-us/network/breadfinancial/credit-cards/bread-cashback-card.html
+
+### Source page moved (4)
+
+- **#62 Citi / AAdvantage Executive World Legend Mastercard** (Citi / American Airlines) — 🟡 Medium
+  - sourceUrl redirects to https://www.citi.com/credit-cards/citi-aadvantage-executive-world-legend-mastercard. Update sourceUrl, and check whether the product changed.
+  - https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card
+- **#71 Discover it Secured Cash Back** (Capital One / Discover) — 🟡 Medium
+  - sourceUrl redirects to https://www.discover.com/credit-cards/secured-credit-card/. Update sourceUrl, and check whether the product changed.
+  - https://www.discover.com/credit-cards/secured/
+- **#115 U.S. Bank Business Leverage Visa Signature** (U.S. Bank) — 🟡 Medium
+  - sourceUrl redirects to https://www.usbank.com/business-banking/business-credit-cards.html. Update sourceUrl, and check whether the product changed.
+  - https://www.usbank.com/business-banking/business-credit-cards/business-leverage-rewards-credit-card.html
+- **#169 BECU Cash Back Visa** (BECU) — 🟡 Medium
+  - sourceUrl redirects to https://www.becu.org/everyday-banking/credit-card/cash-back-credit-card. Update sourceUrl, and check whether the product changed.
+  - https://www.becu.org/everyday-banking/credit-card/cash-back-visa
+
+### Issuer page changed since last crawl (82)
+
+- **#3 Chase Freedom Unlimited** (Chase) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (26 -> 18), cash back (45 -> 42), bonus (12 -> 10)
+  - https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited
+- **#7 Citi Custom Cash** (Citi) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (1 -> 0), cash back (2 -> 0), no longer (1 -> 0)
+  - https://www.citi.com/credit-cards/citi-custom-cash-credit-card
+- **#9 American Express Platinum** (American Express) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (45 -> 43)
+  - https://www.americanexpress.com/us/credit-cards/card/platinum/
+- **#10 Amex Blue Cash Preferred** (American Express) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (10 -> 6), statement credit (4 -> 8), cash back (31 -> 34)
+  - https://www.americanexpress.com/us/credit-cards/card/blue-cash-preferred/
+- **#11 Amex Blue Cash Everyday** (American Express) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (7 -> 5), statement credit (4 -> 7), cash back (31 -> 32)
+  - https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/
+- **#12 Capital One Venture X** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (2 -> 1), miles (16 -> 14), lounge (22 -> 15), global entry (1 -> 0), priority pass (5 -> 4)
+  - https://www.capitalone.com/credit-cards/venture-x/
+- **#13 Capital One Venture Rewards** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (2 -> 1), statement credit (9 -> 4), miles (30 -> 22), cash back (3 -> 1), bonus (9 -> 4), global entry (4 -> 2), tsa precheck (4 -> 2), authorized user (3 -> 2)
+  - https://www.capitalone.com/credit-cards/venture/
+- **#14 Capital One Savor Rewards** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (1 -> 2), points (0 -> 1), cash back (21 -> 18), bonus (8 -> 3), authorized user (0 -> 2)
+  - https://www.capitalone.com/credit-cards/savor/
+- **#15 Capital One SavorOne** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 1), statement credit (1 -> 2), points (0 -> 1), cash back (26 -> 18), foreign transaction (0 -> 2), authorized user (0 -> 2)
+  - https://www.capitalone.com/credit-cards/savorone/
+- **#16 Capital One Quicksilver** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (0 -> 2), statement credit (2 -> 1), points (0 -> 1), cash back (12 -> 19), bonus (4 -> 2), no longer (1 -> 0), authorized user (0 -> 2)
+  - https://www.capitalone.com/credit-cards/quicksilver/
+- **#17 Discover it Cash Back** (Capital One / Discover) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (1 -> 3), cash back (25 -> 26), bonus (0 -> 7)
+  - https://www.discover.com/credit-cards/cash-back/it-card/
+- **#19 Wells Fargo Active Cash** (Wells Fargo) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: cash back (11 -> 14), bonus (8 -> 9)
+  - https://creditcards.wellsfargo.com/active-cash-credit-card/
+- **#24 US Bank Cash+** (US Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (4 -> 8), cash back (55 -> 62), bonus (8 -> 12)
+  - https://www.usbank.com/credit-cards/cash-plus-visa-signature-credit-card.html
+- **#25 US Bank Altitude Connect** (US Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 5), statement credit (2 -> 3), points (39 -> 40), bonus (11 -> 12), lounge (3 -> 9), tsa precheck (3 -> 4), foreign transaction (2 -> 6)
+  - https://www.usbank.com/credit-cards/altitude-connect-visa-signature-credit-card.html
+- **#28 United Quest Card** (Chase / United Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (15 -> 12), statement credit (0 -> 40), points (4 -> 11), miles (13 -> 96), cash back (6 -> 5), bonus (12 -> 33), no longer (0 -> 1), global entry (0 -> 6), tsa precheck (0 -> 7), foreign transaction (4 -> 8), authorized user (0 -> 20)
+  - https://creditcards.chase.com/travel-credit-cards/united/united-quest
+- **#29 Southwest Rapid Rewards Plus** (Chase / Southwest Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (11 -> 8), statement credit (0 -> 2), points (19 -> 58), cash back (6 -> 5), bonus (6 -> 17), no longer (0 -> 1), foreign transaction (4 -> 6), authorized user (0 -> 7)
+  - https://creditcards.chase.com/travel-credit-cards/southwest/plus
+- **#30 Southwest Rapid Rewards Priority** (Chase / Southwest Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (11 -> 8), statement credit (0 -> 2), points (19 -> 65), cash back (6 -> 5), bonus (6 -> 17), no longer (0 -> 1), foreign transaction (4 -> 9), authorized user (0 -> 8)
+  - https://creditcards.chase.com/travel-credit-cards/southwest/priority
+- **#31 Delta SkyMiles Gold American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (8 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-gold-american-express-card/
+- **#32 Delta SkyMiles Platinum American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-platinum-american-express-card/
+- **#33 Delta SkyMiles Reserve American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (7 -> 5)
+  - https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/
+- **#37 World of Hyatt Credit Card** (Chase / Hyatt) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (7 -> 56), miles (0 -> 2), cash back (6 -> 3), bonus (6 -> 54), no longer (0 -> 1), authorized user (0 -> 13)
+  - https://creditcards.chase.com/travel-credit-cards/world-of-hyatt-credit-card
+- **#39 Marriott Bonvoy Brilliant American Express** (American Express / Marriott Bonvoy) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-brilliant/
+- **#40 Hilton Honors American Express Surpass** (American Express / Hilton) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (5 -> 1)
+  - https://www.americanexpress.com/us/credit-cards/card/hilton-honors-surpass/
+- **#41 Hilton Honors American Express Aspire** (American Express / Hilton) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/card/hilton-honors-aspire/
+- **#42 Wyndham Rewards Earner+ Card** (Barclays / Wyndham Rewards) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 7), statement credit (0 -> 38), points (50 -> 102), bonus (12 -> 45), no longer (0 -> 1), global entry (0 -> 11), tsa precheck (0 -> 11), foreign transaction (3 -> 2), authorized user (0 -> 5)
+  - https://www.wyndhamrewardscreditcard.com/earner-plus/
+- **#43 Apple Card** (Goldman Sachs / Apple) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: cash back (16 -> 14)
+  - https://www.apple.com/apple-card/
+- **#45 Bilt Mastercard** (Wells Fargo / Bilt) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 3), statement credit (0 -> 3), points (17 -> 43), bonus (3 -> 10), lounge (0 -> 1), foreign transaction (3 -> 4), authorized user (1 -> 2), priority pass (1 -> 3)
+  - https://www.bilt.com/card
+- **#48 Chase Ink Business Cash** (Chase) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (10 -> 8), statement credit (1 -> 0), points (16 -> 14), cash back (42 -> 37), foreign transaction (5 -> 3)
+  - https://creditcards.chase.com/business-credit-cards/ink/cash
+- **#50 Prime Visa** (Chase / Amazon) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 8), points (19 -> 20), cash back (3 -> 6), foreign transaction (4 -> 7)
+  - https://creditcards.chase.com/cash-back-credit-cards/amazon-prime-rewards
+- **#51 United Gateway Card** (Chase / United Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (15 -> 12), statement credit (0 -> 4), points (4 -> 0), miles (13 -> 64), cash back (6 -> 3), bonus (12 -> 23), no longer (0 -> 1), authorized user (0 -> 15)
+  - https://creditcards.chase.com/travel-credit-cards/united/united-gateway
+- **#52 United Club Card** (Chase / United Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (15 -> 12), statement credit (0 -> 40), points (4 -> 9), miles (13 -> 95), cash back (6 -> 5), bonus (12 -> 33), no longer (0 -> 1), lounge (0 -> 6), global entry (0 -> 6), tsa precheck (0 -> 7), foreign transaction (4 -> 8), authorized user (0 -> 33)
+  - https://creditcards.chase.com/travel-credit-cards/united/club-infinite
+- **#53 Southwest Rapid Rewards Premier** (Chase / Southwest Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (11 -> 8), statement credit (0 -> 2), points (19 -> 64), cash back (6 -> 5), bonus (6 -> 17), no longer (0 -> 1), foreign transaction (4 -> 9), authorized user (0 -> 7)
+  - https://creditcards.chase.com/travel-credit-cards/southwest/premier
+- **#55 IHG One Rewards Credit Card** (Chase / IHG) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (17 -> 74), miles (0 -> 2), cash back (6 -> 5), bonus (8 -> 25), no longer (0 -> 1), foreign transaction (4 -> 8), authorized user (0 -> 16)
+  - https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/one-rewards
+- **#56 American Express Business Gold** (American Express) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 9), statement credit (0 -> 11), points (12 -> 31), miles (0 -> 1), welcome offer (0 -> 2), lounge (3 -> 6), foreign transaction (0 -> 6)
+  - https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-gold-card-amex/
+- **#57 American Express Business Platinum** (American Express) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 8), statement credit (0 -> 34), points (12 -> 53), miles (0 -> 1), bonus (0 -> 8), welcome offer (0 -> 2), lounge (3 -> 27), global entry (0 -> 3), tsa precheck (0 -> 3), foreign transaction (0 -> 5), priority pass (0 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/american-express-business-platinum-credit-card-amex/
+- **#58 Marriott Bonvoy Bevy American Express** (American Express / Marriott) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 4)
+  - https://www.americanexpress.com/us/credit-cards/card/marriott-bonvoy-bevy/
+- **#59 Hilton Honors American Express** (American Express / Hilton) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (7 -> 3)
+  - https://www.americanexpress.com/us/credit-cards/card/hilton-honors/
+- **#62 Citi / AAdvantage Executive World Legend Mastercard** (Citi / American Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (6 -> 7), points (10 -> 11), miles (20 -> 18)
+  - https://www.citi.com/credit-cards/citi-aadvantage-executive-credit-card
+- **#65 AAdvantage Aviator Red World Elite** (Barclays / American Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (4 -> 1), miles (0 -> 2), bonus (4 -> 3)
+  - https://cards.barclaycardus.com/
+- **#66 Aeroplan Card** (Chase / Air Canada) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (10 -> 8), statement credit (25 -> 23), points (66 -> 60), miles (2 -> 1), cash back (5 -> 3), bonus (13 -> 12), global entry (5 -> 4), tsa precheck (6 -> 5), foreign transaction (7 -> 3)
+  - https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan
+- **#67 US Bank Altitude Reserve** (US Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (15 -> 0), statement credit (4 -> 7), points (68 -> 122), cash back (40 -> 2), bonus (46 -> 34), no longer (0 -> 1), authorized user (1 -> 0)
+  - https://rewards.usbank.com/benefits/card/AltitudeReserveBenefits/faqs
+- **#68 US Bank Altitude Go** (US Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (5 -> 8), points (32 -> 38), bonus (10 -> 11)
+  - https://www.usbank.com/credit-cards/altitude-go-visa-signature-credit-card.html
+- **#73 Choice Privileges Select Mastercard** (Wells Fargo / Choice Hotels) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 2), statement credit (0 -> 9), points (73 -> 50), miles (0 -> 5), global entry (0 -> 3), tsa precheck (0 -> 3), authorized user (5 -> 0)
+  - https://creditcards.wellsfargo.com/choice-hotels-privileges-select-mastercard/
+- **#77 Capital One Walmart Rewards (legacy)** (Capital One / Walmart) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (0 -> 2), statement credit (2 -> 1), points (0 -> 1), cash back (12 -> 19), bonus (4 -> 2), no longer (1 -> 0), authorized user (0 -> 2)
+  - https://www.capitalone.com/credit-cards/quicksilver/
+- **#81 Scotiabank Passport Visa Infinite +** (Scotiabank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (98 -> 101), bonus (46 -> 48)
+  - https://www.scotiabank.com/ca/en/personal/credit-cards/visa/passport-infinite-card.html
+- **#83 CIBC Aventura Visa Infinite** (CIBC) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 2), cash back (2 -> 3), bonus (0 -> 1)
+  - https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html
+- **#85 Rogers Red World Elite Mastercard** (Rogers Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (2 -> 0), cash back (2 -> 16), bonus (0 -> 2), no longer (0 -> 1)
+  - https://www.rogersbank.com/en/help_centre_answers/upcoming_account_changes
+- **#93 Chase Ink Business Premier** (Chase) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (7 -> 9), statement credit (0 -> 1), points (14 -> 16), cash back (39 -> 44), foreign transaction (3 -> 5)
+  - https://creditcards.chase.com/business-credit-cards/ink/premier
+- **#96 Southwest Rapid Rewards Performance Business** (Chase / Southwest Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (8 -> 9), points (66 -> 37), bonus (14 -> 8), authorized user (8 -> 10)
+  - https://creditcards.chase.com/business-credit-cards/southwest/performance-business
+- **#97 Southwest Rapid Rewards Premier Business** (Chase / Southwest Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (8 -> 9), points (56 -> 33), bonus (14 -> 8), authorized user (4 -> 8)
+  - https://creditcards.chase.com/business-credit-cards/southwest/premier-business
+- **#98 Capital One VentureOne Rewards** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: points (1 -> 0), cash back (3 -> 2)
+  - https://www.capitalone.com/credit-cards/ventureone/
+- **#99 Capital One Venture Business** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (29 -> 31), bonus (5 -> 8)
+  - https://www.capitalone.com/small-business/credit-cards/venture-business/
+- **#100 Capital One Venture X Business** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (20 -> 24), bonus (8 -> 11)
+  - https://www.capitalone.com/small-business/credit-cards/venture-x-business/
+- **#109 Wells Fargo Attune** (Wells Fargo) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (66 -> 21), statement credit (5 -> 2), points (140 -> 68), cash back (3 -> 2), bonus (81 -> 44)
+  - https://creditcards.wellsfargo.com/
+- **#110 Choice Privileges Mastercard** (Wells Fargo / Choice Hotels) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 2), points (69 -> 47), miles (0 -> 5), bonus (21 -> 23), authorized user (5 -> 0)
+  - https://creditcards.wellsfargo.com/choice-hotel-privileges-mastercard/
+- **#111 U.S. Bank Smartly Visa Signature** (U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (4 -> 9), statement credit (2 -> 3), cash back (31 -> 49), bonus (25 -> 18), authorized user (2 -> 1)
+  - https://www.usbank.com/credit-cards/bank-smartly-visa-signature-credit-card.html
+- **#112 U.S. Bank Shopper Cash Rewards Visa Signature** (U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (15 -> 21), points (68 -> 65), cash back (40 -> 48), bonus (46 -> 47), welcome offer (0 -> 1)
+  - https://www.usbank.com/credit-cards.html
+- **#113 U.S. Bank Shield Visa** (U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (5 -> 9), cash back (9 -> 8)
+  - https://www.usbank.com/credit-cards/shield-visa-credit-card.html
+- **#114 U.S. Bank Business Triple Cash Rewards** (U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (7 -> 8), cash back (25 -> 33), bonus (3 -> 4)
+  - https://www.usbank.com/business-banking/business-credit-cards/business-triple-cash-back-credit-card.html
+- **#116 Navy Federal cashRewards Plus** (Navy Federal Credit Union) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: cash back (19 -> 20), bonus (3 -> 4)
+  - https://www.navyfederal.org/loans-cards/credit-cards/cash-rewards.html
+- **#118 Navy Federal Visa Signature Flagship Rewards** (Navy Federal Credit Union) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (15 -> 1), points (20 -> 5), cash back (1 -> 0), bonus (6 -> 0), welcome offer (1 -> 0), global entry (9 -> 1), tsa precheck (2 -> 0), foreign transaction (2 -> 0), authorized user (1 -> 0)
+  - https://www.navyfederal.org/about/press-releases/2026-press-releases/Flagship-Premier-Launch.html
+- **#120 Wyndham Rewards Earner Card** (Barclays / Wyndham Rewards) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (0 -> 29), points (27 -> 88), bonus (12 -> 43), no longer (0 -> 1), global entry (0 -> 11), tsa precheck (0 -> 11), foreign transaction (1 -> 2), authorized user (0 -> 4)
+  - https://www.wyndhamrewardscreditcard.com/earner-card/
+- **#121 Wyndham Rewards Earner Business Card** (Barclays / Wyndham Rewards) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: statement credit (16 -> 45), points (80 -> 102), bonus (19 -> 42), no longer (0 -> 1), global entry (0 -> 11), tsa precheck (0 -> 11), authorized user (2 -> 6)
+  - https://www.wyndhamrewardscreditcard.com/earner-business-card/
+- **#122 Hawaiian Airlines Business Mastercard** (Barclays / Hawaiian Airlines) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (0 -> 4), statement credit (0 -> 2), points (4 -> 18), miles (0 -> 19), bonus (4 -> 8), no longer (0 -> 2)
+  - https://frequentmiler.com/hawaiian-airlines-cards-issued-by-barclays-still-available-for-now/
+- **#125 Chase Sapphire Reserve for Business** (Chase) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (11 -> 9), statement credit (80 -> 67), points (67 -> 62), miles (2 -> 0), cash back (5 -> 3), bonus (8 -> 7), lounge (41 -> 30), global entry (6 -> 5), tsa precheck (7 -> 6), foreign transaction (7 -> 3), priority pass (17 -> 13)
+  - https://creditcards.chase.com/business-credit-cards/sapphire/reserve
+- **#134 Capital One Spark Cash Plus** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (1 -> 3), bonus (17 -> 20)
+  - https://www.capitalone.com/small-business/credit-cards/spark-cash-plus/
+- **#135 Capital One Spark 1.5% Cash Select** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (4 -> 5), cash back (16 -> 14)
+  - https://www.capitalone.com/small-business/credit-cards/spark-cash-select/
+- **#137 AAA Daily Advantage Visa Signature** (AAA / Comenity Capital Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: cash back (30 -> 27), bonus (2 -> 0)
+  - https://mwg.aaa.com/credit-card
+- **#138 AAA Travel Advantage Visa Signature** (AAA / Comenity Capital Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: cash back (30 -> 27), bonus (2 -> 0)
+  - https://mwg.aaa.com/credit-card
+- **#147 TD Business Solutions Credit Card** (TD Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (23 -> 9), cash back (26 -> 23), bonus (28 -> 26)
+  - https://www.td.com/us/en/personal-banking/credit-cards/business
+- **#152 Delta SkyMiles Gold Business American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 11), statement credit (0 -> 5), miles (0 -> 41), welcome offer (0 -> 3), lounge (3 -> 6), foreign transaction (0 -> 4)
+  - https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-gold/
+- **#153 Delta SkyMiles Platinum Business American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 11), statement credit (0 -> 14), miles (0 -> 51), welcome offer (0 -> 3), lounge (3 -> 5), global entry (0 -> 3), tsa precheck (0 -> 3), foreign transaction (0 -> 2)
+  - https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-platinum/
+- **#154 Delta SkyMiles Reserve Business American Express** (American Express / Delta) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (6 -> 10), statement credit (0 -> 13), miles (0 -> 60), welcome offer (0 -> 2), lounge (3 -> 28), global entry (0 -> 4), tsa precheck (0 -> 5), foreign transaction (0 -> 1)
+  - https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-reserve/
+- **#155 Capital One VentureOne Business** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (30 -> 32), bonus (5 -> 8)
+  - https://www.capitalone.com/small-business/credit-cards/ventureone-business/
+- **#156 Capital One Spark 2% Cash** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (4 -> 6), cash back (14 -> 13), bonus (10 -> 11), foreign transaction (2 -> 0)
+  - https://www.capitalone.com/small-business/credit-cards/spark-cash/
+- **#163 Prime Business Card** (Amazon / U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 4), statement credit (4 -> 7), points (3 -> 1), cash back (1 -> 8), welcome offer (1 -> 2), foreign transaction (4 -> 1)
+  - https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html
+- **#164 Amazon Business Card** (Amazon / U.S. Bank) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: annual fee (3 -> 4), statement credit (4 -> 7), points (3 -> 1), cash back (1 -> 8), welcome offer (1 -> 2), foreign transaction (4 -> 1)
+  - https://www.usbank.com/business-banking/business-credit-cards/amazon-business-credit-cards.html
+- **#166 Capital One Spark 2X Miles** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (15 -> 18), bonus (20 -> 13)
+  - https://www.capitalone.com/small-business/credit-cards/travel-and-miles/
+- **#167 Capital One Spark 1.5X Miles Select** (Capital One) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (15 -> 18), bonus (20 -> 13)
+  - https://www.capitalone.com/small-business/credit-cards/travel-and-miles/
+- **#172 HSBC Visa Signature Card** (HSBC Hong Kong) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: bonus (0 -> 1), welcome offer (3 -> 4)
+  - https://www.hsbc.com.hk/credit-cards/products/visa-signature/
+- **#173 Standard Chartered Cathay Mastercard** (Standard Chartered Hong Kong / Cathay) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: miles (150 -> 152), bonus (17 -> 18)
+  - https://www.sc.com/hk/credit-cards/cathay/
+- **#182 Standard Chartered Smart Credit Card** (Standard Chartered Singapore) — 🟡 Medium
+  - Page text changed since 2026-10-15 in terms that affect card rules.
+  - changed terms: no longer (1 -> 2), lounge (3 -> 2)
+  - https://www.sc.com/sg/credit-cards/smart-credit-card/
 
 ### Never confirmed against an issuer source (22)
 
@@ -64,61 +477,88 @@ change must be confirmed against the issuer page before editing `catalog.ts`.
 - **#179 OCBC 365 Credit Card** (OCBC Singapore) — 🟡 Medium
   - dataConfidence is "needs-review" — these rules were never confirmed against an issuer source.
 
+### Source page not machine-readable (8)
+
+- **#64 Hawaiian Airlines World Elite Mastercard** (Barclays / Hawaiian Airlines) — ⚪ Low
+  - Source page returns HTTP 504; automated checks cannot cover this card.
+  - https://yourmileagemayvary.com/2026/10/01/hawaiian-airlines-card-atmos-rewards/
+- **#130 Alliant Cashback Visa Signature** (Alliant Credit Union) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://www.alliantcreditunion.org/credit-cards/visa-signature-card
+- **#141 PenFed Power Cash Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://www.penfed.org/credit-cards/power-cash-rewards-visa
+- **#142 PenFed Platinum Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://www.penfed.org/credit-cards/platinum-rewards-visa
+- **#160 Bank of America Business Advantage Customized Cash Rewards** (Bank of America) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://business.bankofamerica.com/en/credit-cards/business-advantage-customized-cash-rewards
+- **#161 Bank of America Business Advantage Unlimited Cash Rewards** (Bank of America) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://business.bankofamerica.com/en/credit-cards/business-advantage-unlimited-cash-rewards
+- **#162 Bank of America Business Advantage Travel Rewards** (Bank of America) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://business.bankofamerica.com/en/credit-cards/business-advantage-travel-rewards
+- **#168 Atmos Rewards Visa Signature Business** (Bank of America / Alaska Airlines) — ⚪ Low
+  - Source page returns HTTP 403; automated checks cannot cover this card.
+  - https://business.bankofamerica.com/en/credit-cards/atmos-rewards
+
 ### Past the review budget (28)
 
 - **#19 Wells Fargo Active Cash** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-17 (168 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (169 days ago); review budget is 90 days.
 - **#59 Hilton Honors American Express** (American Express / Hilton) — ⚪ Low
-  - Last reviewed 2026-05-17 (168 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (169 days ago); review budget is 90 days.
 - **#61 Citi / AAdvantage MileUp** (Citi / American Airlines) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#76 Target Circle Credit Card** (TD Bank / Target) — ⚪ Low
-  - Last reviewed 2026-05-17 (168 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (169 days ago); review budget is 90 days.
 - **#82 BMO eclipse Visa Infinite** (BMO) — ⚪ Low
-  - Last reviewed 2026-05-17 (168 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-17 (169 days ago); review budget is 90 days.
 - **#89 American Express Blue Business Cash** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (164 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (165 days ago); review budget is 90 days.
 - **#90 American Express Blue Business Plus** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-21 (164 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (165 days ago); review budget is 90 days.
 - **#92 Chase Slate Credit Card** (Chase) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#101 Citi Simplicity Card** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#102 Citi Diamond Preferred Card** (Citi) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#117 Navy Federal More Rewards American Express** (Navy Federal Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#127 SoFi Unlimited 2% Credit Card** (SoFi) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#128 SoFi Everyday Cash Rewards Credit Card** (SoFi) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#129 Venmo Visa Signature Credit Card** (Venmo / Synchrony) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#130 Alliant Cashback Visa Signature** (Alliant Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#131 Wells Fargo Signify Business Cash** (Wells Fargo) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#136 Verizon Visa Card** (Verizon / Synchrony) — ⚪ Low
-  - Last reviewed 2026-05-21 (164 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-21 (165 days ago); review budget is 90 days.
 - **#139 FNBO Evergreen Rewards Visa** (FNBO) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#140 FNBO Getaway** (FNBO) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#141 PenFed Power Cash Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#142 PenFed Platinum Rewards Visa Signature** (PenFed Credit Union) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#145 TD Clear Visa Platinum** (TD Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#149 Bread Cashback American Express** (Bread Financial / Comenity Capital Bank) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#151 American Express Business Green Rewards** (American Express) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#157 Capital One Spark 1% Classic** (Capital One) — ⚪ Low
-  - Last reviewed 2026-05-18 (167 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-18 (168 days ago); review budget is 90 days.
 - **#161 Bank of America Business Advantage Unlimited Cash Rewards** (Bank of America) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#169 BECU Cash Back Visa** (BECU) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
 - **#170 BECU Low Rate Visa** (BECU) — ⚪ Low
-  - Last reviewed 2026-05-19 (166 days ago); review budget is 90 days.
+  - Last reviewed 2026-05-19 (167 days ago); review budget is 90 days.
