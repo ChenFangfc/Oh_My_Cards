@@ -1,19 +1,12 @@
 # Card rule change watch
 
-Generated 2026-11-13T14:46:18.882Z · window since 2026-10-31
+Generated 2026-11-14T13:42:54.055Z · window since 2026-10-31
 
-2 feed items mention a catalog card alongside change language.
+1 feed items mention a catalog card alongside change language.
 
-### American Express Graphite Business Cash Unlimited Card ($2,000 Bonus, $295 Annual Fee) 
+### Amex Airline Fee Reimbursements. What still works? Several American Express cards offer annual airline fee reimbursements. These reimbursements can go a long wa
 
-- feed: Doctor of Credit · published Thu, 12 Nov 2026 19:34:09 +0000
-- cards: #150 American Express Graphite Business Cash Unlimited
-- signals: annual fee
-- https://www.doctorofcredit.com/american-express-graphite-business-cash-unlimited-card-1500-bonus-295-annual-fee/
-
-### Is the $795 Chase Sapphire Reserve® Card worth renewing? &#124; Coffee Break Ep129 &#124; 11-11-26 $795 is a lot to pay for a credit card. The Chase Sapphire Re
-
-- feed: Frequent Miler · published Thu, 12 Nov 2026 16:45:30 +0000
-- cards: #2 Chase Sapphire Reserve
-- signals: credit
-- https://frequentmiler.com/is-the-795-chase-sapphire-reserve-card-worth-renewing-coffee-break-ep129-11-11-26/
+- feed: Frequent Miler · published Fri, 13 Nov 2026 14:45:38 +0000
+- cards: #9 American Express Platinum, #57 American Express Business Platinum
+- signals: annual fee, increasing, credit
+- https://frequentmiler.com/amex-airline-fee-reimbursements-still-works/
