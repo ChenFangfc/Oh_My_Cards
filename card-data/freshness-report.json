@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-09T17:00:53.810Z",
+  "generatedAt": "2026-11-16T16:40:02.610Z",
   "rulesetVersion": "2026.11.01.13",
   "cardCount": 189,
   "crawled": 189,
@@ -114,17 +114,20 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 1,
-      "cardName": "Chase Sapphire Preferred",
+      "cardId": 2,
+      "cardName": "Chase Sapphire Reserve",
       "issuer": "Chase",
-      "url": "https://creditcards.chase.com/rewards-credit-cards/sapphire/preferred",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "url": "https://creditcards.chase.com/rewards-credit-cards/sapphire/reserve",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (9 -> 7)",
-        "points (51 -> 46)",
-        "miles (1 -> 0)",
+        "annual fee (10 -> 8)",
+        "statement credit (66 -> 61)",
+        "points (80 -> 68)",
+        "miles (3 -> 0)",
         "cash back (5 -> 3)",
-        "foreign transaction (8 -> 4)"
+        "lounge (33 -> 29)",
+        "foreign transaction (7 -> 3)",
+        "priority pass (14 -> 12)"
       ]
     },
     {
@@ -134,13 +137,13 @@
       "cardName": "Chase Freedom Unlimited",
       "issuer": "Chase",
       "url": "https://creditcards.chase.com/cash-back-credit-cards/freedom/unlimited",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (12 -> 10)",
-        "statement credit (2 -> 0)",
-        "points (18 -> 16)",
-        "cash back (42 -> 32)",
-        "foreign transaction (5 -> 3)"
+        "annual fee (10 -> 12)",
+        "statement credit (0 -> 2)",
+        "points (16 -> 18)",
+        "cash back (32 -> 43)",
+        "foreign transaction (3 -> 5)"
       ]
     },
     {
@@ -154,27 +157,26 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 7,
-      "cardName": "Citi Custom Cash",
-      "issuer": "Citi",
-      "url": "https://www.citi.com/credit-cards/citi-custom-cash-credit-card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "cardId": 9,
+      "cardName": "American Express Platinum",
+      "issuer": "American Express",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/platinum/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (0 -> 1)",
-        "cash back (0 -> 2)",
-        "no longer (0 -> 1)"
+        "statement credit (43 -> 41)"
       ]
     },
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 9,
-      "cardName": "American Express Platinum",
+      "cardId": 11,
+      "cardName": "Amex Blue Cash Everyday",
       "issuer": "American Express",
-      "url": "https://www.americanexpress.com/us/credit-cards/card/platinum/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/blue-cash-everyday/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (44 -> 43)"
+        "statement credit (7 -> 8)",
+        "cash back (32 -> 33)"
       ]
     },
     {
@@ -194,16 +196,25 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 19,
+      "cardName": "Wells Fargo Active Cash",
+      "issuer": "Wells Fargo",
+      "detail": "Last reviewed 2026-05-17 (183 days ago); review budget is 90 days."
+    },
+    {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 20,
-      "cardName": "Wells Fargo Autograph",
+      "cardId": 19,
+      "cardName": "Wells Fargo Active Cash",
       "issuer": "Wells Fargo",
-      "url": "https://creditcards.wellsfargo.com/autograph-visa-credit-card/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "url": "https://creditcards.wellsfargo.com/active-cash-credit-card/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (14 -> 10)",
-        "points (37 -> 44)"
+        "annual fee (5 -> 6)",
+        "cash back (14 -> 12)",
+        "bonus (9 -> 8)"
       ]
     },
     {
@@ -218,21 +229,34 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 28,
-      "cardName": "United Quest Card",
+      "cardId": 27,
+      "cardName": "United Explorer Card",
       "issuer": "Chase / United Airlines",
-      "url": "https://creditcards.chase.com/travel-credit-cards/united/united-quest",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "url": "https://creditcards.chase.com/travel-credit-cards/united/united-explorer",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
         "annual fee (12 -> 10)",
-        "statement credit (40 -> 29)",
-        "points (11 -> 8)",
-        "miles (96 -> 77)",
+        "statement credit (41 -> 32)",
+        "points (2 -> 1)",
+        "miles (88 -> 69)",
         "cash back (5 -> 3)",
-        "bonus (33 -> 30)",
-        "global entry (6 -> 4)",
-        "tsa precheck (7 -> 5)",
+        "global entry (7 -> 5)",
+        "tsa precheck (8 -> 6)",
         "foreign transaction (8 -> 3)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 33,
+      "cardName": "Delta SkyMiles Reserve American Express",
+      "issuer": "American Express / Delta",
+      "url": "https://www.americanexpress.com/us/credit-cards/card/delta-skymiles-reserve-american-express-card/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "miles (49 -> 52)",
+        "lounge (5 -> 14)",
+        "foreign transaction (1 -> 2)"
       ]
     },
     {
@@ -242,10 +266,13 @@
       "cardName": "Marriott Bonvoy Boundless",
       "issuer": "Chase / Marriott Bonvoy",
       "url": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/boundless",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (59 -> 62)",
-        "bonus (14 -> 24)"
+        "annual fee (12 -> 13)",
+        "points (62 -> 66)",
+        "miles (0 -> 1)",
+        "bonus (24 -> 15)",
+        "authorized user (7 -> 8)"
       ]
     },
     {
@@ -255,11 +282,30 @@
       "cardName": "World of Hyatt Credit Card",
       "issuer": "Chase / Hyatt",
       "url": "https://creditcards.chase.com/travel-credit-cards/world-of-hyatt-credit-card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (56 -> 38)",
-        "bonus (54 -> 33)",
-        "authorized user (13 -> 14)"
+        "annual fee (8 -> 10)",
+        "cash back (3 -> 5)",
+        "foreign transaction (4 -> 8)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 38,
+      "cardName": "IHG One Rewards Premier",
+      "issuer": "Chase / IHG",
+      "url": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (11 -> 9)",
+        "statement credit (20 -> 14)",
+        "points (83 -> 78)",
+        "cash back (5 -> 3)",
+        "bonus (25 -> 23)",
+        "global entry (10 -> 6)",
+        "tsa precheck (11 -> 7)",
+        "foreign transaction (8 -> 4)"
       ]
     },
     {
@@ -273,30 +319,17 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 45,
-      "cardName": "Bilt Mastercard",
-      "issuer": "Wells Fargo / Bilt",
-      "url": "https://www.bilt.com/card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
-      "changedTerms": [
-        "points (43 -> 50)",
-        "bonus (10 -> 9)"
-      ]
-    },
-    {
-      "kind": "CONTENT_CHANGED",
-      "severity": "medium",
       "cardId": 47,
       "cardName": "Chase Ink Business Preferred",
       "issuer": "Chase",
       "url": "https://creditcards.chase.com/business-credit-cards/ink/business-preferred",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (8 -> 6)",
-        "statement credit (1 -> 0)",
-        "points (43 -> 31)",
-        "cash back (8 -> 3)",
-        "foreign transaction (9 -> 4)"
+        "annual fee (6 -> 8)",
+        "statement credit (0 -> 1)",
+        "points (31 -> 43)",
+        "cash back (3 -> 8)",
+        "foreign transaction (4 -> 9)"
       ]
     },
     {
@@ -306,68 +339,61 @@
       "cardName": "Chase Ink Business Cash",
       "issuer": "Chase",
       "url": "https://creditcards.chase.com/business-credit-cards/ink/cash",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (8 -> 10)",
-        "statement credit (0 -> 1)",
-        "points (14 -> 16)",
-        "cash back (37 -> 42)",
-        "foreign transaction (3 -> 5)"
+        "annual fee (10 -> 8)",
+        "statement credit (1 -> 0)",
+        "points (16 -> 14)",
+        "cash back (42 -> 37)",
+        "foreign transaction (5 -> 3)"
       ]
     },
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 50,
-      "cardName": "Prime Visa",
-      "issuer": "Chase / Amazon",
-      "url": "https://creditcards.chase.com/cash-back-credit-cards/amazon-prime-rewards",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
-      "changedTerms": [
-        "annual fee (8 -> 6)",
-        "points (20 -> 19)",
-        "cash back (6 -> 3)",
-        "foreign transaction (7 -> 4)"
-      ]
-    },
-    {
-      "kind": "CONTENT_CHANGED",
-      "severity": "medium",
-      "cardId": 52,
-      "cardName": "United Club Card",
+      "cardId": 51,
+      "cardName": "United Gateway Card",
       "issuer": "Chase / United Airlines",
-      "url": "https://creditcards.chase.com/travel-credit-cards/united/club-infinite",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "url": "https://creditcards.chase.com/travel-credit-cards/united/united-gateway",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (12 -> 10)",
-        "statement credit (40 -> 29)",
-        "points (9 -> 4)",
-        "miles (95 -> 75)",
-        "cash back (5 -> 3)",
-        "bonus (33 -> 30)",
-        "lounge (6 -> 5)",
-        "global entry (6 -> 4)",
-        "tsa precheck (7 -> 5)",
-        "foreign transaction (8 -> 3)",
-        "authorized user (33 -> 26)"
+        "annual fee (12 -> 14)",
+        "statement credit (4 -> 6)",
+        "miles (64 -> 85)",
+        "cash back (3 -> 5)",
+        "foreign transaction (4 -> 9)"
       ]
     },
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 54,
-      "cardName": "Marriott Bonvoy Bold",
-      "issuer": "Chase / Marriott",
-      "url": "https://creditcards.chase.com/travel-credit-cards/marriott-bonvoy/bold",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "cardId": 55,
+      "cardName": "IHG One Rewards Credit Card",
+      "issuer": "Chase / IHG",
+      "url": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/one-rewards",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (9 -> 6)",
-        "points (72 -> 65)",
-        "miles (1 -> 0)",
+        "annual fee (10 -> 8)",
+        "points (74 -> 72)",
         "cash back (5 -> 3)",
-        "bonus (22 -> 21)",
         "foreign transaction (8 -> 4)"
       ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 59,
+      "cardName": "Hilton Honors American Express",
+      "issuer": "American Express / Hilton",
+      "detail": "Last reviewed 2026-05-17 (183 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 61,
+      "cardName": "Citi / AAdvantage MileUp",
+      "issuer": "Citi / American Airlines",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_REDIRECTED",
@@ -399,6 +425,21 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 64,
+      "cardName": "Hawaiian Airlines World Elite Mastercard",
+      "issuer": "Barclays / Hawaiian Airlines",
+      "url": "https://yourmileagemayvary.com/2026/10/01/hawaiian-airlines-card-atmos-rewards/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "points (18 -> 17)",
+        "miles (7 -> 6)",
+        "lounge (2 -> 3)",
+        "global entry (0 -> 1)"
+      ]
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 65,
@@ -413,17 +454,12 @@
       "cardName": "Aeroplan Card",
       "issuer": "Chase / Air Canada",
       "url": "https://creditcards.chase.com/travel-credit-cards/aircanada/aeroplan",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (8 -> 10)",
-        "statement credit (23 -> 25)",
-        "points (60 -> 66)",
-        "miles (1 -> 2)",
-        "cash back (3 -> 5)",
-        "bonus (12 -> 13)",
-        "global entry (4 -> 5)",
-        "tsa precheck (5 -> 6)",
-        "foreign transaction (3 -> 7)"
+        "annual fee (10 -> 11)",
+        "points (66 -> 86)",
+        "bonus (13 -> 30)",
+        "authorized user (6 -> 7)"
       ]
     },
     {
@@ -470,12 +506,28 @@
       "detail": "Request failed after retries: AbortError: This operation was aborted"
     },
     {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 76,
+      "cardName": "Target Circle Credit Card",
+      "issuer": "TD Bank / Target",
+      "detail": "Last reviewed 2026-05-17 (183 days ago); review budget is 90 days."
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 77,
       "cardName": "Capital One Walmart Rewards (legacy)",
       "issuer": "Capital One / Walmart",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 82,
+      "cardName": "BMO eclipse Visa Infinite",
+      "issuer": "BMO",
+      "detail": "Last reviewed 2026-05-17 (183 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_GONE",
@@ -489,13 +541,13 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 87,
-      "cardName": "National Bank World Elite Mastercard",
-      "issuer": "National Bank of Canada",
-      "url": "https://www.nbc.ca/personal/mastercard-credit-cards/world-elite.html",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "cardId": 83,
+      "cardName": "CIBC Aventura Visa Infinite",
+      "issuer": "CIBC",
+      "url": "https://www.cibc.com/en/personal-banking/credit-cards/all-credit-cards/aventura-visa-infinite-card.html",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (62 -> 73)"
+        "points (83 -> 82)"
       ]
     },
     {
@@ -518,17 +570,59 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
+      "cardId": 91,
+      "cardName": "Chase Freedom Rise",
+      "issuer": "Chase",
+      "url": "https://creditcards.chase.com/cash-back-credit-cards/freedom/rise",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (8 -> 6)",
+        "statement credit (6 -> 4)",
+        "points (18 -> 16)",
+        "cash back (36 -> 26)",
+        "foreign transaction (5 -> 3)"
+      ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 92,
+      "cardName": "Chase Slate Credit Card",
+      "issuer": "Chase",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
       "cardId": 93,
       "cardName": "Chase Ink Business Premier",
       "issuer": "Chase",
       "url": "https://creditcards.chase.com/business-credit-cards/ink/premier",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (9 -> 7)",
-        "statement credit (1 -> 0)",
-        "points (16 -> 14)",
-        "cash back (44 -> 39)",
-        "foreign transaction (5 -> 3)"
+        "annual fee (7 -> 9)",
+        "statement credit (0 -> 1)",
+        "points (14 -> 16)",
+        "cash back (39 -> 44)",
+        "foreign transaction (3 -> 5)"
+      ]
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 94,
+      "cardName": "United Business Card",
+      "issuer": "Chase / United Airlines",
+      "url": "https://creditcards.chase.com/business-credit-cards/united/united-business-card",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (12 -> 10)",
+        "statement credit (42 -> 30)",
+        "points (6 -> 5)",
+        "miles (82 -> 62)",
+        "cash back (5 -> 3)",
+        "bonus (27 -> 25)",
+        "foreign transaction (8 -> 3)"
       ]
     },
     {
@@ -538,15 +632,11 @@
       "cardName": "World of Hyatt Business Credit Card",
       "issuer": "Chase / Hyatt",
       "url": "https://creditcards.chase.com/business-credit-cards/world-of-hyatt/hyatt-business-card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (10 -> 8)",
-        "statement credit (7 -> 5)",
-        "points (59 -> 56)",
-        "miles (4 -> 2)",
-        "cash back (5 -> 3)",
-        "bonus (55 -> 54)",
-        "foreign transaction (9 -> 4)"
+        "points (56 -> 54)",
+        "bonus (54 -> 52)",
+        "authorized user (5 -> 6)"
       ]
     },
     {
@@ -556,12 +646,12 @@
       "cardName": "Southwest Rapid Rewards Premier Business",
       "issuer": "Chase / Southwest Airlines",
       "url": "https://creditcards.chase.com/business-credit-cards/southwest/premier-business",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (9 -> 7)",
-        "points (33 -> 31)",
-        "cash back (5 -> 3)",
-        "foreign transaction (9 -> 4)"
+        "annual fee (7 -> 9)",
+        "points (31 -> 33)",
+        "cash back (3 -> 5)",
+        "foreign transaction (4 -> 9)"
       ]
     },
     {
@@ -571,11 +661,27 @@
       "cardName": "Capital One VentureOne Rewards",
       "issuer": "Capital One",
       "url": "https://www.capitalone.com/credit-cards/ventureone/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (0 -> 2)",
-        "cash back (2 -> 3)"
+        "points (2 -> 0)",
+        "cash back (3 -> 2)"
       ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 101,
+      "cardName": "Citi Simplicity Card",
+      "issuer": "Citi",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 102,
+      "cardName": "Citi Diamond Preferred Card",
+      "issuer": "Citi",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
     },
     {
       "kind": "CONTENT_CHANGED",
@@ -584,13 +690,13 @@
       "cardName": "Wells Fargo Autograph Journey",
       "issuer": "Wells Fargo",
       "url": "https://creditcards.wellsfargo.com/autograph-journey-visa-credit-card/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (6 -> 10)",
-        "points (52 -> 51)",
-        "cash back (4 -> 3)",
-        "bonus (11 -> 18)",
-        "foreign transaction (6 -> 1)"
+        "annual fee (10 -> 6)",
+        "points (51 -> 52)",
+        "cash back (3 -> 4)",
+        "bonus (18 -> 11)",
+        "foreign transaction (1 -> 6)"
       ]
     },
     {
@@ -600,22 +706,6 @@
       "cardName": "Wells Fargo Attune",
       "issuer": "Wells Fargo",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
-    },
-    {
-      "kind": "CONTENT_CHANGED",
-      "severity": "medium",
-      "cardId": 109,
-      "cardName": "Wells Fargo Attune",
-      "issuer": "Wells Fargo",
-      "url": "https://creditcards.wellsfargo.com/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
-      "changedTerms": [
-        "annual fee (21 -> 41)",
-        "statement credit (2 -> 4)",
-        "points (68 -> 79)",
-        "cash back (2 -> 1)",
-        "bonus (44 -> 36)"
-      ]
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -655,6 +745,14 @@
       "observedValue": "0, 295"
     },
     {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 117,
+      "cardName": "Navy Federal More Rewards American Express",
+      "issuer": "Navy Federal Credit Union",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
       "kind": "LOW_CONFIDENCE",
       "severity": "medium",
       "cardId": 118,
@@ -673,14 +771,67 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
+      "cardId": 122,
+      "cardName": "Hawaiian Airlines Business Mastercard",
+      "issuer": "Barclays / Hawaiian Airlines",
+      "url": "https://frequentmiler.com/hawaiian-airlines-cards-issued-by-barclays-still-available-for-now/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "points (18 -> 19)",
+        "bonus (8 -> 10)"
+      ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 127,
+      "cardName": "SoFi Unlimited 2% Credit Card",
+      "issuer": "SoFi",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 128,
+      "cardName": "SoFi Everyday Cash Rewards Credit Card",
+      "issuer": "SoFi",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 129,
+      "cardName": "Venmo Visa Signature Credit Card",
+      "issuer": "Venmo / Synchrony",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 130,
+      "cardName": "Alliant Cashback Visa Signature",
+      "issuer": "Alliant Credit Union",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 131,
+      "cardName": "Wells Fargo Signify Business Cash",
+      "issuer": "Wells Fargo",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
       "cardId": 131,
       "cardName": "Wells Fargo Signify Business Cash",
       "issuer": "Wells Fargo",
       "url": "https://creditcards.wellsfargo.com/business-credit-cards/signify-business-cash-credit-card/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (15 -> 11)",
-        "bonus (6 -> 4)"
+        "annual fee (11 -> 15)",
+        "bonus (4 -> 6)"
       ]
     },
     {
@@ -709,14 +860,46 @@
       "cardName": "Wells Fargo One Key+ Card",
       "issuer": "Wells Fargo",
       "url": "https://creditcards.wellsfargo.com/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (41 -> 21)",
-        "statement credit (4 -> 2)",
-        "points (79 -> 68)",
-        "cash back (1 -> 2)",
-        "bonus (36 -> 44)"
+        "annual fee (21 -> 41)",
+        "statement credit (2 -> 4)",
+        "points (68 -> 79)",
+        "cash back (2 -> 1)",
+        "bonus (44 -> 36)"
       ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 139,
+      "cardName": "FNBO Evergreen Rewards Visa",
+      "issuer": "FNBO",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 140,
+      "cardName": "FNBO Getaway",
+      "issuer": "FNBO",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 141,
+      "cardName": "PenFed Power Cash Rewards Visa Signature",
+      "issuer": "PenFed Credit Union",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 142,
+      "cardName": "PenFed Platinum Rewards Visa Signature",
+      "issuer": "PenFed Credit Union",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -725,6 +908,22 @@
       "cardName": "PenFed Pathfinder Rewards Visa Signature",
       "issuer": "PenFed Credit Union",
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 145,
+      "cardName": "TD Clear Visa Platinum",
+      "issuer": "TD Bank",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 149,
+      "cardName": "Bread Cashback American Express",
+      "issuer": "Bread Financial / Comenity Capital Bank",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_GONE",
@@ -738,20 +937,68 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
+      "cardId": 150,
+      "cardName": "American Express Graphite Business Cash Unlimited",
+      "issuer": "American Express",
+      "url": "https://www.americanexpress.com/us/credit-cards/business/business-credit-cards/graphite-business-cash-unlimited-card/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "cash back (42 -> 38)",
+        "foreign transaction (3 -> 6)"
+      ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 151,
+      "cardName": "American Express Business Green Rewards",
+      "issuer": "American Express",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
       "cardId": 154,
       "cardName": "Delta SkyMiles Reserve Business American Express",
       "issuer": "American Express / Delta",
       "url": "https://www.americanexpress.com/en-us/business/credit-cards/delta-skymiles-reserve/",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (10 -> 6)",
-        "statement credit (13 -> 0)",
-        "miles (60 -> 0)",
-        "welcome offer (2 -> 0)",
-        "lounge (28 -> 3)",
-        "global entry (4 -> 0)",
-        "tsa precheck (5 -> 0)",
-        "foreign transaction (1 -> 0)"
+        "annual fee (6 -> 10)",
+        "statement credit (0 -> 13)",
+        "miles (0 -> 60)",
+        "welcome offer (0 -> 2)",
+        "lounge (3 -> 28)",
+        "global entry (0 -> 4)",
+        "tsa precheck (0 -> 5)",
+        "foreign transaction (0 -> 1)"
+      ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 157,
+      "cardName": "Capital One Spark 1% Classic",
+      "issuer": "Capital One",
+      "detail": "Last reviewed 2026-05-18 (182 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 158,
+      "cardName": "IHG One Rewards Business Credit Card",
+      "issuer": "Chase / IHG",
+      "url": "https://creditcards.chase.com/business-credit-cards/IHG/business",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "annual fee (12 -> 10)",
+        "statement credit (31 -> 22)",
+        "points (85 -> 79)",
+        "miles (3 -> 2)",
+        "cash back (5 -> 3)",
+        "global entry (10 -> 6)",
+        "tsa precheck (11 -> 7)",
+        "foreign transaction (9 -> 4)"
       ]
     },
     {
@@ -761,17 +1008,25 @@
       "cardName": "United Club Business Card",
       "issuer": "Chase / United",
       "url": "https://creditcards.chase.com/business-credit-cards/united/united-club-business",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (13 -> 11)",
-        "statement credit (42 -> 30)",
-        "points (7 -> 6)",
-        "miles (88 -> 69)",
-        "cash back (5 -> 3)",
-        "lounge (6 -> 5)",
-        "foreign transaction (8 -> 3)",
-        "authorized user (22 -> 21)"
+        "annual fee (11 -> 13)",
+        "statement credit (30 -> 42)",
+        "points (6 -> 7)",
+        "miles (69 -> 88)",
+        "cash back (3 -> 5)",
+        "lounge (5 -> 6)",
+        "foreign transaction (3 -> 8)",
+        "authorized user (21 -> 22)"
       ]
+    },
+    {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 161,
+      "cardName": "Bank of America Business Advantage Unlimited Cash Rewards",
+      "issuer": "Bank of America",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
     },
     {
       "kind": "LOW_CONFIDENCE",
@@ -798,6 +1053,14 @@
       "detail": "dataConfidence is \"needs-review\" — these rules were never confirmed against an issuer source."
     },
     {
+      "kind": "STALE_REVIEW",
+      "severity": "medium",
+      "cardId": 169,
+      "cardName": "BECU Cash Back Visa",
+      "issuer": "BECU",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
       "kind": "PAGE_REDIRECTED",
       "severity": "medium",
       "cardId": 169,
@@ -808,35 +1071,49 @@
       "observedValue": "https://www.becu.org/everyday-banking/credit-card/cash-back-credit-card"
     },
     {
-      "kind": "CONTENT_CHANGED",
-      "severity": "medium",
-      "cardId": 169,
-      "cardName": "BECU Cash Back Visa",
-      "issuer": "BECU",
-      "url": "https://www.becu.org/everyday-banking/credit-card/cash-back-visa",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
-      "changedTerms": [
-        "annual fee (6 -> 5)",
-        "statement credit (2 -> 3)",
-        "points (5 -> 4)",
-        "cash back (57 -> 42)",
-        "bonus (8 -> 7)"
-      ]
-    },
-    {
-      "kind": "CONTENT_CHANGED",
+      "kind": "STALE_REVIEW",
       "severity": "medium",
       "cardId": 170,
       "cardName": "BECU Low Rate Visa",
       "issuer": "BECU",
-      "url": "https://www.becu.org/everyday-banking/credit-card/low-rate-credit-card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "detail": "Last reviewed 2026-05-19 (181 days ago); review budget is 90 days."
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 173,
+      "cardName": "Standard Chartered Cathay Mastercard",
+      "issuer": "Standard Chartered Hong Kong / Cathay",
+      "url": "https://www.sc.com/hk/credit-cards/cathay/",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "annual fee (9 -> 8)",
-        "statement credit (1 -> 0)",
-        "cash back (25 -> 6)",
-        "bonus (5 -> 0)",
-        "foreign transaction (2 -> 1)"
+        "miles (152 -> 150)",
+        "bonus (18 -> 17)"
+      ]
+    },
+    {
+      "kind": "PAGE_REDIRECTED",
+      "severity": "medium",
+      "cardId": 176,
+      "cardName": "Citi Cash Back Card (Hong Kong)",
+      "issuer": "Citi Hong Kong",
+      "url": "https://www1.citibank.com.hk/english/credit-cards/cash-back-card",
+      "detail": "sourceUrl redirects to https://www.citibank.com.hk/en/credit-cards/cashback-card/index.html. Update sourceUrl, and check whether the product changed.",
+      "observedValue": "https://www.citibank.com.hk/en/credit-cards/cashback-card/index.html"
+    },
+    {
+      "kind": "CONTENT_CHANGED",
+      "severity": "medium",
+      "cardId": 176,
+      "cardName": "Citi Cash Back Card (Hong Kong)",
+      "issuer": "Citi Hong Kong",
+      "url": "https://www1.citibank.com.hk/english/credit-cards/cash-back-card",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
+      "changedTerms": [
+        "points (1 -> 7)",
+        "miles (1 -> 2)",
+        "cash back (14 -> 9)",
+        "lounge (0 -> 3)"
       ]
     },
     {
@@ -850,40 +1127,32 @@
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 186,
-      "cardName": "Bilt Blue Card",
-      "issuer": "Column N.A. / Bilt",
-      "url": "https://www.bilt.com/card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "cardId": 179,
+      "cardName": "OCBC 365 Credit Card",
+      "issuer": "OCBC Singapore",
+      "url": "https://www.ocbc.com/personal-banking/cards/365-cashback-credit-card",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (43 -> 50)",
-        "bonus (10 -> 9)"
+        "miles (1 -> 0)"
       ]
     },
     {
       "kind": "CONTENT_CHANGED",
       "severity": "medium",
-      "cardId": 187,
-      "cardName": "Bilt Obsidian Card",
-      "issuer": "Column N.A. / Bilt",
-      "url": "https://www.bilt.com/card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
+      "cardId": 183,
+      "cardName": "IHG One Rewards Premier Select Credit Card",
+      "issuer": "Chase / IHG",
+      "url": "https://creditcards.chase.com/travel-credit-cards/ihg-rewards-club/premier-select",
+      "detail": "Page text changed since 2026-11-09 in terms that affect card rules.",
       "changedTerms": [
-        "points (43 -> 50)",
-        "bonus (10 -> 9)"
-      ]
-    },
-    {
-      "kind": "CONTENT_CHANGED",
-      "severity": "medium",
-      "cardId": 188,
-      "cardName": "Bilt Palladium Card",
-      "issuer": "Column N.A. / Bilt",
-      "url": "https://www.bilt.com/card",
-      "detail": "Page text changed since 2026-11-02 in terms that affect card rules.",
-      "changedTerms": [
-        "points (43 -> 50)",
-        "bonus (10 -> 9)"
+        "annual fee (12 -> 10)",
+        "statement credit (22 -> 14)",
+        "points (81 -> 76)",
+        "cash back (5 -> 3)",
+        "bonus (25 -> 23)",
+        "global entry (12 -> 6)",
+        "tsa precheck (13 -> 7)",
+        "foreign transaction (8 -> 4)"
       ]
     },
     {
@@ -892,31 +1161,7 @@
       "cardId": 7,
       "cardName": "Citi Custom Cash",
       "issuer": "Citi",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 19,
-      "cardName": "Wells Fargo Active Cash",
-      "issuer": "Wells Fargo",
-      "detail": "Last reviewed 2026-05-17 (176 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 59,
-      "cardName": "Hilton Honors American Express",
-      "issuer": "American Express / Hilton",
-      "detail": "Last reviewed 2026-05-17 (176 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 61,
-      "cardName": "Citi / AAdvantage MileUp",
-      "issuer": "Citi / American Airlines",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -924,15 +1169,7 @@
       "cardId": 65,
       "cardName": "AAdvantage Aviator Red World Elite",
       "issuer": "Barclays / American Airlines",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 76,
-      "cardName": "Target Circle Credit Card",
-      "issuer": "TD Bank / Target",
-      "detail": "Last reviewed 2026-05-17 (176 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -940,15 +1177,7 @@
       "cardId": 77,
       "cardName": "Capital One Walmart Rewards (legacy)",
       "issuer": "Capital One / Walmart",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 82,
-      "cardName": "BMO eclipse Visa Infinite",
-      "issuer": "BMO",
-      "detail": "Last reviewed 2026-05-17 (176 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -956,7 +1185,7 @@
       "cardId": 89,
       "cardName": "American Express Blue Business Cash",
       "issuer": "American Express",
-      "detail": "Last reviewed 2026-05-21 (172 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-05-21 (179 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -964,31 +1193,7 @@
       "cardId": 90,
       "cardName": "American Express Blue Business Plus",
       "issuer": "American Express",
-      "detail": "Last reviewed 2026-05-21 (172 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 92,
-      "cardName": "Chase Slate Credit Card",
-      "issuer": "Chase",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 101,
-      "cardName": "Citi Simplicity Card",
-      "issuer": "Citi",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 102,
-      "cardName": "Citi Diamond Preferred Card",
-      "issuer": "Citi",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-05-21 (179 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -996,7 +1201,7 @@
       "cardId": 107,
       "cardName": "Bank of America Customized Cash Rewards Secured",
       "issuer": "Bank of America",
-      "detail": "Last reviewed 2026-08-07 (94 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-07 (101 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -1004,7 +1209,7 @@
       "cardId": 109,
       "cardName": "Wells Fargo Attune",
       "issuer": "Wells Fargo",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -1012,47 +1217,7 @@
       "cardId": 112,
       "cardName": "U.S. Bank Shopper Cash Rewards Visa Signature",
       "issuer": "U.S. Bank",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 117,
-      "cardName": "Navy Federal More Rewards American Express",
-      "issuer": "Navy Federal Credit Union",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 127,
-      "cardName": "SoFi Unlimited 2% Credit Card",
-      "issuer": "SoFi",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 128,
-      "cardName": "SoFi Everyday Cash Rewards Credit Card",
-      "issuer": "SoFi",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 129,
-      "cardName": "Venmo Visa Signature Credit Card",
-      "issuer": "Venmo / Synchrony",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 130,
-      "cardName": "Alliant Cashback Visa Signature",
-      "issuer": "Alliant Credit Union",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_BLOCKED",
@@ -1066,42 +1231,10 @@
     {
       "kind": "STALE_REVIEW",
       "severity": "low",
-      "cardId": 131,
-      "cardName": "Wells Fargo Signify Business Cash",
-      "issuer": "Wells Fargo",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
       "cardId": 136,
       "cardName": "Verizon Visa Card",
       "issuer": "Verizon / Synchrony",
-      "detail": "Last reviewed 2026-05-21 (172 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 139,
-      "cardName": "FNBO Evergreen Rewards Visa",
-      "issuer": "FNBO",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 140,
-      "cardName": "FNBO Getaway",
-      "issuer": "FNBO",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 141,
-      "cardName": "PenFed Power Cash Rewards Visa Signature",
-      "issuer": "PenFed Credit Union",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-05-21 (179 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_BLOCKED",
@@ -1111,14 +1244,6 @@
       "issuer": "PenFed Credit Union",
       "url": "https://www.penfed.org/credit-cards/power-cash-rewards-visa",
       "detail": "Source page returns HTTP 403; automated checks cannot cover this card."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 142,
-      "cardName": "PenFed Platinum Rewards Visa Signature",
-      "issuer": "PenFed Credit Union",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
     },
     {
       "kind": "PAGE_BLOCKED",
@@ -1132,50 +1257,10 @@
     {
       "kind": "STALE_REVIEW",
       "severity": "low",
-      "cardId": 145,
-      "cardName": "TD Clear Visa Platinum",
-      "issuer": "TD Bank",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 149,
-      "cardName": "Bread Cashback American Express",
-      "issuer": "Bread Financial / Comenity Capital Bank",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 151,
-      "cardName": "American Express Business Green Rewards",
-      "issuer": "American Express",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 157,
-      "cardName": "Capital One Spark 1% Classic",
-      "issuer": "Capital One",
-      "detail": "Last reviewed 2026-05-18 (175 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 161,
-      "cardName": "Bank of America Business Advantage Unlimited Cash Rewards",
-      "issuer": "Bank of America",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
       "cardId": 166,
       "cardName": "Capital One Spark 2X Miles",
       "issuer": "Capital One",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     },
     {
       "kind": "STALE_REVIEW",
@@ -1183,42 +1268,26 @@
       "cardId": 167,
       "cardName": "Capital One Spark 1.5X Miles Select",
       "issuer": "Capital One",
-      "detail": "Last reviewed 2026-08-06 (95 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 169,
-      "cardName": "BECU Cash Back Visa",
-      "issuer": "BECU",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
-    },
-    {
-      "kind": "STALE_REVIEW",
-      "severity": "low",
-      "cardId": 170,
-      "cardName": "BECU Low Rate Visa",
-      "issuer": "BECU",
-      "detail": "Last reviewed 2026-05-19 (174 days ago); review budget is 90 days."
+      "detail": "Last reviewed 2026-08-06 (102 days ago); review budget is 90 days."
     }
   ],
   "stats": {
     "byKind": {
       "PRODUCT_DISCONTINUED": 2,
       "ANNUAL_FEE_MISMATCH": 11,
-      "CONTENT_CHANGED": 31,
+      "CONTENT_CHANGED": 35,
       "LOW_CONFIDENCE": 22,
-      "PAGE_GONE": 5,
-      "PAGE_REDIRECTED": 4,
       "STALE_REVIEW": 36,
+      "PAGE_GONE": 5,
+      "PAGE_REDIRECTED": 5,
       "PAGE_BLOCKED": 3
     },
     "bySeverity": {
       "high": 10,
-      "medium": 65,
-      "low": 39
+      "medium": 95,
+      "low": 14
     },
     "stalestReviewDate": "2026-05-17",
-    "medianReviewAgeDays": 9
+    "medianReviewAgeDays": 16
   }
 }
