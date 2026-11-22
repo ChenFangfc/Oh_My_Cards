@@ -1,19 +1,12 @@
 # Card rule change watch
 
-Generated 2026-11-21T14:50:13.401Z · window since 2026-10-31
+Generated 2026-11-22T14:46:30.294Z · window since 2026-10-31
 
-2 feed items mention a catalog card alongside change language.
+1 feed items mention a catalog card alongside change language.
 
-### Amex Blue Cash Everyday Review: A No Annual Fee Card With Solid Bonus Categories 
+### (Confirmed) US Bank Altitude Connect GigSky benefit may end 11/30/26 On a recent podcast episode about hidden gem credit cards, we extolled the benefits of the 
 
-- feed: One Mile at a Time · published Sat, 21 Nov 2026 14:33:12 +0000
-- cards: #11 Amex Blue Cash Everyday
-- signals: annual fee, bonus categor
-- https://onemileatatime.com/reviews/credit-cards/american-express/blue-cash-everyday-card/
-
-### Capital One VentureOne Rewards Credit Card review: Simple travel rewards without an annual fee 
-
-- feed: The Points Guy · published 2026-11-20T17:00:56.000Z
-- cards: #98 Capital One VentureOne Rewards
-- signals: annual fee, credit
-- https://thepointsguy.com/credit-cards/reviews/credit-card-review-the-capital-one-ventureone-rewards-credit-card/
+- feed: Frequent Miler · published Sat, 21 Nov 2026 16:45:10 +0000
+- cards: #25 US Bank Altitude Connect
+- signals: credit
+- https://frequentmiler.com/us-bank-altitude-connect-gigsky-benefit-may-end-11-30-26/
